@@ -1,0 +1,237 @@
+body{
+    width:100%;
+    /*
+    background: rgb(2,0,36);
+    background: linear-gradient(90deg, rgba(2,0,36,1) 0%, rgba(9,62,121,1) 6%, rgba(0,212,255,1) 100%);
+    */
+    background-color:white;
+    font-family: 'Work Sans', sans-serif;
+}
+#prompt{
+    margin-left:auto;
+    margin-right:auto;
+    font-size:28px;
+    font-weight:bold;
+    margin:20px;
+    align:center;
+}
+#answer{
+    margin-left:auto;
+    margin-right:auto;
+    font-size:22px;
+    font-weight:bold;
+    margin:20px;
+    align:center;
+    
+}
+
+#settings{
+    position:absolute;
+    min-height:200px;
+    min-width:100px;
+    top:20px;
+    right:10px; 
+    height:500px;
+    text-align:left;
+}
+
+#history{
+    position:absolute;
+    min-height:200px;
+    min-width:310px;
+    max-width: 310px;
+    overflow-x:hidden;
+    top:20px;
+    left:10px;	
+    text-align:left;
+    height:500px;
+    overflow-y:auto;
+}
+
+#donate-links{
+    position:absolute;
+    height:45px;
+    min-width:310px;
+    bottom:3px;
+    left:10px;
+    padding-top:1px;
+}
+.button{
+    background-color:#0a0a23;
+    color: #fff;
+    border:none; 
+    border-radius:10px; 
+    padding:15px;
+    min-height:30px; 
+    min-width: 120px;
+    cursor:pointer;
+}
+
+.header{
+    font-size:36px;
+    font-weight:bold;
+}
+
+.sub-header{
+    font-size:24px;
+    font-weight:bold;
+}
+#button-container  > * {
+    
+    display: inline-block;
+    vertical-align: middle;
+}
+#container{
+    margin: auto;
+    text-align: center;
+}
+
+#content{
+    min-height:400px;
+}
+
+.panel{
+    -webkit-box-shadow:0px 5px 10px #1c1c1c;
+    -moz-box-shadow:0px 5px 10px #1c1c1c;
+    box-shadow:0px 5px 10px #1c1c1c;
+    border:none; 
+    border-radius:10px;
+    background-color:rgb(231, 233, 235);
+    padding:15px;
+}
+
+.flip-card {
+    background-color: transparent;
+    height: 300px;
+    perspective: 1000px; /* Remove this if you don't want the 3D effect */
+    border-radius:10px;
+    padding:0px;
+    font-family: 'Work Sans', sans-serif;
+    font-weight: 900;
+    font-size: 8vw;
+    text-transform: uppercase;
+    
+
+}
+
+/* This container is needed to position the front and back side */
+.flip-card-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  text-align: center;
+  transition: transform 0.8s;
+  transform-style: preserve-3d;
+  background-color:rgb(231, 233, 235);
+  border-radius:10px;
+  line-height: 50px;
+  border-style: solid;
+    border-width: 5px;
+    border-color: #04AA6D;
+}
+
+/* Do an horizontal flip when you move the mouse over the flip box container */
+.flip-card-flipped .flip-card-inner {
+  transform: rotateY(180deg);
+}
+
+/* Position the front and back side */
+.flip-card-front, .flip-card-back {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  -webkit-backface-visibility: hidden; /* Safari */
+  backface-visibility: hidden;
+}
+
+/* Style the front side (fallback if image is missing) */
+.flip-card-front {
+  color: black;
+}
+
+/* Style the back side */
+.flip-card-back {
+  background-color:rgb(231, 233, 235);
+  transform: rotateY(180deg);
+  border-radius:10px;
+}
+
+#flip-button{
+    width:75px;
+    height:75px;
+    cursor:pointer;
+    transition: all 0.5s;
+}
+
+#flip-button:hover{
+    transform: scale(0.98);
+
+}
+
+.center-content{
+    margin:auto;
+    margin-top:15px;
+    margin-bottom:15px;
+    width: 50%;
+    padding:15px;
+}
+
+#help-icon{
+    width:50px;
+    height:50px;
+}
+
+#hint-container{
+    height:50px;
+    font-weight:bold;
+}
+
+
+.history-item{
+    margin-bottom:5px;
+    cursor:pointer;
+    border-radius:5px;
+    padding:3px;
+    
+}
+.history-item:hover{
+    background-color: #04AA6D!important;
+    color: #ffffff!important;
+    
+}
+
+.selected-history-item{
+    background-color: #04AA6D!important;
+    color: #ffffff!important;
+    font-weight:bold;		
+}
+::-webkit-scrollbar{
+    width: 10px;
+}
+
+::-webkit-scrollbar-track-piece{
+    background-color: #FFF;
+}
+
+::-webkit-scrollbar-thumb{
+    background-color: #CBCBCB;
+    outline: 2px solid #FFF;
+    outline-offset: -2px;
+    border: .1px solid #B7B7B7;
+}
+
+::-webkit-scrollbar-thumb:hover{
+    background-color: #909090;
+}
+
+select{
+    margin-top:5px;
+}
+
+select:invalid { color: gray; }
+
+.prompt-text{
+    font-weight: 900;
+    color: #04AA6D;
+    /*text-shadow: black 0.1em 0.1em 0.2em*/
+}
