@@ -11,17 +11,17 @@
           "drugs_group_b": {
             "name": "Drugs Group B",
             "description": "Collection of drug generic names and brand names",
-            "url": "https://kenji776.github.io/SimpleFlashChard/groupB.cards"
+            "url": "https://kenji776.github.io/SimpleFlashChard/GroupB.cards"
           },
           "drugs_group_c": {
             "name": "Drugs Group C",
             "description": "Collection of drug generic names and brand names",
-            "url": "https://kenji776.github.io/SimpleFlashChard/groupC.cards"
+            "url": "https://kenji776.github.io/SimpleFlashChard/GroupC.cards"
           },
           "drugs_group_d": {
             "name": "Drugs Group D",
             "description": "Collection of drug generic names and brand names",
-            "url": "https://kenji776.github.io/SimpleFlashChard/groupD.cards"
+            "url": "https://kenji776.github.io/SimpleFlashChard/GroupD.cards"
           }
         }
       ]

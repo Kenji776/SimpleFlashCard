@@ -18,7 +18,7 @@ var selectedDeckCategory = 'pharmacy'
 
 async function loadCardLibrary(){
     console.log('Loading card library');
-    const response = await fetch("https://kenji776.github.io/SimpleFlashChard/cardLibrary.json");
+    const response = await fetch("https://kenji776.github.io/SimpleFlashChard/cardLibrary.json?cache-invalidate="+Date.now(), {cache: "no-store"});
     const cardLibrary = await response.json();
     console.log(cardLibrary);
 
@@ -48,7 +48,7 @@ async function loadDeck(deckUrl){
         return;
     }
     console.log('Loading card library: ' + deckUrl);
-    const response = await fetch(deckUrl);
+    const response = await fetch(deckUrl+'?cache-invalidate='+Date.now(), {cache: "no-store"});
     const deckData = await response.json();
     console.log(deckData);
 
