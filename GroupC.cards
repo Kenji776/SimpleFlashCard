@@ -1,0 +1,433 @@
+{
+  "config": {
+    "promptKeys": [
+      {
+        "value": "genericName",
+        "label": "Generic Name"
+      },
+      {
+        "value": "brandName",
+        "label": "Brand Name"
+      }
+    ],
+    "answerKeys": [
+      {
+        "value": "genericName",
+        "label": "Generic Name"
+      },
+      {
+        "value": "brandName",
+        "label": "Brand Name"
+      }
+    ],
+    "defaultPrompt": "genericName",
+    "defaultAnswer": "brandName",
+    "labels": {
+      "genericName": "Generic Name",
+      "brandName": "Brand Name",
+      "drugClassName": "Drug Class Name"
+    }
+  },
+  "cards": [
+    {
+      "genericName": "Amiodarone",
+      "brandName": "Cordarone, Pacerone",
+      "drugClassName": "Antiarrhythmic"
+    },
+    {
+      "genericName": "Amlodipine Besylate",
+      "brandName": "Norvasc",
+      "drugClassName": "Antihypertensive"
+    },
+    {
+      "genericName": "Amlodipine Besylate with Benazepril\nHydrochloride",
+      "brandName": "Lotrel",
+      "drugClassName": "Antihypertensive"
+    },
+    {
+      "genericName": "Amphetamine with Dextroamphetamine\nSalts",
+      "brandName": "Adderall, Adderall XR",
+      "drugClassName": "CNS agent for ADHD"
+    },
+    {
+      "genericName": "Anastrozole",
+      "brandName": "Arimidex",
+      "drugClassName": "Antineoplastic"
+    },
+    {
+      "genericName": "Apixaban",
+      "brandName": "Eliquis",
+      "drugClassName": "Hematological agent"
+    },
+    {
+      "genericName": "Atenolol",
+      "brandName": "Tenormin",
+      "drugClassName": "Antihypertensive"
+    },
+    {
+      "genericName": "Atomoxetine Hydrochloride",
+      "brandName": "Strattera",
+      "drugClassName": "CNS agent for ADHD"
+    },
+    {
+      "genericName": "Atorvastatin Calcium",
+      "brandName": "Lipitor",
+      "drugClassName": "Antihyperlipidemic"
+    },
+    {
+      "genericName": "Benazepril Hydrochloride",
+      "brandName": "Lotensin",
+      "drugClassName": "Antihypertensive"
+    },
+    {
+      "genericName": "Bumetanide",
+      "brandName": "Bumex",
+      "drugClassName": "Diuretic"
+    },
+    {
+      "genericName": "Carvedilol",
+      "brandName": "Coreg, Coreg CR",
+      "drugClassName": "Antihypertensive"
+    },
+    {
+      "genericName": "Chlorhexidine Gluconate",
+      "brandName": "Peridex, Periogard",
+      "drugClassName": "Antiplaque rinse"
+    },
+    {
+      "genericName": "Chlorthalidone",
+      "brandName": "Hygroton",
+      "drugClassName": "Diuretic"
+    },
+    {
+      "genericName": "Cholestyramine resin",
+      "brandName": "Questran",
+      "drugClassName": "Antihyperlipidemic"
+    },
+    {
+      "genericName": "Clonidine Hydrochloride",
+      "brandName": "Catapres, Nexiclon XR, Kapvay",
+      "drugClassName": "Antihypertensive"
+    },
+    {
+      "genericName": "Clopidogrel Bisulfate",
+      "brandName": "Plavix",
+      "drugClassName": "Hematological agent"
+    },
+    {
+      "genericName": "Colestipol Hydrochloride",
+      "brandName": "Colestid",
+      "drugClassName": "Antihyperlipidemic"
+    },
+    {
+      "genericName": "Cyanocobalamin (Vitamin B12)",
+      "brandName": "Nascobal",
+      "drugClassName": "Hematological agent"
+    },
+    {
+      "genericName": "Dabigatran Etexilate Mesylate",
+      "brandName": "Pradaxa",
+      "drugClassName": "Hematological agent"
+    },
+    {
+      "genericName": "Dexmethylphenidate Hydrochloride",
+      "brandName": "Focalin, Focalin XR",
+      "drugClassName": "CNS agent for ADHD"
+    },
+    {
+      "genericName": "Diltiazem Hydrochloride",
+      "brandName": "Cardizem (CD), Cartia, Dilacor, Dilt-XR,\nTiazac",
+      "drugClassName": "Antihypertensive / antianginal"
+    },
+    {
+      "genericName": "Dipyridamole with Aspirin",
+      "brandName": "Aggrenox",
+      "drugClassName": "Antiplatelet agent"
+    },
+    {
+      "genericName": "Dofetilide",
+      "brandName": "Tikosyn",
+      "drugClassName": "Antiarrhythmic"
+    },
+    {
+      "genericName": "Doxazosin Mesylate",
+      "brandName": "Cardura, Cardura XL",
+      "drugClassName": "Antihypertensive / BPH agent"
+    },
+    {
+      "genericName": "Enalapril Maleate",
+      "brandName": "Vasotec, Epaned",
+      "drugClassName": "Antihypertensive"
+    },
+    {
+      "genericName": "Ezetimibe",
+      "brandName": "Zetia",
+      "drugClassName": "Antihyperlipidemic"
+    },
+    {
+      "genericName": "Fenofibrate",
+      "brandName": "Tricor, Lipofen",
+      "drugClassName": "Antihyperlipidemic"
+    },
+    {
+      "genericName": "Flecainide",
+      "brandName": "Tambocor",
+      "drugClassName": "Antiarrhythmic"
+    },
+    {
+      "genericName": "Fosinopril sodium",
+      "brandName": "Monopril",
+      "drugClassName": "Antihypertensive"
+    },
+    {
+      "genericName": "Furosemide",
+      "brandName": "Lasix",
+      "drugClassName": "Diuretic"
+    },
+    {
+      "genericName": "Gemfibrozil",
+      "brandName": "Lopid",
+      "drugClassName": "Antihyperlipidemic"
+    },
+    {
+      "genericName": "Guanfacine Hydrochloride",
+      "brandName": "Intuniv",
+      "drugClassName": "Antihypertensive/antipsychotic"
+    },
+    {
+      "genericName": "Hydralazine Hydrochloride",
+      "brandName": "Apresoline",
+      "drugClassName": "Antihypertensive"
+    },
+    {
+      "genericName": "Hydrochlorothiazide",
+      "brandName": "Microzide",
+      "drugClassName": "Diuretic"
+    },
+    {
+      "genericName": "Icosapent Ethyl",
+      "brandName": "Vascepa",
+      "drugClassName": "Antihyperlipidemic"
+    },
+    {
+      "genericName": "Irbesartan",
+      "brandName": "Avapro",
+      "drugClassName": "Antihypertensive"
+    },
+    {
+      "genericName": "Isosorbide Mononitrate",
+      "brandName": "Imdur",
+      "drugClassName": "Antianginal"
+    },
+    {
+      "genericName": "Labetalol Hydrochloride",
+      "brandName": "Normodyne, Trandate",
+      "drugClassName": "Antihypertensive"
+    },
+    {
+      "genericName": "Lisdexamfetamine Dimesylate",
+      "brandName": "Vyvanse",
+      "drugClassName": "CNS agent for ADHD"
+    },
+    {
+      "genericName": "Lisinopril",
+      "brandName": "Prinivil, Zestril",
+      "drugClassName": "Antihypertensive"
+    },
+    {
+      "genericName": "Lisinopril with Hydrochlorothiazide",
+      "brandName": "Zestoretic, Prinzide",
+      "drugClassName": "Antihypertensive"
+    },
+    {
+      "genericName": "Losartan Potassium",
+      "brandName": "Cozaar",
+      "drugClassName": "Antihypertensive"
+    },
+    {
+      "genericName": "Losartan Potassium with\nHydrochlorothiazide",
+      "brandName": "Hyzaar",
+      "drugClassName": "Antihypertensive"
+    },
+    {
+      "genericName": "Lovastatin",
+      "brandName": "Mevacor",
+      "drugClassName": "Antihyperlipidemic"
+    },
+    {
+      "genericName": "Methotrexate",
+      "brandName": "Trexall",
+      "drugClassName": "Antimetabolite"
+    },
+    {
+      "genericName": "Methylphenidate Hydrochloride",
+      "brandName": "Ritalin, Methylin, Metadate, Concerta",
+      "drugClassName": "CNS agent for ADHD"
+    },
+    {
+      "genericName": "Metolazone",
+      "brandName": "Zaroxolyn",
+      "drugClassName": "Diuretic"
+    },
+    {
+      "genericName": "Metoprolol Succinate",
+      "brandName": "Toprol-XL",
+      "drugClassName": "Antihypertensive"
+    },
+    {
+      "genericName": "Metoprolol Tartrate",
+      "brandName": "Lopressor",
+      "drugClassName": "Antihypertensive"
+    },
+    {
+      "genericName": "Modafinil",
+      "brandName": "Provigil",
+      "drugClassName": "Pseudosympathomimetic"
+    },
+    {
+      "genericName": "Nebivolol Hydrochloride",
+      "brandName": "Bystolic",
+      "drugClassName": "Antihypertensive"
+    },
+    {
+      "genericName": "Niacin (ER)",
+      "brandName": "Niaspan",
+      "drugClassName": "Antihyperlipidemic"
+    },
+    {
+      "genericName": "Nifedipine",
+      "brandName": "Procardia (XL), Nifedical XL, Adalat CC*",
+      "drugClassName": "Antihypertensive / Antianginal"
+    },
+    {
+      "genericName": "Nitroglycerin (Sublingual and Injectable)",
+      "brandName": "Nitrostat, Nitroquick",
+      "drugClassName": "Antianginal"
+    },
+    {
+      "genericName": "Olmesartan Medoxomil",
+      "brandName": "Benicar",
+      "drugClassName": "Antihypertensive"
+    },
+    {
+      "genericName": "Omega-3-Acid Ethyl Esters",
+      "brandName": "Lovaza",
+      "drugClassName": "Antihyperlipidemic"
+    },
+    {
+      "genericName": "Pravastatin Sodium",
+      "brandName": "Pravachol",
+      "drugClassName": "Antihyperlipidemic"
+    },
+    {
+      "genericName": "Prazosin Hydrochloride",
+      "brandName": "Minipress",
+      "drugClassName": "Antihypertensive"
+    },
+    {
+      "genericName": "Propranolol Hydrochloride",
+      "brandName": "Inderal, Inderal LA, Innopran XL",
+      "drugClassName": "Antihypertensive"
+    },
+    {
+      "genericName": "Ramipril",
+      "brandName": "Altace",
+      "drugClassName": "Antihypertensive"
+    },
+    {
+      "genericName": "Ranolazine",
+      "brandName": "Ranexa",
+      "drugClassName": "Antianginal"
+    },
+    {
+      "genericName": "Rivaroxaban",
+      "brandName": "Xarelto",
+      "drugClassName": "Anticoagulant"
+    },
+    {
+      "genericName": "Rosuvastatin Calcium",
+      "brandName": "Crestor",
+      "drugClassName": "Antihyperlipidemic"
+    },
+    {
+      "genericName": "Sacubitril and Valsartan",
+      "brandName": "Entresto",
+      "drugClassName": "Heart failure cardiovascular"
+    },
+    {
+      "genericName": "Sildenafil Citrate",
+      "brandName": "Viagra, Revatio",
+      "drugClassName": "Agent for erectile dysfunction"
+    },
+    {
+      "genericName": "Simvastatin",
+      "brandName": "Zocor",
+      "drugClassName": "Antihyperlipidemic"
+    },
+    {
+      "genericName": "Sodium Fluoride (paste)",
+      "brandName": "SF 5000 Plus",
+      "drugClassName": "Dentifrice"
+    },
+    {
+      "genericName": "Sotalol Hydrochloride",
+      "brandName": "Betapace",
+      "drugClassName": "Antiarrhythmic"
+    },
+    {
+      "genericName": "Spironolactone",
+      "brandName": "Aldactone",
+      "drugClassName": "Diuretic"
+    },
+    {
+      "genericName": "Tadalafil",
+      "brandName": "Cialis",
+      "drugClassName": "Agent for erectile dysfunction"
+    },
+    {
+      "genericName": "Tamoxifen Citrate",
+      "brandName": "Nolvadex",
+      "drugClassName": "Antineoplastic"
+    },
+    {
+      "genericName": "Telmisartan",
+      "brandName": "Micardis",
+      "drugClassName": "Antihypertensive"
+    },
+    {
+      "genericName": "Terazosin Hydrochloride",
+      "brandName": "Hytrin",
+      "drugClassName": "Antihypertensive"
+    },
+    {
+      "genericName": "Torsemide",
+      "brandName": "Demadex",
+      "drugClassName": "Diuretic"
+    },
+    {
+      "genericName": "Triamterene with Hydrochlorothiazide",
+      "brandName": "Dyazide, Maxzide",
+      "drugClassName": "Diuretic"
+    },
+    {
+      "genericName": "Valsartan",
+      "brandName": "Diovan",
+      "drugClassName": "Antihypertensive"
+    },
+    {
+      "genericName": "Verapamil Hydrochloride",
+      "brandName": "Isoptin, Calan, Verelan*",
+      "drugClassName": "Antihypertensive / Antianginal"
+    },
+    {
+      "genericName": "Warfarin Sodium (Crystalline)",
+      "brandName": "Coumadin, Jantoven",
+      "drugClassName": "Anticoagulant"
+    },
+    {
+      "genericName": "* Misspelled in Sigler’s",
+      "brandName": "",
+      "drugClassName": ""
+    }
+  ]
+}

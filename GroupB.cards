@@ -1,0 +1,413 @@
+{
+  "config": {
+    "promptKeys": [
+      {
+        "value": "genericName",
+        "label": "Generic Name"
+      },
+      {
+        "value": "brandName",
+        "label": "Brand Name"
+      }
+    ],
+    "answerKeys": [
+      {
+        "value": "genericName",
+        "label": "Generic Name"
+      },
+      {
+        "value": "brandName",
+        "label": "Brand Name"
+      }
+    ],
+    "defaultPrompt": "genericName",
+    "defaultAnswer": "brandName",
+    "labels": {
+      "genericName": "Generic Name",
+      "brandName": "Brand Name",
+      "drugClassName": "Drug Class Name"
+    }
+  },
+  "cards": [
+    {
+      "genericName": "Amitriptyline Hydrochloride",
+      "brandName": "Elavil",
+      "drugClassName": "Antidepressant"
+    },
+    {
+      "genericName": "Aripiprazole",
+      "brandName": "Abilify",
+      "drugClassName": "Antipsychotic"
+    },
+    {
+      "genericName": "Benztropine Mesylate",
+      "brandName": "Cogentin",
+      "drugClassName": "Antiparkinson agent"
+    },
+    {
+      "genericName": "Bimatoprost",
+      "brandName": "Lumigan",
+      "drugClassName": "Glaucoma agent"
+    },
+    {
+      "genericName": "Brimonidine Tartrate",
+      "brandName": "Alphagan P",
+      "drugClassName": "Glaucoma agent"
+    },
+    {
+      "genericName": "Bupropion Hydrochloride",
+      "brandName": "Wellbutrin, Wellbutrin SR, Wellbutrin XL, Zyban",
+      "drugClassName": "Antidepressant"
+    },
+    {
+      "genericName": "Carbamazepine",
+      "brandName": "Tegretol, Tegretol XR, Carbatrol ER, Equetrol ER",
+      "drugClassName": "Anticonvulsant"
+    },
+    {
+      "genericName": "Carbidopa with Levodopa",
+      "brandName": "Sinemet, Sinemet CR",
+      "drugClassName": "Antiparkinson agent"
+    },
+    {
+      "genericName": "Citalopram Hydrobromide",
+      "brandName": "Celexa",
+      "drugClassName": "Antidepressant"
+    },
+    {
+      "genericName": "Clonazepam",
+      "brandName": "Klonopin",
+      "drugClassName": "Antiepileptic"
+    },
+    {
+      "genericName": "Clozapine",
+      "brandName": "Clozaril",
+      "drugClassName": "Antipsychotic"
+    },
+    {
+      "genericName": "Cyclosporine Emulsion",
+      "brandName": "Restasis",
+      "drugClassName": "Agent for dry eyes"
+    },
+    {
+      "genericName": "Desvenlafaxine",
+      "brandName": "Pristiq",
+      "drugClassName": "Antidepressant"
+    },
+    {
+      "genericName": "Dexlansoprazole",
+      "brandName": "Dexilant",
+      "drugClassName": "Gastric antisecretory"
+    },
+    {
+      "genericName": "Dicyclomine Hydrochloride",
+      "brandName": "Bentyl",
+      "drugClassName": "GI antispasmodic"
+    },
+    {
+      "genericName": "Digoxin",
+      "brandName": "Lanoxin, Digitek",
+      "drugClassName": "Inotropic agent"
+    },
+    {
+      "genericName": "Diphenoxylate Hydrochloride with Atropine\nSulfate",
+      "brandName": "Lomotil",
+      "drugClassName": "Antidiarrheal"
+    },
+    {
+      "genericName": "Divalproex Sodium",
+      "brandName": "Depakote, Depakote ER",
+      "drugClassName": "Anticonvulsant / antipsychotic"
+    },
+    {
+      "genericName": "Donepezil Hydrochloride",
+      "brandName": "Aricept",
+      "drugClassName": "Agent for Alzheimer's dementia"
+    },
+    {
+      "genericName": "Dorzolamide Hydrochloride and Timolol\nMaleate",
+      "brandName": "Cosopt",
+      "drugClassName": "Glaucoma agent"
+    },
+    {
+      "genericName": "Doxepin Hydrochloride",
+      "brandName": "Sinequan",
+      "drugClassName": "Antidepressant"
+    },
+    {
+      "genericName": "Duloxetine Hydrochloride",
+      "brandName": "Cymbalta",
+      "drugClassName": "Antidepressant"
+    },
+    {
+      "genericName": "Escitalopram Oxalate",
+      "brandName": "Lexapro",
+      "drugClassName": "Antidepressant"
+    },
+    {
+      "genericName": "Esomeprazole Magnesium",
+      "brandName": "Nexium",
+      "drugClassName": "Gastric antisecretory"
+    },
+    {
+      "genericName": "Famotidine",
+      "brandName": "Pepcid",
+      "drugClassName": "Gastric antisecretory"
+    },
+    {
+      "genericName": "Fluoxetine Hydrochloride",
+      "brandName": "Prozac, Sarafem",
+      "drugClassName": "Antidepressant"
+    },
+    {
+      "genericName": "Fluvoxamine Maleate",
+      "brandName": "Luvox",
+      "drugClassName": "CNS Agent for OCD"
+    },
+    {
+      "genericName": "Gabapentin",
+      "brandName": "Neurontin",
+      "drugClassName": "Anticonvulsant/antineuralgic"
+    },
+    {
+      "genericName": "Haloperidol",
+      "brandName": "Haldol",
+      "drugClassName": "Antipsychotic"
+    },
+    {
+      "genericName": "Hyoscyamine Sulfate",
+      "brandName": "Levsin, Levbid",
+      "drugClassName": "GI antispasmodic"
+    },
+    {
+      "genericName": "Lacosamide",
+      "brandName": "Vimpat",
+      "drugClassName": "Anticonvulsant"
+    },
+    {
+      "genericName": "Lactulose",
+      "brandName": "Kristalose",
+      "drugClassName": "Laxative"
+    },
+    {
+      "genericName": "Lamotrigine",
+      "brandName": "Lamictal, Lamictal XR, Lamictal ODT",
+      "drugClassName": "Antiepileptic"
+    },
+    {
+      "genericName": "Lansoprazole",
+      "brandName": "Prevacid",
+      "drugClassName": "Gastric antisecretory"
+    },
+    {
+      "genericName": "Latanoprost",
+      "brandName": "Xalatan",
+      "drugClassName": "Glaucoma agent"
+    },
+    {
+      "genericName": "Levetiracetam",
+      "brandName": "Keppra",
+      "drugClassName": "Anticonvulsant"
+    },
+    {
+      "genericName": "Linaclotide",
+      "brandName": "Linzess",
+      "drugClassName": "Laxative"
+    },
+    {
+      "genericName": "Lithium Carbonate",
+      "brandName": "Lithonate, Lithotabs, Lithobid",
+      "drugClassName": "Antipsychotic"
+    },
+    {
+      "genericName": "Lubiprostone",
+      "brandName": "Amitiza",
+      "drugClassName": "Agent for Irritable Bowel Syndrome"
+    },
+    {
+      "genericName": "Lurasidone Hydrochloride",
+      "brandName": "Latuda",
+      "drugClassName": "Antipsychotic"
+    },
+    {
+      "genericName": "Memantine Hydrochloride",
+      "brandName": "Namenda",
+      "drugClassName": "Agent for Alzheimer's dementia"
+    },
+    {
+      "genericName": "Metoclopramide Hydrochloride",
+      "brandName": "Reglan",
+      "drugClassName": "Antiemetic"
+    },
+    {
+      "genericName": "Midodrine",
+      "brandName": "Proamatine",
+      "drugClassName": "Vasopressor"
+    },
+    {
+      "genericName": "Mirtazapine",
+      "brandName": "Remeron",
+      "drugClassName": "Antidepressant"
+    },
+    {
+      "genericName": "Nortriptyline Hydrochloride",
+      "brandName": "Pamelor",
+      "drugClassName": "Antidepressant"
+    },
+    {
+      "genericName": "Ofloxacin (ophthamlic)",
+      "brandName": "Ocuflox",
+      "drugClassName": "Ophthalmic Antibiotic"
+    },
+    {
+      "genericName": "Olanzapine",
+      "brandName": "Zyprexa",
+      "drugClassName": "Antipsychotic"
+    },
+    {
+      "genericName": "Olopatadine Hydrochloride",
+      "brandName": "Patanol, Pataday, Pazeo",
+      "drugClassName": "Ophthalmic anti-allergy"
+    },
+    {
+      "genericName": "Omeprazole",
+      "brandName": "Prilosec",
+      "drugClassName": "Gastric antisecretory"
+    },
+    {
+      "genericName": "Ondansetron Hydrochloride",
+      "brandName": "Zofran",
+      "drugClassName": "Antiemetic"
+    },
+    {
+      "genericName": "Oxcarbazepine",
+      "brandName": "Trileptal, Oxtellar XR",
+      "drugClassName": "Antiepileptic"
+    },
+    {
+      "genericName": "Paliperidone",
+      "brandName": "Invega",
+      "drugClassName": "Antipsychotic"
+    },
+    {
+      "genericName": "Pantoprazole Sodium",
+      "brandName": "Protonix",
+      "drugClassName": "Gastric antisecretory"
+    },
+    {
+      "genericName": "Paroxetine Hydrochloride",
+      "brandName": "Paxil, Paxil XR, Pexeva",
+      "drugClassName": "Antidepressant"
+    },
+    {
+      "genericName": "Phenobarbital",
+      "brandName": "---",
+      "drugClassName": "Anticonvulsant"
+    },
+    {
+      "genericName": "Phenytoin Sodium (Extended)",
+      "brandName": "Dilantin",
+      "drugClassName": "Antiepileptic"
+    },
+    {
+      "genericName": "Pramipexole Dihydrochloride",
+      "brandName": "Mirapex",
+      "drugClassName": "Antiparkinson agent"
+    },
+    {
+      "genericName": "Prednisolone Acetate (Ophthalmic)",
+      "brandName": "Pred Forte, Pred Mild, Omnipred",
+      "drugClassName": "Ophthalmic anti-inflammatory"
+    },
+    {
+      "genericName": "Pregabalin",
+      "brandName": "Lyrica",
+      "drugClassName": "Anticonvulsant / Antineuralgic"
+    },
+    {
+      "genericName": "Primidone",
+      "brandName": "Mysoline",
+      "drugClassName": "Antiepileptic"
+    },
+    {
+      "genericName": "Promethazine Hydrochloride",
+      "brandName": "Phenergan",
+      "drugClassName": "Antiemetic / Antiallergy"
+    },
+    {
+      "genericName": "Quetiapine Fumarate",
+      "brandName": "Seroquel",
+      "drugClassName": "Antipsychotic"
+    },
+    {
+      "genericName": "Risperidone",
+      "brandName": "Risperdal",
+      "drugClassName": "Antipsychotic"
+    },
+    {
+      "genericName": "Rivastigmine",
+      "brandName": "Exelon",
+      "drugClassName": "Agent for Alzheimer's dementia"
+    },
+    {
+      "genericName": "Ropinirole Hydrochloride",
+      "brandName": "Requip, Requip XL",
+      "drugClassName": "Antiparkinson agent"
+    },
+    {
+      "genericName": "Sertraline hydrochloride",
+      "brandName": "Zoloft",
+      "drugClassName": "Antidepressant"
+    },
+    {
+      "genericName": "Sucralfate",
+      "brandName": "Carafate",
+      "drugClassName": "Antiulcer agent"
+    },
+    {
+      "genericName": "Sulfasalazine",
+      "brandName": "Azulfidine",
+      "drugClassName": "GI antiinflammatory"
+    },
+    {
+      "genericName": "Timolol Maleate (Ophthalmic)",
+      "brandName": "Timoptic, Timoptic XR",
+      "drugClassName": "Glaucoma agent"
+    },
+    {
+      "genericName": "Topiramate",
+      "brandName": "Topamax, Trokendi XR",
+      "drugClassName": "Antiepileptic"
+    },
+    {
+      "genericName": "Trazodone Hydrochloride",
+      "brandName": "Desyrel",
+      "drugClassName": "Antidepressant"
+    },
+    {
+      "genericName": "Ursodiol",
+      "brandName": "Actigall",
+      "drugClassName": "Gallstone agent"
+    },
+    {
+      "genericName": "Venlafaxine Hydrochloride",
+      "brandName": "Effexor, Effexor XR",
+      "drugClassName": "Antidepressant"
+    },
+    {
+      "genericName": "Vilazodone Hydrochloride",
+      "brandName": "Viibryd",
+      "drugClassName": "Antidepressant"
+    },
+    {
+      "genericName": "Vortioxetine",
+      "brandName": "Trintellix",
+      "drugClassName": "Antidepressant"
+    },
+    {
+      "genericName": "Ziprasidone Hydrochloride",
+      "brandName": "Geodon",
+      "drugClassName": "Antipsychotic"
+    }
+  ]
+}
