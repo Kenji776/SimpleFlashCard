@@ -1,15 +1,30 @@
 {
-	"card_stacks": {
-		"categories": {
-			"pharmacy": [
-				{
-					"drugs_group_a": {
-						"name": "Drugs Group A",
-						"description": "Collection of drug generic names and brand names",
-						"url":""
-					}
-					}
-			]
-		}
-	}
+  "card_stacks": {
+    "categories": {
+      "pharmacy": [
+        {
+          "drugs_group_a": {
+            "name": "Drugs Group A",
+            "description": "Collection of drug generic names and brand names",
+            "url": "https://kenji776.github.io/SimpleFlashChard/groupA.cards"
+          },
+          "drugs_group_b": {
+            "name": "Drugs Group B",
+            "description": "Collection of drug generic names and brand names",
+            "url": "https://kenji776.github.io/SimpleFlashChard/groupB.cards"
+          },
+          "drugs_group_c": {
+            "name": "Drugs Group C",
+            "description": "Collection of drug generic names and brand names",
+            "url": "https://kenji776.github.io/SimpleFlashChard/groupC.cards"
+          },
+          "drugs_group_d": {
+            "name": "Drugs Group D",
+            "description": "Collection of drug generic names and brand names",
+            "url": "https://kenji776.github.io/SimpleFlashChard/groupD.cards"
+          }
+        }
+      ]
+    }
+  }
 }
