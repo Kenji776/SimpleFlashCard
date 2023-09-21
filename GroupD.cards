@@ -1,0 +1,408 @@
+{
+  "config": {
+    "promptKeys": [
+      {
+        "value": "genericName",
+        "label": "Generic Name"
+      },
+      {
+        "value": "brandName",
+        "label": "Brand Name"
+      }
+    ],
+    "answerKeys": [
+      {
+        "value": "genericName",
+        "label": "Generic Name"
+      },
+      {
+        "value": "brandName",
+        "label": "Brand Name"
+      }
+    ],
+    "defaultPrompt": "genericName",
+    "defaultAnswer": "brandName",
+    "labels": {
+      "genericName": "Generic Name",
+      "brandName": "Brand Name",
+      "drugClassName": "Drug Class Name"
+    }
+  },
+  "cards": [
+    {
+      "genericName": "Generic Name",
+      "brandName": "Brand Name",
+      "drugClassName": "Drug Class"
+    },
+    {
+      "genericName": "Abacavir, Dolutegravir, Lamivudine",
+      "brandName": "Triumeq",
+      "drugClassName": "Antiretroviral"
+    },
+    {
+      "genericName": "Acyclovir",
+      "brandName": "Zovirax",
+      "drugClassName": "Antiviral"
+    },
+    {
+      "genericName": "Albuterol Sulfate (Inhalation)",
+      "brandName": "Proventil HFA, Ventolin HFA, Proair HFA",
+      "drugClassName": "Bronchodilator"
+    },
+    {
+      "genericName": "Albuterol Sulfate (Oral)",
+      "brandName": "Proventil",
+      "drugClassName": "Bronchodilator"
+    },
+    {
+      "genericName": "Alendronate Sodium",
+      "brandName": "Fosamax",
+      "drugClassName": "Osteoporosis agent"
+    },
+    {
+      "genericName": "Allopurinol",
+      "brandName": "Zyloprim",
+      "drugClassName": "Agent for gout"
+    },
+    {
+      "genericName": "Amantadine Hydrochloride",
+      "brandName": "Symmetrel",
+      "drugClassName": "Antiviral / Parkinson's Agent"
+    },
+    {
+      "genericName": "Arformoterol",
+      "brandName": "Brovana",
+      "drugClassName": "COPD agent"
+    },
+    {
+      "genericName": "Azelastine Hydrochloride (Nasal)",
+      "brandName": "Astelin, Astepro",
+      "drugClassName": "Antiallergy agent"
+    },
+    {
+      "genericName": "Benzonatate",
+      "brandName": "Tessalon",
+      "drugClassName": "Antitussive"
+    },
+    {
+      "genericName": "Bictegravir, emtricitabine, and tenofovir alafenamide",
+      "brandName": "Biktarvy",
+      "drugClassName": "Antiretroviral"
+    },
+    {
+      "genericName": "Budesonide (Inhalation)",
+      "brandName": "Pulmicort",
+      "drugClassName": "Antiasthmatic"
+    },
+    {
+      "genericName": "Budesonide and Formoterol Fumarate Dihydrate\n(Inhalation)",
+      "brandName": "Symbicort",
+      "drugClassName": "COPD agent/antiasthmatic"
+    },
+    {
+      "genericName": "Canagliflozin",
+      "brandName": "Invokana",
+      "drugClassName": "Antidiabetic"
+    },
+    {
+      "genericName": "Clotrimazole with Betamethasone Dipropionate",
+      "brandName": "Lotrisone",
+      "drugClassName": "Topical antifungal"
+    },
+    {
+      "genericName": "Codeine Phosphate with Guaifenesin",
+      "brandName": "Mytussin AC, Robitussin AC",
+      "drugClassName": "Antitussive / expectorant"
+    },
+    {
+      "genericName": "Colchicine",
+      "brandName": "Colcrys",
+      "drugClassName": "Agent for gout"
+    },
+    {
+      "genericName": "Dapagliflozin",
+      "brandName": "Farxiga",
+      "drugClassName": "Antidiabetic"
+    },
+    {
+      "genericName": "Dolutegravir",
+      "brandName": "Tivicay",
+      "drugClassName": "Antiretroviral"
+    },
+    {
+      "genericName": "Dulaglutide",
+      "brandName": "Trulicity",
+      "drugClassName": "Antidiabetic"
+    },
+    {
+      "genericName": "Elvitegravir, Cobicistat, Emtricitabine, and Tenofovir\nAlafenamide",
+      "brandName": "Genvoya",
+      "drugClassName": "Antiretroviral"
+    },
+    {
+      "genericName": "Empagliflozin",
+      "brandName": "Jardiance",
+      "drugClassName": "Antidiabetic"
+    },
+    {
+      "genericName": "Emtricitabine and Tenofovir Alafenamide",
+      "brandName": "Descovy",
+      "drugClassName": "Antiretroviral"
+    },
+    {
+      "genericName": "Estradiol",
+      "brandName": "Divigel",
+      "drugClassName": "Hormone / Estrogen"
+    },
+    {
+      "genericName": "Estradiol (Cream)",
+      "brandName": "Estrace",
+      "drugClassName": "Hormone / Estrogen"
+    },
+    {
+      "genericName": "Estradiol (Suppository)",
+      "brandName": "Vagifem",
+      "drugClassName": "Hormone / Estrogen"
+    },
+    {
+      "genericName": "Estradiol (Tablet)",
+      "brandName": "Estrace",
+      "drugClassName": "Hormone / Estrogen"
+    },
+    {
+      "genericName": "Estradiol (Topical Patches)",
+      "brandName": "Vivelle-Dot, Alora, Climara",
+      "drugClassName": "Hormone / Estrogen"
+    },
+    {
+      "genericName": "Estradiol (Vaginal Insert)",
+      "brandName": "Femring, Estring",
+      "drugClassName": "Hormone / Estrogen"
+    },
+    {
+      "genericName": "Estrogen (Conjugated)",
+      "brandName": "Premarin",
+      "drugClassName": "Hormone / Estrogen"
+    },
+    {
+      "genericName": "Fluconazole",
+      "brandName": "Diflucan",
+      "drugClassName": "Antifungal"
+    },
+    {
+      "genericName": "Fluticasone Furoate and Vilanterol",
+      "brandName": "Breo Ellipta",
+      "drugClassName": "COPD agent/antiasthmatic"
+    },
+    {
+      "genericName": "Fluticasone Furoate, Umeclidinium Bromide, and\nVilanterol",
+      "brandName": "Trelegy Ellipta",
+      "drugClassName": "COPD agent/antiasthmatic"
+    },
+    {
+      "genericName": "Fluticasone Propionate (Inhalation)",
+      "brandName": "Flovent",
+      "drugClassName": "Antiasthmatic"
+    },
+    {
+      "genericName": "Fluticasone Propionate (Nasal)",
+      "brandName": "Flonase",
+      "drugClassName": "Antiallergy agent"
+    },
+    {
+      "genericName": "Fluticasone Propionate with Salmeterol Xinafoate",
+      "brandName": "Advair",
+      "drugClassName": "Antiasthmatic"
+    },
+    {
+      "genericName": "Glimepiride",
+      "brandName": "Amaryl",
+      "drugClassName": "Antidiabetic"
+    },
+    {
+      "genericName": "Glipizide",
+      "brandName": "Glucotrol, Glucotrol XL",
+      "drugClassName": "Antidiabetic"
+    },
+    {
+      "genericName": "Glyburide",
+      "brandName": "Micronase, Diabeta",
+      "drugClassName": "Antidiabetic"
+    },
+    {
+      "genericName": "Hydroxyzine Hydrochloride",
+      "brandName": "Atarax",
+      "drugClassName": "Antiallergy / Antianxiety"
+    },
+    {
+      "genericName": "Hydroxyzine Pamoate",
+      "brandName": "Vistaril",
+      "drugClassName": "Antiallergy / Antianxiety"
+    },
+    {
+      "genericName": "Insulin Aspart, rDNA Origin",
+      "brandName": "Novolog",
+      "drugClassName": "Antidiabetic"
+    },
+    {
+      "genericName": "Insulin Degludec",
+      "brandName": "Tresiba",
+      "drugClassName": "Antidiabetic"
+    },
+    {
+      "genericName": "Insulin Detemir",
+      "brandName": "Levemir",
+      "drugClassName": "Antidiabetic"
+    },
+    {
+      "genericName": "Insulin Glargine, rDNA Origin",
+      "brandName": "Lantus, Toujeo, Basaglar",
+      "drugClassName": "Antidiabetic"
+    },
+    {
+      "genericName": "Insulin Lispro, rDNA Origin",
+      "brandName": "Humalog",
+      "drugClassName": "Antidiabetic"
+    },
+    {
+      "genericName": "Ipratropium Bromide",
+      "brandName": "Atrovent",
+      "drugClassName": "COPD agent/antiallergy"
+    },
+    {
+      "genericName": "Ipratropium Bromide with Albuterol Sulfate",
+      "brandName": "Combivent, DuoNeb",
+      "drugClassName": "COPD agent"
+    },
+    {
+      "genericName": "Ketoconazole",
+      "brandName": "Nizoral",
+      "drugClassName": "Antifungal"
+    },
+    {
+      "genericName": "Levothyroxine Sodium",
+      "brandName": "Synthroid, Levoxyl, Levothroid",
+      "drugClassName": "Hormone / Thyroid"
+    },
+    {
+      "genericName": "Linagliptin",
+      "brandName": "Tradjenta",
+      "drugClassName": "Antidiabetic"
+    },
+    {
+      "genericName": "Liothyronine Sodium",
+      "brandName": "Cytomel, Triostat",
+      "drugClassName": "Hormone / Thyroid"
+    },
+    {
+      "genericName": "Liraglutide (rDNA Origin)",
+      "brandName": "Victoza, Saxenda",
+      "drugClassName": "Antidiabetic"
+    },
+    {
+      "genericName": "Medroxyprogesterone Acetate (Oral)",
+      "brandName": "Provera",
+      "drugClassName": "Hormone / Progestin"
+    },
+    {
+      "genericName": "Metformin Hydrochloride",
+      "brandName": "Glucophage (XR)",
+      "drugClassName": "Antidiabetic"
+    },
+    {
+      "genericName": "Montelukast Sodium",
+      "brandName": "Singulair",
+      "drugClassName": "Antiasthamatic / Antiallergy"
+    },
+    {
+      "genericName": "Norethindrone, Ethinyl Estradiol & Ferrous Fumarate",
+      "brandName": "Loestrin FE (24), Microgestin FE, Junel FE,Minastrin 24",
+      "drugClassName": "Oral contraceptive"
+    },
+    {
+      "genericName": "Norgestimate & Ethinyl Estradiol",
+      "brandName": "Ortho-Cyclen, Sprintec",
+      "drugClassName": "Oral contraceptive"
+    },
+    {
+      "genericName": "Norgestimate & Ethinyl Estradiol (Triphasic)",
+      "brandName": "Ortho Tri-Cyclen, TriSprintec, Trinessa",
+      "drugClassName": "Oral contraceptive"
+    },
+    {
+      "genericName": "Nystatin",
+      "brandName": "Nystop",
+      "drugClassName": "Antifungal"
+    },
+    {
+      "genericName": "Pioglitazone Hydrochloride",
+      "brandName": "Actos",
+      "drugClassName": "Antidiabetic"
+    },
+    {
+      "genericName": "Progesterone (Oral)",
+      "brandName": "Prometrium",
+      "drugClassName": "Hormone replacement"
+    },
+    {
+      "genericName": "Promethazine Hydrochloride with Codeine\nPhosphate",
+      "brandName": "Phenergan with Codeine",
+      "drugClassName": "Antitussive"
+    },
+    {
+      "genericName": "Raloxifene Hydrochloride",
+      "brandName": "Evista",
+      "drugClassName": "Osteoporosis agent"
+    },
+    {
+      "genericName": "Semaglutide",
+      "brandName": "Ozempic, Wegovy",
+      "drugClassName": "Antidiabetic / Weight\nmanagement"
+    },
+    {
+      "genericName": "Sitagliptin Phosphate",
+      "brandName": "Januvia",
+      "drugClassName": "Antidiabetic"
+    },
+    {
+      "genericName": "Sitagliptin Phosphate with Metformin Hydrochloride",
+      "brandName": "Janumet (XR)",
+      "drugClassName": "Antidiabetic"
+    },
+    {
+      "genericName": "Terbinafine Hydrochloride",
+      "brandName": "Lamisil",
+      "drugClassName": "Antifungal"
+    },
+    {
+      "genericName": "Testosterone Gel (Topical)",
+      "brandName": "Androgel",
+      "drugClassName": "Hormone"
+    },
+    {
+      "genericName": "Thyroid",
+      "brandName": "Armour Thyroid",
+      "drugClassName": "Hormone / Thyroid"
+    },
+    {
+      "genericName": "Tiotropium Bromide (Inhalation)",
+      "brandName": "Spiriva",
+      "drugClassName": "COPD agent"
+    },
+    {
+      "genericName": "Umeclidinium (inhalation)",
+      "brandName": "Incruse Ellipta",
+      "drugClassName": "COPD agent"
+    },
+    {
+      "genericName": "Umeclidinium and Vilanterol",
+      "brandName": "Anoro Ellipta",
+      "drugClassName": "COPD agent"
+    },
+    {
+      "genericName": "Valacyclovir Hydrochloride",
+      "brandName": "Valtrex",
+      "drugClassName": "Antiviral"
+    }
+  ]
+}

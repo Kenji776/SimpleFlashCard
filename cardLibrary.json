@@ -1,0 +1,15 @@
+{
+	"card_stacks": {
+		"categories": {
+			"pharmacy": [
+				{
+					"drugs_group_a": {
+						"name": "Drugs Group A",
+						"description": "Collection of drug generic names and brand names",
+						"url":""
+					}
+					}
+			]
+		}
+	}
+}
