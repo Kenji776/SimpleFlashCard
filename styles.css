@@ -12,9 +12,9 @@ body{
     display: grid; 
     grid-template-columns: 0.5fr 2.2fr 0.3fr; 
     grid-template-rows: 0.3fr 2.5fr 0.2fr; 
-    width:99vw;
+    width:95vw;
     gap: 10px 10px; 
-    padding:10px;
+    
     grid-template-areas: 
       "header header header"
       "settings content history"
@@ -26,7 +26,9 @@ body{
     height:6vh; 
     font-size:30px;
     font-weight:bold;
-    width:100%;
+    width:99%;
+    margin-left:auto;
+    margin-right:auto;
 }
 
 .settings { 
@@ -70,16 +72,16 @@ body{
     font-size:28px;
     font-weight:bold;
     margin:20px;
-    align:center;
+    text-align:center;
 }
+
 #answer{
     margin-left:auto;
     margin-right:auto;
     font-size:22px;
     font-weight:bold;
     margin:20px;
-    align:center;
-    
+    text-align:center;
 }
 
 #settings{
@@ -90,6 +92,10 @@ body{
     right:10px; 
     height:500px;
     text-align:left;
+}
+
+#deck-controls{
+    visibility:hidden;
 }
 
 #history{
@@ -142,6 +148,7 @@ body{
     left: 10; 
     right: 10;
     height:28%;
+    visibility:hidden;
 }
 
 .panel{

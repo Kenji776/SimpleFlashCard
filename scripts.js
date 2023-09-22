@@ -1,4 +1,4 @@
-var cardStack = 'GroupA';
+var cardStack = '';
 var currentCard = {};
 var cardIndex = 0;
 var promptKey = 'brandName';
@@ -9,12 +9,13 @@ var useRandom = false;
 var hintIndex = 0;
 var currentAnswer;
 var viewedCards = [];
-var preventDuplicates = false;
+var preventDuplicates = true;
 var availableCards = [];
 var hintText = 'Stuck? Try clicking Show Drug Class or Show Next Letter!';
 var historyEntryToWrite;
 var showHistory = true;
 var selectedDeckCategory = 'pharmacy'
+var showUi = false;
 
 async function loadCardLibrary(){
     console.log('Loading card library');
@@ -35,12 +36,17 @@ function setDeckOptions(cardLibrary){
         }
 
     });
-    setSelectOptions('card-deck', optionsArray, null, false)
+    setSelectOptions('card-deck', optionsArray, null, false, false)
 }
 
 async function loadDeck(deckUrl){
     
-    if(!deckUrl){
+    viewedCards = [];
+    availableCards = [];
+    cards = [];
+    cardIndex = 0;
+
+    if(!deckUrl || deckUrl == 'none'){
         console.warn('No deck URL provided to load deck. Aborting');
         return;
     }
@@ -65,9 +71,14 @@ async function loadDeck(deckUrl){
     
     setPromptKey(config.defaultPrompt);
     
-    setSelectOptions('prompt-key', config.promptKeys, promptKey, true);
+    setSelectOptions('prompt-key', config.promptKeys, promptKey, true, true);
     //setSelectOptions('answerKey', config.answerKeys, answerKey, true);
     //loadCard(0);
+
+    setUi(true);
+
+    
+    document.getElementById("prompt").innerHTML= `Press Next To Begin`;
 }
 
 /**
@@ -130,12 +141,20 @@ function loadCard(cardId, forceIndex){
         answerVal = config.answerKeys[Math.floor(Math.random()*config.answerKeys.length)].value;		
     }
 
-
     var selectedAnswerKeyText = config.answerKeys.find(x => x.value === answerVal).label;
     var selectedPromptKeyText = config.promptKeys.find(x => x.value === promptVal).label;
-    
-    //TODO: Make the currentAnswer the value from whatever the promptVal isn't.
-    //if promptVal == config.defaultPrompt => currentAnswer = config.defaultAnswer
+   
+    //create the history entry if it doesn't exist for this card.
+    if(!viewedCards.some(e => e.id === currentCard.id)) {
+        console.log('Viewed cards does not have an entry for id: ' + currentCard.id);
+        console.log(viewedCards)
+        console.log('Creating history item for card');
+        console.log(currentCard);
+        createHistoryEntry(currentCard,viewedCards.length,currentCard[promptVal]);
+        viewedCards.push(currentCard);
+    }
+
+
     currentAnswer = promptVal == config.defaultPrompt ? currentCard[config.defaultAnswer] : currentCard[config.defaultPrompt];
     /*
     
@@ -156,18 +175,14 @@ function loadCard(cardId, forceIndex){
     //document.getElementById('answer').style.visibility='hidden';
     document.getElementById('drug-class').style.visibility='hidden';
     document.getElementById('hint-text').style.visibility='hidden';
-    
-     console.log('Viewed Cards Array');
-     console.log(viewedCards);	 			
+
+    document.getElementById("viewed-total").innerHTML = `${viewedCards.length} / ${cards.length}`;
+		
 }
 
 function removeCardFromAvailable(cardId){
     console.log('Removing card from stack with Id' + cardId);
-    availableCards.splice(cardIndex, 1);
-    console.log(availableCards);
-
     availableCards = availableCards.filter(item => item.id !== cardId);
-
     console.log('Available cards is now: ');
     console.log(availableCards);
 }
@@ -206,9 +221,16 @@ function loadNext(){
     //card object to load next
     let cardToLoad;
 
+
+
     if(historyEntryToWrite != null){
         document.getElementById('history-items').appendChild(historyEntryToWrite);
         historyEntryToWrite = null;
+    }
+
+    if(cardIndex == cards.length){
+        alert('End of deck reached');
+        return;
     }
 
     //if we are back in the stack, then instead just move up to the next card
@@ -221,16 +243,18 @@ function loadNext(){
         if(!useRandom){
             cardToLoad = cards[cardIndex];
         }else{
-            if(!preventDuplicates) cardToLoad = Math.floor(Math.random()*cards.length)	
-            else cardToLoad = Math.floor(Math.random()*availableCards.length)	
+            
+            if(!preventDuplicates) cardToLoad = cards[Math.floor(Math.random()*cards.length)];	
+            else {
+                console.log('Loading random card, preventing dupes');
+                console.log(availableCards);
+                cardToLoad = availableCards[Math.floor(Math.random()*availableCards.length)];	
+            }
         }
         
         console.log('Card to load set to:');
         console.log(cardToLoad);
-        createHistoryEntry(cardToLoad,cardIndex);
-        viewedCards.push(cardToLoad);
         cardIndex++;
-        
         document.getElementById("history-items").scrollIntoView({ behavior: 'smooth', block: 'end' });
         
         loadCard(cardToLoad.id);
@@ -242,13 +266,13 @@ function loadNext(){
 }
 
 
-function createHistoryEntry(cardData,navigationPosition){
+function createHistoryEntry(cardData,navigationPosition,entryLabel){
     var div = document.createElement('div');
 
     //TODO - Replace this with whatever 
-    div.innerHTML = `${cardData.genericName}`;
+    div.innerHTML = `${entryLabel}`;
     div.setAttribute('class', 'history-item');
-    div.setAttribute('onClick', `loadCard('${cardData.id}',${navigationPosition+1})`);
+    div.setAttribute('onClick', `loadCard('${cardData.id}',${navigationPosition})`);
     div.setAttribute('data-card-id', `${cardData.id}`);
     //stack the entry into the div
     historyEntryToWrite = div;
@@ -301,11 +325,11 @@ function showNextHintLetter(){
     
 }
 
-function setSelectOptions(selectId, optionsArray, defaultValue, includeRandom){
+function setSelectOptions(selectId, optionsArray, defaultValue, includeRandom, clearExisting){
 
     let selectList = document.getElementById(selectId);
 
-    selectList.length = 0;
+    if(clearExisting) selectList.length = 0;
     
     for (var i = 0; i < optionsArray.length; i++) {
         var option = document.createElement("option");
@@ -344,6 +368,24 @@ function toggleHistory(){
     }
 }
 
+function setUi(enableUi){
+
+
+    console.log('toggling ui');
+    if(enableUi){
+        console.log('enabling UI');
+        document.getElementById('deck-controls').style.visibility='visible';
+        document.getElementById('controls').style.visibility='visible';
+    }else{
+        console.log('Hiding ui')
+        document.getElementById('deck-controls').style.visibility='hidden';
+        document.getElementById('controls').style.visibility='hidden';
+    }
+    
+    
+}
+
 window.onload = function() {
+    
     loadCardLibrary();
 };
