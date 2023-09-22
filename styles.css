@@ -7,6 +7,63 @@ body{
     background-color:white;
     font-family: 'Work Sans', sans-serif;
 }
+
+.container {
+    display: grid; 
+    grid-template-columns: 0.5fr 2.2fr 0.3fr; 
+    grid-template-rows: 0.3fr 2.5fr 0.2fr; 
+    width:99vw;
+    gap: 10px 10px; 
+    padding:10px;
+    grid-template-areas: 
+      "header header header"
+      "settings content history"
+      "settings footer history"; 
+  }
+  
+.header { 
+    grid-area: header; 
+    height:6vh; 
+    font-size:30px;
+    font-weight:bold;
+    width:100%;
+}
+
+.settings { 
+    grid-area: settings; 
+    width:15vw;
+    height:80vh;
+}
+.history { 
+    grid-area: history; 
+    height:80vh;
+    overflow-y:auto;
+    width:18vw;
+}
+.footer { grid-area: footer; 
+    position: relative;
+    width: 60vw;
+    height:2vh;
+
+}
+.content { 
+    grid-area: content; 
+    width:60vw;
+    position:relative;
+}
+
+.center {
+    margin:auto;
+    text-align:center;
+}
+
+#hint-container{
+    margin:auto;
+    margin-top:15px;
+    margin-bottom:15px;
+    
+}
+
 #prompt{
     margin-left:auto;
     margin-right:auto;
@@ -67,10 +124,6 @@ body{
     cursor:pointer;
 }
 
-.header{
-    font-size:36px;
-    font-weight:bold;
-}
 
 .sub-header{
     font-size:24px;
@@ -80,14 +133,15 @@ body{
     
     display: inline-block;
     vertical-align: middle;
-}
-#container{
-    margin: auto;
-    text-align: center;
+    
 }
 
-#content{
-    min-height:400px;
+#controls{
+    position:absolute; 
+    bottom:0px; 
+    left: 10; 
+    right: 10;
+    height:28%;
 }
 
 .panel{
@@ -102,7 +156,7 @@ body{
 
 .flip-card {
     background-color: transparent;
-    height: 300px;
+    height: 70%;
     perspective: 1000px; /* Remove this if you don't want the 3D effect */
     border-radius:10px;
     padding:0px;

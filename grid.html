@@ -4,53 +4,7 @@
 <script type="text/javascript" language="javascript" src="scripts.js"></script> 
 <script type="text/javascript" language="javascript" src="groupA.cards"></script> 
 <style>
-    .container {
-  display: grid; 
-  grid-template-columns: 0.5fr 2.2fr 0.3fr; 
-  grid-template-rows: 0.3fr 2.5fr 0.2fr; 
-  width:99vw;
-  gap: 10px 10px; 
-  padding:10px;
-  grid-template-areas: 
-    "header header header"
-    "settings content history"
-    "settings footer history"; 
-}
 
-.header { grid-area: header; height:6vh }
-
-.settings { 
-    grid-area: settings; 
-    width:15vw;
-    height:80vh;
-}
-.history { 
-    grid-area: history; 
-    height:80vh;
-    overflow-y:auto;
-    width:18vw;
-}
-.footer { grid-area: footer; 
-    position: relative;
-    width: 60vw;
-    height:2vh;
-
-}
-.content { 
-    grid-area: content; 
-    width:60vw;
-}
-
-  .center {
-    margin:auto;
-    text-align:center;
-  }
-
-  #hint-container{
-    margin:auto;
-    margin-top:15px;
-    
-  }
 </style>  
 
 <body>
@@ -128,19 +82,21 @@
                 </div>
             </div>
 
-            <div class="panel center" id="hint-container">
-				<img src="media/question.png" id="help-icon" style="float:left" />
-				<div id="hint-title">Hints</div>
-				<div id="hint-text"></div>
-				<div id="drug-class"></div>
-			</div>
+            <div style="position:absolute; bottom:0px">
+                <div class="panel center" id="hint-container">
+                    <img src="media/question.png" id="help-icon" style="float:left" />
+                    <div id="hint-title">Hints</div>
+                    <div id="hint-text"></div>
+                    <div id="drug-class"></div>
+                </div>
 
-            <div id="button-container" class="center">
-                <button type="button" class="button" onclick="loadPrev()">Previous</button>
-                <button type="button" class="button" onclick="showDrugClass()">Show Drug Class</button>
-                <img src="media/flip.png" onclick="showAnswer()" id="flip-button" />
-                <button type="button" class="button" onclick="showNextHintLetter()">Show Next Letter</button>
-                <button type="button" class="button" onclick="loadNext()">Next</button>
+                <div id="button-container" class="center">
+                    <button type="button" class="button" onclick="loadPrev()">Previous</button>
+                    <button type="button" class="button" onclick="showDrugClass()">Show Drug Class</button>
+                    <img src="media/flip.png" onclick="showAnswer()" id="flip-button" />
+                    <button type="button" class="button" onclick="showNextHintLetter()">Show Next Letter</button>
+                    <button type="button" class="button" onclick="loadNext()">Next</button>
+                </div>
             </div>
         </div>
     </div>

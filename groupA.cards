@@ -1,390 +1,484 @@
-var jsonData = `{
-	"config": {
-		"promptKeys": [ {"value": "genericName", "label":"Generic Name"}, {"value": "brandName", "label":"Brand Name"}],
-		"answerKeys": [ {"value": "genericName", "label":"Generic Name"}, {"value": "brandName", "label":"Brand Name"}],
-		"defaultPrompt": "genericName",
-		"defaultAnswer": "brandName",
-		"labels" : {
-			"genericName":  "Generic Name",
-			"brandName":  "Brand Name",
-			"drugClassName":  "Drug Class Name"
-		}
-	},
-	"cards": [
-	  {
-		"genericName": "Acetaminophen with Codeine Phosphate",
-		"brandName": "Tylenol (with Codeine)",
-		"drugClassName": "Opioid analgesic"
-	  },
-	  {
-		"genericName": "Alfuzosin Hydrochloride",
-		"brandName": "Uroxatral",
-		"drugClassName": "BPH agent"
-	  },
-	  {
-		"genericName": "Alprazolam",
-		"brandName": "Xanax, Xanax XR",
-		"drugClassName": "Antianxiety agent"
-	  },
-	  {
-		"genericName": "Amoxicillin Trihydrate",
-		"brandName": "Amoxil, Moxatag, Trimox",
-		"drugClassName": "Antibiotic"
-	  },
-	  {
-		"genericName": "Amoxicillin with Clavulanate Potassium",
-		"brandName": "Augmentin, Augmentin XR",
-		"drugClassName": "Antibiotic"
-	  },
-	  {
-		"genericName": "Azithromycin Dihydrate",
-		"brandName": "Zithromax, Zmax",
-		"drugClassName": "Antibiotic (macrolide)"
-	  },
-	  {
-		"genericName": "Baclofen",
-		"brandName": "Lioresal",
-		"drugClassName": "Muscle relaxant"
-	  },
-	  {
-		"genericName": "Betamethasone dipropionate",
-		"brandName": "Diprosone",
-		"drugClassName": "Anti-inflammatory"
-	  },
-	  {
-		"genericName": "Buprenorphine with Naloxone",
-		"brandName": "Suboxone",
-		"drugClassName": "Opioid dependence agent"
-	  },
-	  {
-		"genericName": "Buspirone Hydrochloride",
-		"brandName": "BuSpar",
-		"drugClassName": "Antianxiety agent"
-	  },
-	  {
-		"genericName": "Butalbital, Acetaminophen & Caffeine",
-		"brandName": "Fioricet",
-		"drugClassName": "Analgesic"
-	  },
-	  {
-		"genericName": "Calcitriol",
-		"brandName": "Rocaltrol",
-		"drugClassName": "Vitamin"
-	  },
-	  {
-		"genericName": "Carisoprodol",
-		"brandName": "Soma",
-		"drugClassName": "Muscle relaxant"
-	  },
-	  {
-		"genericName": "Cefdinir",
-		"brandName": "Omnicef",
-		"drugClassName": "Antibiotic (cephalosporin)"
-	  },
-	  {
-		"genericName": "Celecoxib",
-		"brandName": "Celebrex",
-		"drugClassName": "Nonsteroidal Anti-inflammatory"
-	  },
-	  {
-		"genericName": "Cephalexin Monohydrate",
-		"brandName": "Keflex",
-		"drugClassName": "Antibiotic (cephalosporin)"
-	  },
-	  {
-		"genericName": "Ciprofloxacin Hydrochloride",
-		"brandName": "Cipro, Cipro XR",
-		"drugClassName": "Antibiotic (fluoroquinolone)"
-	  },
-	  {
-		"genericName": "Clindamycin Hydrochloride (Oral)",
-		"brandName": "Cleocin",
-		"drugClassName": "Antibiotic"
-	  },
-	  {
-		"genericName": "Clindamycin Phosphate (Topical)",
-		"brandName": "Cleocin T",
-		"drugClassName": "Topical acne agent"
-	  },
-	  {
-		"genericName": "Clobetasol Propionate (Topical)",
-		"brandName": "Temovate",
-		"drugClassName": "Topical anti-inflammatory"
-	  },
-	  {
-		"genericName": "Cyclobenzaprine Hydrochloride",
-		"brandName": "Amrix, Flexeril, Fexmid",
-		"drugClassName": "Muscle relaxant"
-	  },
-	  {
-		"genericName": "Diazepam",
-		"brandName": "Valium",
-		"drugClassName": "Antianxiety agent"
-	  },
-	  {
-		"genericName": "Diclofenac Sodium (Oral)",
-		"brandName": "Voltaren, Voltaren XR",
-		"drugClassName": "Nonsteroidal Anti-inflammatory"
-	  },
-	  {
-		"genericName": "Diclofenac Sodium (Topical)",
-		"brandName": "Voltaren Gel",
-		"drugClassName": "Nonsteroidal Anti-inflammatory"
-	  },
-	  {
-		"genericName": "Doxycycline Hyclate",
-		"brandName": "Vibramycin",
-		"drugClassName": "Antibiotic (tetracycline)"
-	  },
-	  {
-		"genericName": "Dutasteride",
-		"brandName": "Avodart",
-		"drugClassName": "BPH agent"
-	  },
-	  {
-		"genericName": "Eszopiclone",
-		"brandName": "Lunesta",
-		"drugClassName": "Sedative"
-	  },
-	  {
-		"genericName": "Fentanyl (Transdermal)",
-		"brandName": "Duragesic",
-		"drugClassName": "Opioid analgesic"
-	  },
-	  {
-		"genericName": "Finasteride",
-		"brandName": "Proscar",
-		"drugClassName": "BPH agent"
-	  },
-	  {
-		"genericName": "Folic Acid",
-		"brandName": "---",
-		"drugClassName": "Vitamin"
-	  },
-	  {
-		"genericName": "Hydrocodone Bitartrate with Acetaminophen",
-		"brandName": "Lortab, Vicodin, Norco",
-		"drugClassName": "Opioid analgesic"
-	  },
-	  {
-		"genericName": "Hydrocodone Bitartrate with Ibuprofen",
-		"brandName": "Vicoprofen",
-		"drugClassName": "Opioid analgesic"
-	  },
-	  {
-		"genericName": "Hydrocortisone (Rectal)",
-		"brandName": "Anusol-HC, Proctosol-HC",
-		"drugClassName": "Topical corticosteroid"
-	  },
-	  {
-		"genericName": "Hydromorphone Hydrochloride",
-		"brandName": "Dilaudid",
-		"drugClassName": "Opioid analgesic"
-	  },
-	  {
-		"genericName": "Hydroxychloroquine Sulfate",
-		"brandName": "Plaquenil",
-		"drugClassName": "Antimalarial"
-	  },
-	  {
-		"genericName": "Ibuprofen",
-		"brandName": "Motrin",
-		"drugClassName": "Nonsteroidal Anti-inflammatory"
-	  },
-	  {
-		"genericName": "Levofloxacin",
-		"brandName": "Levaquin",
-		"drugClassName": "Antibiotic (fluoroquinolone)"
-	  },
-	  {
-		"genericName": "Lidocaine (Transdermal)",
-		"brandName": "Lidoderm",
-		"drugClassName": "Topical Analgesic"
-	  },
-	  {
-		"genericName": "Lorazepam",
-		"brandName": "Ativan",
-		"drugClassName": "Antianxiety agent"
-	  },
-	  {
-		"genericName": "Meloxicam",
-		"brandName": "Mobic",
-		"drugClassName": "Nonsteroidal Anti-inflammatory"
-	  },
-	  {
-		"genericName": "Methadone Hydrochloride",
-		"brandName": "Methadose",
-		"drugClassName": "Opioid analgesic"
-	  },
-	  {
-		"genericName": "Methenamine Hippurate",
-		"brandName": "Hiprex",
-		"drugClassName": "Urinary tract antiseptic"
-	  },
-	  {
-		"genericName": "Methocarbamol",
-		"brandName": "Robaxin",
-		"drugClassName": "Muscle relaxant"
-	  },
-	  {
-		"genericName": "Methylprednisolone",
-		"brandName": "Medrol",
-		"drugClassName": "Anti-inflammatory"
-	  },
-	  {
-		"genericName": "Metronidazole",
-		"brandName": "Flagyl",
-		"drugClassName": "Antibacterial / Antiprotozoal"
-	  },
-	  {
-		"genericName": "Minocycline Hydrochloride",
-		"brandName": "Minocin",
-		"drugClassName": "Antibiotic (tetracycline)"
-	  },
-	  {
-		"genericName": "Mirabegron",
-		"brandName": "Myrbetriq",
-		"drugClassName": "Urinary bladder modifier"
-	  },
-	  {
-		"genericName": "Morphine Sulfate (Extended Release)",
-		"brandName": "MS Contin",
-		"drugClassName": "Opioid analgesic"
-	  },
-	  {
-		"genericName": "Mupirocin (Topical)",
-		"brandName": "Bactroban",
-		"drugClassName": "Topical Antibiotic"
-	  },
-	  {
-		"genericName": "Nabumetone",
-		"brandName": "Relafen",
-		"drugClassName": "Nonsteroidal Anti-inflammatory"
-	  },
-	  {
-		"genericName": "Naltrexone Hydrochloride",
-		"brandName": "ReVia, Vivitrol",
-		"drugClassName": "Opioid antagonist"
-	  },
-	  {
-		"genericName": "Naproxen",
-		"brandName": "Naprosyn, EC-Naprosyn",
-		"drugClassName": "Nonsteroidal Anti-inflammatory"
-	  },
-	  {
-		"genericName": "Nitrofurantoin",
-		"brandName": "Macrodantin, Macrobid",
-		"drugClassName": "Antibacterial"
-	  },
-	  {
-		"genericName": "Oxybutynin Chloride (Oral)",
-		"brandName": "Ditropan, Ditropan XL",
-		"drugClassName": "Urinary bladder modifier"
-	  },
-	  {
-		"genericName": "Oxycodone Hydrochloride",
-		"brandName": "OxyContin, Roxicodone",
-		"drugClassName": "Opioid analgesic"
-	  },
-	  {
-		"genericName": "Oxycodone with Acetaminophen",
-		"brandName": "Percocet, Roxicet, Endocet",
-		"drugClassName": "Opioid analgesic"
-	  },
-	  {
-		"genericName": "Phentermine Hydrochloride",
-		"brandName": "Adipex-P, Ionamin",
-		"drugClassName": "Weight management"
-	  },
-	  {
-		"genericName": "Potassium Chloride (Oral)",
-		"brandName": "Klor-Con, K-Dur, Micro-K",
-		"drugClassName": "Electrolyte"
-	  },
-	  {
-		"genericName": "Prednisone",
-		"brandName": "Deltasone",
-		"drugClassName": "Anti-inflammatory"
-	  },
-	  {
-		"genericName": "Quinine Sulfate",
-		"brandName": "Qualaquin",
-		"drugClassName": "Antimalarial"
-	  },
-	  {
-		"genericName": "Rizatriptan Benzoate",
-		"brandName": "Maxalt",
-		"drugClassName": "Antimigrainous agent"
-	  },
-	  {
-		"genericName": "Solifenacin Succinate",
-		"brandName": "Vesicare",
-		"drugClassName": "Urinary bladder modifier"
-	  },
-	  {
-		"genericName": "Sulfamethoxazole with Trimethoprim",
-		"brandName": "Bactrim, Septra",
-		"drugClassName": "Antibiotic"
-	  },
-	  {
-		"genericName": "Sumatriptan Succinate",
-		"brandName": "Imitrex",
-		"drugClassName": "Antimigrainous agent"
-	  },
-	  {
-		"genericName": "Tacrolimus (systemic)",
-		"brandName": "Astagraf XL, Prograf",
-		"drugClassName": "Immunosuppressant"
-	  },
-	  {
-		"genericName": "Tamsulosin Hydrochloride",
-		"brandName": "Flomax",
-		"drugClassName": "BPH agent"
-	  },
-	  {
-		"genericName": "Temazepam",
-		"brandName": "Restoril",
-		"drugClassName": "Sedative"
-	  },
-	  {
-		"genericName": "Tizanidine Hydrochloride",
-		"brandName": "Zanaflex",
-		"drugClassName": "Muscle relaxant"
-	  },
-	  {
-		"genericName": "Tolterodine Tartrate",
-		"brandName": "Detrol, Detrol LA",
-		"drugClassName": "Urinary bladder modifier"
-	  },
-	  {
-		"genericName": "Tramadol Hydrochloride",
-		"brandName": "Ultram, Ultram ER",
-		"drugClassName": "Analgesic"
-	  },
-	  {
-		"genericName": "Triamcinolone Acetonide (Topical)",
-		"brandName": "Kenalog",
-		"drugClassName": "Topical corticosteroid"
-	  },
-	  {
-		"genericName": "Varenicline Tartrate",
-		"brandName": "Chantix",
-		"drugClassName": "Smoking cessation aid"
-	  },
-	  {
-		"genericName": "Vitamin D, Ergocalciferol",
-		"brandName": "Drisdol",
-		"drugClassName": "Vitamin"
-	  },
-	  {
-		"genericName": "Zaleplon",
-		"brandName": "Sonata",
-		"drugClassName": "Sedative"
-	  },
-	  {
-		"genericName": "Zolpidem Tartrate",
-		"brandName": "Ambien (CR)",
-		"drugClassName": "Sedative"
-	  }
-	]
-}`;
+{
+  "config": {
+    "name": "Group A Drugs",
+    "promptKeys": [
+      {
+        "value": "genericName",
+        "label": "Generic Name"
+      },
+      {
+        "value": "brandName",
+        "label": "Brand Name"
+      }
+    ],
+    "answerKeys": [
+      {
+        "value": "genericName",
+        "label": "Generic Name"
+      },
+      {
+        "value": "brandName",
+        "label": "Brand Name"
+      }
+    ],
+    "defaultPrompt": "genericName",
+    "defaultAnswer": "brandName",
+    "labels": {
+      "genericName": "Generic Name",
+      "brandName": "Brand Name",
+      "drugClassName": "Drug Class Name"
+    }
+  },
+  "cards": [
+    {
+      "genericName": "Acetaminophen with Codeine Phosphate",
+      "brandName": "Tylenol (with Codeine)",
+      "drugClassName": "Opioid analgesic",
+      "id": "lmtuukx6d1cgrgcmv1c"
+    },
+    {
+      "genericName": "Alfuzosin Hydrochloride",
+      "brandName": "Uroxatral",
+      "drugClassName": "BPH agent",
+      "id": "lmtuukx6o8v11m03zn"
+    },
+    {
+      "genericName": "Alprazolam",
+      "brandName": "Xanax, Xanax XR",
+      "drugClassName": "Antianxiety agent",
+      "id": "lmtuukx6sxqt71in97"
+    },
+    {
+      "genericName": "Amoxicillin Trihydrate",
+      "brandName": "Amoxil, Moxatag, Trimox",
+      "drugClassName": "Antibiotic",
+      "id": "lmtuukx6ig9fjprg10r"
+    },
+    {
+      "genericName": "Amoxicillin with Clavulanate Potassium",
+      "brandName": "Augmentin, Augmentin XR",
+      "drugClassName": "Antibiotic",
+      "id": "lmtuukx6njzobc2xy2"
+    },
+    {
+      "genericName": "Azithromycin Dihydrate",
+      "brandName": "Zithromax, Zmax",
+      "drugClassName": "Antibiotic (macrolide)",
+      "id": "lmtuukx6nesg163f5ad"
+    },
+    {
+      "genericName": "Baclofen",
+      "brandName": "Lioresal",
+      "drugClassName": "Muscle relaxant",
+      "id": "lmtuukx6c1iqcrxburb"
+    },
+    {
+      "genericName": "Betamethasone dipropionate",
+      "brandName": "Diprosone",
+      "drugClassName": "Anti-inflammatory",
+      "id": "lmtuukx6ufigz5wi80i"
+    },
+    {
+      "genericName": "Buprenorphine with Naloxone",
+      "brandName": "Suboxone",
+      "drugClassName": "Opioid dependence agent",
+      "id": "lmtuukx6a4v3hiak2e"
+    },
+    {
+      "genericName": "Buspirone Hydrochloride",
+      "brandName": "BuSpar",
+      "drugClassName": "Antianxiety agent",
+      "id": "lmtuukx6a2gz04jvk5r"
+    },
+    {
+      "genericName": "Butalbital, Acetaminophen & Caffeine",
+      "brandName": "Fioricet",
+      "drugClassName": "Analgesic",
+      "id": "lmtuukx6p2r34ksjibm"
+    },
+    {
+      "genericName": "Calcitriol",
+      "brandName": "Rocaltrol",
+      "drugClassName": "Vitamin",
+      "id": "lmtuukx6k2gm505hx5m"
+    },
+    {
+      "genericName": "Carisoprodol",
+      "brandName": "Soma",
+      "drugClassName": "Muscle relaxant",
+      "id": "lmtuukx6i9e7hag1aas"
+    },
+    {
+      "genericName": "Cefdinir",
+      "brandName": "Omnicef",
+      "drugClassName": "Antibiotic (cephalosporin)",
+      "id": "lmtuukx6ac7s4u2ovvc"
+    },
+    {
+      "genericName": "Celecoxib",
+      "brandName": "Celebrex",
+      "drugClassName": "Nonsteroidal Anti-inflammatory",
+      "id": "lmtuukx6bd1a7uu006r"
+    },
+    {
+      "genericName": "Cephalexin Monohydrate",
+      "brandName": "Keflex",
+      "drugClassName": "Antibiotic (cephalosporin)",
+      "id": "lmtuukx64jk8xf87xkb"
+    },
+    {
+      "genericName": "Ciprofloxacin Hydrochloride",
+      "brandName": "Cipro, Cipro XR",
+      "drugClassName": "Antibiotic (fluoroquinolone)",
+      "id": "lmtuukx69taauln7ah8"
+    },
+    {
+      "genericName": "Clindamycin Hydrochloride (Oral)",
+      "brandName": "Cleocin",
+      "drugClassName": "Antibiotic",
+      "id": "lmtuukx6a5e3qm0jh5u"
+    },
+    {
+      "genericName": "Clindamycin Phosphate (Topical)",
+      "brandName": "Cleocin T",
+      "drugClassName": "Topical acne agent",
+      "id": "lmtuukx68yn191jfz1c"
+    },
+    {
+      "genericName": "Clobetasol Propionate (Topical)",
+      "brandName": "Temovate",
+      "drugClassName": "Topical anti-inflammatory",
+      "id": "lmtuukx6hwjmk1okp"
+    },
+    {
+      "genericName": "Cyclobenzaprine Hydrochloride",
+      "brandName": "Amrix, Flexeril, Fexmid",
+      "drugClassName": "Muscle relaxant",
+      "id": "lmtuukx6uepevr9ar9h"
+    },
+    {
+      "genericName": "Diazepam",
+      "brandName": "Valium",
+      "drugClassName": "Antianxiety agent",
+      "id": "lmtuukx68oh92wm7nto"
+    },
+    {
+      "genericName": "Diclofenac Sodium (Oral)",
+      "brandName": "Voltaren, Voltaren XR",
+      "drugClassName": "Nonsteroidal Anti-inflammatory",
+      "id": "lmtuukx6d2mqvpjsdjp"
+    },
+    {
+      "genericName": "Diclofenac Sodium (Topical)",
+      "brandName": "Voltaren Gel",
+      "drugClassName": "Nonsteroidal Anti-inflammatory",
+      "id": "lmtuukx669h41lmx30p"
+    },
+    {
+      "genericName": "Doxycycline Hyclate",
+      "brandName": "Vibramycin",
+      "drugClassName": "Antibiotic (tetracycline)",
+      "id": "lmtuukx6rybr49w2o3s"
+    },
+    {
+      "genericName": "Dutasteride",
+      "brandName": "Avodart",
+      "drugClassName": "BPH agent",
+      "id": "lmtuukx6x7q2mned1n"
+    },
+    {
+      "genericName": "Eszopiclone",
+      "brandName": "Lunesta",
+      "drugClassName": "Sedative",
+      "id": "lmtuukx6fa8fy51lr1i"
+    },
+    {
+      "genericName": "Fentanyl (Transdermal)",
+      "brandName": "Duragesic",
+      "drugClassName": "Opioid analgesic",
+      "id": "lmtuukx6zo271nuro4d"
+    },
+    {
+      "genericName": "Finasteride",
+      "brandName": "Proscar",
+      "drugClassName": "BPH agent",
+      "id": "lmtuukx6k5n5ilt9t4"
+    },
+    {
+      "genericName": "Folic Acid",
+      "brandName": "---",
+      "drugClassName": "Vitamin",
+      "id": "lmtuukx6bd2k6e7seej"
+    },
+    {
+      "genericName": "Hydrocodone Bitartrate with Acetaminophen",
+      "brandName": "Lortab, Vicodin, Norco",
+      "drugClassName": "Opioid analgesic",
+      "id": "lmtuukx6dcmin7zc95"
+    },
+    {
+      "genericName": "Hydrocodone Bitartrate with Ibuprofen",
+      "brandName": "Vicoprofen",
+      "drugClassName": "Opioid analgesic",
+      "id": "lmtuukx6yyqhit3c5k"
+    },
+    {
+      "genericName": "Hydrocortisone (Rectal)",
+      "brandName": "Anusol-HC, Proctosol-HC",
+      "drugClassName": "Topical corticosteroid",
+      "id": "lmtuukx64y3d10veq5"
+    },
+    {
+      "genericName": "Hydromorphone Hydrochloride",
+      "brandName": "Dilaudid",
+      "drugClassName": "Opioid analgesic",
+      "id": "lmtuukx63103oysquk9"
+    },
+    {
+      "genericName": "Hydroxychloroquine Sulfate",
+      "brandName": "Plaquenil",
+      "drugClassName": "Antimalarial",
+      "id": "lmtuukx6dxebkodwm2o"
+    },
+    {
+      "genericName": "Ibuprofen",
+      "brandName": "Motrin",
+      "drugClassName": "Nonsteroidal Anti-inflammatory",
+      "id": "lmtuukx6dezo8fmcs4k"
+    },
+    {
+      "genericName": "Levofloxacin",
+      "brandName": "Levaquin",
+      "drugClassName": "Antibiotic (fluoroquinolone)",
+      "id": "lmtuukx6mnv63hu959s"
+    },
+    {
+      "genericName": "Lidocaine (Transdermal)",
+      "brandName": "Lidoderm",
+      "drugClassName": "Topical Analgesic",
+      "id": "lmtuukx60i20laclwuop"
+    },
+    {
+      "genericName": "Lorazepam",
+      "brandName": "Ativan",
+      "drugClassName": "Antianxiety agent",
+      "id": "lmtuukx661i0msjele3"
+    },
+    {
+      "genericName": "Meloxicam",
+      "brandName": "Mobic",
+      "drugClassName": "Nonsteroidal Anti-inflammatory",
+      "id": "lmtuukx6ga5l9qtk45t"
+    },
+    {
+      "genericName": "Methadone Hydrochloride",
+      "brandName": "Methadose",
+      "drugClassName": "Opioid analgesic",
+      "id": "lmtuukx6g2kdqnqj9rg"
+    },
+    {
+      "genericName": "Methenamine Hippurate",
+      "brandName": "Hiprex",
+      "drugClassName": "Urinary tract antiseptic",
+      "id": "lmtuukx66vus4vgys1q"
+    },
+    {
+      "genericName": "Methocarbamol",
+      "brandName": "Robaxin",
+      "drugClassName": "Muscle relaxant",
+      "id": "lmtuukx6kjkqmemyeu"
+    },
+    {
+      "genericName": "Methylprednisolone",
+      "brandName": "Medrol",
+      "drugClassName": "Anti-inflammatory",
+      "id": "lmtuukx6j64umfa1qu"
+    },
+    {
+      "genericName": "Metronidazole",
+      "brandName": "Flagyl",
+      "drugClassName": "Antibacterial / Antiprotozoal",
+      "id": "lmtuukx69rupse4iw0g"
+    },
+    {
+      "genericName": "Minocycline Hydrochloride",
+      "brandName": "Minocin",
+      "drugClassName": "Antibiotic (tetracycline)",
+      "id": "lmtuukx6fy89wykstsu"
+    },
+    {
+      "genericName": "Mirabegron",
+      "brandName": "Myrbetriq",
+      "drugClassName": "Urinary bladder modifier",
+      "id": "lmtuukx6fo7isi6vjyp"
+    },
+    {
+      "genericName": "Morphine Sulfate (Extended Release)",
+      "brandName": "MS Contin",
+      "drugClassName": "Opioid analgesic",
+      "id": "lmtuukx6s098rmcb8m"
+    },
+    {
+      "genericName": "Mupirocin (Topical)",
+      "brandName": "Bactroban",
+      "drugClassName": "Topical Antibiotic",
+      "id": "lmtuukx6x1zgor56gb"
+    },
+    {
+      "genericName": "Nabumetone",
+      "brandName": "Relafen",
+      "drugClassName": "Nonsteroidal Anti-inflammatory",
+      "id": "lmtuukx6polt1jyz5c"
+    },
+    {
+      "genericName": "Naltrexone Hydrochloride",
+      "brandName": "ReVia, Vivitrol",
+      "drugClassName": "Opioid antagonist",
+      "id": "lmtuukx6ubn9sqtcb2s"
+    },
+    {
+      "genericName": "Naproxen",
+      "brandName": "Naprosyn, EC-Naprosyn",
+      "drugClassName": "Nonsteroidal Anti-inflammatory",
+      "id": "lmtuukx6stx1vzv14pn"
+    },
+    {
+      "genericName": "Nitrofurantoin",
+      "brandName": "Macrodantin, Macrobid",
+      "drugClassName": "Antibacterial",
+      "id": "lmtuukx6nxe92bvhzyn"
+    },
+    {
+      "genericName": "Oxybutynin Chloride (Oral)",
+      "brandName": "Ditropan, Ditropan XL",
+      "drugClassName": "Urinary bladder modifier",
+      "id": "lmtuukx6lki013vrump"
+    },
+    {
+      "genericName": "Oxycodone Hydrochloride",
+      "brandName": "OxyContin, Roxicodone",
+      "drugClassName": "Opioid analgesic",
+      "id": "lmtuukx678f3v2eg57b"
+    },
+    {
+      "genericName": "Oxycodone with Acetaminophen",
+      "brandName": "Percocet, Roxicet, Endocet",
+      "drugClassName": "Opioid analgesic",
+      "id": "lmtuukx6gqnda5lkihj"
+    },
+    {
+      "genericName": "Phentermine Hydrochloride",
+      "brandName": "Adipex-P, Ionamin",
+      "drugClassName": "Weight management",
+      "id": "lmtuukx6sme49kozpae"
+    },
+    {
+      "genericName": "Potassium Chloride (Oral)",
+      "brandName": "Klor-Con, K-Dur, Micro-K",
+      "drugClassName": "Electrolyte",
+      "id": "lmtuukx6mn7g8fkq4ud"
+    },
+    {
+      "genericName": "Prednisone",
+      "brandName": "Deltasone",
+      "drugClassName": "Anti-inflammatory",
+      "id": "lmtuukx6yoenycysr0s"
+    },
+    {
+      "genericName": "Quinine Sulfate",
+      "brandName": "Qualaquin",
+      "drugClassName": "Antimalarial",
+      "id": "lmtuukx6mmqsxfeg07n"
+    },
+    {
+      "genericName": "Rizatriptan Benzoate",
+      "brandName": "Maxalt",
+      "drugClassName": "Antimigrainous agent",
+      "id": "lmtuukx6jmr7uwzn9u"
+    },
+    {
+      "genericName": "Solifenacin Succinate",
+      "brandName": "Vesicare",
+      "drugClassName": "Urinary bladder modifier",
+      "id": "lmtuukx6tly5qbhlzen"
+    },
+    {
+      "genericName": "Sulfamethoxazole with Trimethoprim",
+      "brandName": "Bactrim, Septra",
+      "drugClassName": "Antibiotic",
+      "id": "lmtuukx69b755nl7bx"
+    },
+    {
+      "genericName": "Sumatriptan Succinate",
+      "brandName": "Imitrex",
+      "drugClassName": "Antimigrainous agent",
+      "id": "lmtuukx6l2ccp1xx7o"
+    },
+    {
+      "genericName": "Tacrolimus (systemic)",
+      "brandName": "Astagraf XL, Prograf",
+      "drugClassName": "Immunosuppressant",
+      "id": "lmtuukx65sc9xqfjgvq"
+    },
+    {
+      "genericName": "Tamsulosin Hydrochloride",
+      "brandName": "Flomax",
+      "drugClassName": "BPH agent",
+      "id": "lmtuukx6z54zxyjc58"
+    },
+    {
+      "genericName": "Temazepam",
+      "brandName": "Restoril",
+      "drugClassName": "Sedative",
+      "id": "lmtuukx6pda8nhkuq8g"
+    },
+    {
+      "genericName": "Tizanidine Hydrochloride",
+      "brandName": "Zanaflex",
+      "drugClassName": "Muscle relaxant",
+      "id": "lmtuukx6pbiis4x8wfl"
+    },
+    {
+      "genericName": "Tolterodine Tartrate",
+      "brandName": "Detrol, Detrol LA",
+      "drugClassName": "Urinary bladder modifier",
+      "id": "lmtuukx6dpwa0ovh8o"
+    },
+    {
+      "genericName": "Tramadol Hydrochloride",
+      "brandName": "Ultram, Ultram ER",
+      "drugClassName": "Analgesic",
+      "id": "lmtuukx69gd81iurcnh"
+    },
+    {
+      "genericName": "Triamcinolone Acetonide (Topical)",
+      "brandName": "Kenalog",
+      "drugClassName": "Topical corticosteroid",
+      "id": "lmtuukx6xua2cvymzid"
+    },
+    {
+      "genericName": "Varenicline Tartrate",
+      "brandName": "Chantix",
+      "drugClassName": "Smoking cessation aid",
+      "id": "lmtuukx6ux7donqr51"
+    },
+    {
+      "genericName": "Vitamin D, Ergocalciferol",
+      "brandName": "Drisdol",
+      "drugClassName": "Vitamin",
+      "id": "lmtuukx6d1hbjpquogs"
+    },
+    {
+      "genericName": "Zaleplon",
+      "brandName": "Sonata",
+      "drugClassName": "Sedative",
+      "id": "lmtuukx6u1ao0xzew3"
+    },
+    {
+      "genericName": "Zolpidem Tartrate",
+      "brandName": "Ambien (CR)",
+      "drugClassName": "Sedative",
+      "id": "lmtuukx60431vmmn4kc2"
+    }
+  ]
+}

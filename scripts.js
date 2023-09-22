@@ -269,7 +269,7 @@ function loadPrev(){
         console.log('Removed one from card index. Index is now ' + cardIndex);
         cardToLoad = viewedCards[cardIndex];
         console.log('Previous card in the stack found. Going back to index' + cardToLoad);
-        loadCard(cardToLoad);
+        loadCard(cardToLoad.id);
     }else{
         console.log('No previous card in stack. Not going back');
         alert('At beginning of card stack');
@@ -338,9 +338,9 @@ function toggleHistory(){
     showHistory = !showHistory;
 
     if(showHistory){
-        document.getElementById('history').style.visibility='visible';
+        document.getElementById('history-items').style.visibility='visible';
     }else{
-        document.getElementById('history').style.visibility='hidden';
+        document.getElementById('history-items').style.visibility='hidden';
     }
 }
 
