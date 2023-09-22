@@ -35,9 +35,6 @@ function setDeckOptions(cardLibrary){
         }
 
     });
-
-    console.log('Card deck options');
-    console.log(optionsArray);
     setSelectOptions('card-deck', optionsArray, null, false)
 }
 
@@ -47,12 +44,15 @@ async function loadDeck(deckUrl){
         console.warn('No deck URL provided to load deck. Aborting');
         return;
     }
+
     console.log('Loading card library: ' + deckUrl);
     const response = await fetch(deckUrl+'?cache-invalidate='+Date.now(), {cache: "no-store"});
     const deckData = await response.json();
     console.log(deckData);
 
-    cards = deckData.cards;
+    cards = assignCardIds(deckData.cards);
+
+    console.log(JSON.stringify(cards));
     availableCards = cards;
     config = deckData.config;
 
@@ -61,24 +61,51 @@ async function loadDeck(deckUrl){
     console.log(cards);
     console.log('Config');
     console.log(config);
-    document.getElementById("content-header").innerHTML= `Card Stack: ${cardStack} - ${cards.length} Cards`; 
+    document.getElementById("content-header").innerHTML= `Card Stack: ${config.name} - ${cards.length} Cards`; 
     
     setPromptKey(config.defaultPrompt);
-    setAnswerKey(config.defaultAnswer);
     
-    setSelectOptions('promptKey', config.promptKeys, promptKey, true);
-    setSelectOptions('answerKey', config.answerKeys, answerKey, true);
+    setSelectOptions('prompt-key', config.promptKeys, promptKey, true);
+    //setSelectOptions('answerKey', config.answerKeys, answerKey, true);
     //loadCard(0);
 }
 
-function loadCard(index, forceIndex){
-    
-    console.log('Loading card from stack #: ' + index);
-    
+/**
+ * @description ensures that every card has a unique ID so that can be identified between the stack containing all cards (window.cards) and all available cards (window.availableCards)
+ * @param {Array} cards a array of card objects which to assign ids if they do not posses one.
+ * @returns list of cards with set modified ids
+ */
+function assignCardIds(cards){
+    for(card in cards){
+        if(!card.hasOwnProperty('id')){
+            cards[card].id = Date.now().toString(36) + Math.random().toString(36).substr(2);
+        }
+    }
+    return cards;
+}
+
+function getCardById(cardId){
+    return cards.find(card => card.id === cardId);
+}
+
+/**
+ * @description Loads a requested card into view. If the card already exists in the stack, it moves to that index position and displayed it. If not
+ * the card is loaded from the available stack and displayed. The card is then removed from the available list
+ * @param {*} cardId 
+ * @param {*} forceIndex 
+ */
+function loadCard(cardId, forceIndex){
+
+    //flip the card back to the question side
     document.getElementById('answer-card').classList.remove("flip-card-flipped")
     
     hintIndex = 0;
-    currentCard = cards[index];
+
+    //find the current card information by using the id
+    console.log('Getting card with id: ' + cardId);
+    currentCard = getCardById(cardId);
+
+
     if(forceIndex) {
         console.log('Forcing index to: ' +forceIndex);
         cardIndex = forceIndex;
@@ -87,9 +114,9 @@ function loadCard(index, forceIndex){
     console.log(currentCard);
 
 
-    setSelectedHistoryCard(index);
+    setSelectedHistoryCard(currentCard.id);
     
-    //removeCardFromAvailable(index);
+    removeCardFromAvailable(currentCard.id);
     
     let promptVal = promptKey;
     let answerVal = answerKey;
@@ -122,7 +149,7 @@ function loadCard(index, forceIndex){
     console.log(config.promptKeys);
     console.log(config.answerKeys);
     */
-    document.getElementById("prompt").innerHTML= `${index+1} - ${selectedPromptKeyText}<br/> <span class="prompt-text">${currentCard[promptVal]}</span>`; 
+    document.getElementById("prompt").innerHTML= `${selectedPromptKeyText}<br/> <span class="prompt-text">${currentCard[promptVal]}</span>`; 
     document.getElementById("answer").innerHTML= `${generateAnswerText(currentCard)}`;
     
     document.getElementById("drug-class").innerHTML=currentCard.drugClassName;
@@ -134,12 +161,18 @@ function loadCard(index, forceIndex){
      console.log(viewedCards);	 			
 }
 
-function removeCardFromAvailable(cardIndex){
-    console.log('Removing card from stack ' + cardIndex);
+function removeCardFromAvailable(cardId){
+    console.log('Removing card from stack with Id' + cardId);
     availableCards.splice(cardIndex, 1);
     console.log(availableCards);
+
+    availableCards = availableCards.filter(item => item.id !== cardId);
+
+    console.log('Available cards is now: ');
+    console.log(availableCards);
 }
-function setSelectedHistoryCard(cardIndex){
+
+function setSelectedHistoryCard(cardId){
     
     var elems = document.querySelectorAll(".history-item");
 
@@ -147,9 +180,9 @@ function setSelectedHistoryCard(cardIndex){
         el.classList.remove("selected-history-item");
     });
 
-    console.log('Attempting to highlight card with index: ' + cardIndex);
+    console.log('Attempting to highlight card with index: ' + cardId);
     try{
-        document.querySelectorAll(`.history-item[data-index="${cardIndex}"]`)[0].classList.add("selected-history-item");
+        document.querySelectorAll(`.history-item[data-card-id="${cardId}"]`)[0].classList.add("selected-history-item");
     }catch(ex){
         console.log('Could not hightlight item');
         console.log(ex);
@@ -159,8 +192,9 @@ function setSelectedHistoryCard(cardIndex){
 function generateAnswerText(card){
     let answerString = '';
     for (const [key, value] of Object.entries(card)) {
-      let keyLabel = config.labels.hasOwnProperty(key) ? config.labels[key] : key;
-      answerString += `${keyLabel}: ${value} </br>`;
+        if(key == 'id') continue;
+        let keyLabel = config.labels.hasOwnProperty(key) ? config.labels[key] : key;
+        answerString += `${keyLabel}: ${value} </br>`;
     }
     return answerString;
 }
@@ -169,6 +203,7 @@ function loadNext(){
     console.log('---------------------------------- Loading next card. Card Index: ' + cardIndex);
     console.log(viewedCards);
     
+    //card object to load next
     let cardToLoad;
 
     if(historyEntryToWrite != null){
@@ -176,27 +211,29 @@ function loadNext(){
         historyEntryToWrite = null;
     }
 
+    //if we are back in the stack, then instead just move up to the next card
     if(viewedCards.length > cardIndex){
         console.log('Exising card in stack. Loading card at index: ' + cardIndex);
-        cardToLoad = cardIndex;
         cardIndex++;
-        
-        loadCard(cardToLoad);
+        loadCard(viewedCards[cardIndex].id);
     }		
     else {
         if(!useRandom){
-            cardToLoad = cardIndex;
+            cardToLoad = cards[cardIndex];
         }else{
-            cardToLoad = Math.floor(Math.random()*cards.length)	
+            if(!preventDuplicates) cardToLoad = Math.floor(Math.random()*cards.length)	
+            else cardToLoad = Math.floor(Math.random()*availableCards.length)	
         }
         
+        console.log('Card to load set to:');
+        console.log(cardToLoad);
         createHistoryEntry(cardToLoad,cardIndex);
         viewedCards.push(cardToLoad);
         cardIndex++;
         
         document.getElementById("history-items").scrollIntoView({ behavior: 'smooth', block: 'end' });
         
-        loadCard(cardToLoad);
+        loadCard(cardToLoad.id);
     }
         
     
@@ -205,15 +242,14 @@ function loadNext(){
 }
 
 
-function createHistoryEntry(cardIndex,navigationPosition){
-    let cardData = cards[cardIndex];
-    let cardTitle = cardData.genericName;
+function createHistoryEntry(cardData,navigationPosition){
     var div = document.createElement('div');
-    div.innerHTML = `${cardIndex+1}) ${cardTitle}`;
-    div.setAttribute('class', 'history-item');
-    div.setAttribute('onClick', `loadCard(${cardIndex},${navigationPosition+1})`);
-    div.setAttribute('data-index', `${cardIndex}`);
 
+    //TODO - Replace this with whatever 
+    div.innerHTML = `${cardData.genericName}`;
+    div.setAttribute('class', 'history-item');
+    div.setAttribute('onClick', `loadCard('${cardData.id}',${navigationPosition+1})`);
+    div.setAttribute('data-card-id', `${cardData.id}`);
     //stack the entry into the div
     historyEntryToWrite = div;
 }
@@ -268,6 +304,8 @@ function showNextHintLetter(){
 function setSelectOptions(selectId, optionsArray, defaultValue, includeRandom){
 
     let selectList = document.getElementById(selectId);
+
+    selectList.length = 0;
     
     for (var i = 0; i < optionsArray.length; i++) {
         var option = document.createElement("option");
@@ -291,10 +329,6 @@ function setPromptKey(value){
     promptKey = value;
 }
 
-function setAnswerKey(value){
-    console.log('Setting answer key: ' + value);
-    answerKey = value;
-}
 
 function setPreventDupes(){
     preventDuplicates = !preventDuplicates;
@@ -310,4 +344,6 @@ function toggleHistory(){
     }
 }
 
-loadCardLibrary();
+window.onload = function() {
+    loadCardLibrary();
+};
