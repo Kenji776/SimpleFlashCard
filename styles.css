@@ -45,7 +45,7 @@ body{
 .footer { grid-area: footer; 
     position: relative;
     width: 60vw;
-    height:2vh;
+    height:4vh;
 
 }
 .content { 
@@ -295,4 +295,8 @@ select:invalid { color: gray; }
     font-weight: 900;
     color: #04AA6D;
     /*text-shadow: black 0.1em 0.1em 0.2em*/
+}
+
+.history-item-review{
+    color:red;
 }

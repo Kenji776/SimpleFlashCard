@@ -16,6 +16,10 @@ var historyEntryToWrite;
 var showHistory = true;
 var selectedDeckCategory = 'pharmacy'
 var showUi = false;
+var useTimer = false;
+var timerSeconds = 10;
+var timer;
+var elapsedSeconds = 0;
 
 async function loadCardLibrary(){
     console.log('Loading card library');
@@ -99,14 +103,43 @@ function getCardById(cardId){
     return cards.find(card => card.id === cardId);
 }
 
+function clearTimer(){
+    elapsedSeconds = 0;
+    clearInterval(timer);
+}
+
+function updateTimer(){
+    elapsedSeconds++;
+    try{
+        console.log(document.getElementById('timer-display'));
+
+        if(elapsedSeconds > timerSeconds){
+            clearTimer();
+            loadNext(true);
+        }
+        document.getElementById('timer-display').innerHTML = `Time ${elapsedSeconds} / ${timerSeconds}`;
+    }catch(ex){
+        console.error(ex);
+    }
+}
+
 /**
  * @description Loads a requested card into view. If the card already exists in the stack, it moves to that index position and displayed it. If not
  * the card is loaded from the available stack and displayed. The card is then removed from the available list
  * @param {*} cardId 
  * @param {*} forceIndex 
  */
-function loadCard(cardId, forceIndex){
+function loadCard(cardId, forceIndex, markForReview){
 
+    /*
+    if(useTimer){
+        clearTimer();
+
+        console.log('Resetting Timer');
+
+        timer = setInterval(updateTimer, 1000);
+    }
+    */
     //flip the card back to the question side
     document.getElementById('answer-card').classList.remove("flip-card-flipped")
     
@@ -150,7 +183,7 @@ function loadCard(cardId, forceIndex){
         console.log(viewedCards)
         console.log('Creating history item for card');
         console.log(currentCard);
-        createHistoryEntry(currentCard,viewedCards.length,currentCard[promptVal]);
+        createHistoryEntry(currentCard,viewedCards.length,currentCard[promptVal], markForReview);
         viewedCards.push(currentCard);
     }
 
@@ -214,7 +247,7 @@ function generateAnswerText(card){
     return answerString;
 }
 
-function loadNext(){
+function loadNext(markLastForReview=false){
     console.log('---------------------------------- Loading next card. Card Index: ' + cardIndex);
     console.log(viewedCards);
     
@@ -237,7 +270,7 @@ function loadNext(){
     if(viewedCards.length > cardIndex){
         console.log('Exising card in stack. Loading card at index: ' + cardIndex);
         cardIndex++;
-        loadCard(viewedCards[cardIndex].id);
+        loadCard(viewedCards[cardIndex].id,false,markLastForReview);
     }		
     else {
         if(!useRandom){
@@ -257,7 +290,7 @@ function loadNext(){
         cardIndex++;
         document.getElementById("history-items").scrollIntoView({ behavior: 'smooth', block: 'end' });
         
-        loadCard(cardToLoad.id);
+        loadCard(cardToLoad.id,false,markLastForReview);
     }
         
     
@@ -266,7 +299,7 @@ function loadNext(){
 }
 
 
-function createHistoryEntry(cardData,navigationPosition,entryLabel){
+function createHistoryEntry(cardData,navigationPosition,entryLabel, markForReview){
     var div = document.createElement('div');
 
     //TODO - Replace this with whatever 
@@ -274,6 +307,9 @@ function createHistoryEntry(cardData,navigationPosition,entryLabel){
     div.setAttribute('class', 'history-item');
     div.setAttribute('onClick', `loadCard('${cardData.id}',${navigationPosition})`);
     div.setAttribute('data-card-id', `${cardData.id}`);
+    if(markForReview){
+        div.setAttribute('class', 'history-item history-item-review');
+    }
     //stack the entry into the div
     historyEntryToWrite = div;
 }
@@ -303,6 +339,7 @@ function loadPrev(){
 }
 
 function showAnswer(){
+    clearTimer();
     document.getElementById('answer').style.visibility='visible';
     let card = document.getElementById('answer-card').classList.toggle("flip-card-flipped")
 }
@@ -383,6 +420,17 @@ function setUi(enableUi){
     }
     
     
+}
+
+function setTimer(){
+    useTimer = !useTimer;
+
+    if(useTimer){
+        document.getElementById('timer-controls').style.visibility='visible';
+    }else{
+        document.getElementById('timer-controls').style.visibility='hidden'
+        clearTimer();
+    }
 }
 
 window.onload = function() {
