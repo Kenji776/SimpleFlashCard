@@ -159,6 +159,7 @@ body{
     border-radius:10px;
     background-color:rgb(231, 233, 235);
     padding:15px;
+    overflow:auto;
 }
 
 .flip-card {
