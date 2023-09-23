@@ -19,7 +19,7 @@ var showUi = false;
 
 async function loadCardLibrary(){
     console.log('Loading card library');
-    const response = await fetch("https://kenji776.github.io/SimpleFlashChard/cardLibrary.json?cache-invalidate="+Date.now(), {cache: "no-store"});
+    const response = await fetch("https://pharmacy-flashcards-2027.lol/cardLibrary.json?cache-invalidate="+Date.now(), {cache: "no-store"});
     const cardLibrary = await response.json();
     console.log(cardLibrary);
 
