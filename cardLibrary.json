@@ -23,16 +23,16 @@
             "description": "Collection of drug generic names and brand names",
             "url": "https://kenji776.github.io/SimpleFlashChard/cards/Pharmacy/GroupD.cards"
           }
-        },
-		"DeveloperTest": [
+        }
+      ],
+      "DeveloperTest": [
         {
-			"multiple_select_test":{
+			    "multiple_select_test":{
 	            "name": "Multiple Choice Selection Test",
-				"description": "Developer test of multiple choice select",
-				"url": "https://kenji776.github.io/SimpleFlashChard/cards/DeveloperTest/multipleChoice.cards"
-			  }		
-			}
-		}
+				      "description": "Developer test of multiple choice select",
+				      "url": "https://kenji776.github.io/SimpleFlashChard/cards/DeveloperTest/multipleChoice.cards"
+			    }		
+			  }
       ]
     }
   }
