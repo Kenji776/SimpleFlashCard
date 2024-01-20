@@ -6,33 +6,33 @@
           "drugs_group_a": {
             "name": "Drugs Group A",
             "description": "Collection of drug generic names and brand names",
-            "url": "https://kenji776.github.io/SimpleFlashChard/cards/Pharmacy/groupA.cards"
+            "url": "https://pharmacy-flashcards-2027.lol/cards/Pharmacy/groupA.cards"
           },
           "drugs_group_b": {
             "name": "Drugs Group B",
             "description": "Collection of drug generic names and brand names",
-            "url": "https://kenji776.github.io/SimpleFlashChard/cards/Pharmacy/GroupB.cards"
+            "url": "https://pharmacy-flashcards-2027.lol/cards/Pharmacy/GroupB.cards"
           },
           "drugs_group_c": {
             "name": "Drugs Group C",
             "description": "Collection of drug generic names and brand names",
-            "url": "https://kenji776.github.io/SimpleFlashChard/cards/Pharmacy/GroupC.cards"
+            "url": "https://pharmacy-flashcards-2027.lol/cards/Pharmacy/GroupC.cards"
           },
           "drugs_group_d": {
             "name": "Drugs Group D",
             "description": "Collection of drug generic names and brand names",
-            "url": "https://kenji776.github.io/SimpleFlashChard/cards/Pharmacy/GroupD.cards"
+            "url": "https://pharmacy-flashcards-2027.lol/cards/Pharmacy/GroupD.cards"
           }
-        },
-		"DeveloperTest": [
+        }
+      ],
+      "DeveloperTest": [
         {
-			"multiple_select_test":{
+			    "multiple_select_test":{
 	            "name": "Multiple Choice Selection Test",
-				"description": "Developer test of multiple choice select",
-				"url": "https://kenji776.github.io/SimpleFlashChard/cards/DeveloperTest/multipleChoice.cards"
-			  }		
-			}
-		}
+				      "description": "Developer test of multiple choice select",
+				      "url": "https://pharmacy-flashcards-2027.lol/cards/DeveloperTest/multipleChoice.cards"
+			    }		
+			  }
       ]
     }
   }
