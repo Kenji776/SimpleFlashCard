@@ -2,33 +2,37 @@
   "card_stacks": {
     "categories": {
       "Pharmacy": [
-        "drugs_group_a": {
-          "name": "Drugs Group A",
-          "description": "Collection of drug generic names and brand names",
-          "url": "https://pharmacy-flashcards-2027.lol/cards/Pharmacy/groupA.cards"
-        },
-        "drugs_group_b": {
-          "name": "Drugs Group B",
-          "description": "Collection of drug generic names and brand names",
-          "url": "https://pharmacy-flashcards-2027.lol/cards/Pharmacy/GroupB.cards"
-        },
-        "drugs_group_c": {
-          "name": "Drugs Group C",
-          "description": "Collection of drug generic names and brand names",
-          "url": "https://pharmacy-flashcards-2027.lol/cards/Pharmacy/GroupC.cards"
-        },
-        "drugs_group_d": {
-          "name": "Drugs Group D",
-          "description": "Collection of drug generic names and brand names",
-          "url": "https://pharmacy-flashcards-2027.lol/cards/Pharmacy/GroupD.cards"
+        {
+          "drugs_group_a": {
+            "name": "Drugs Group A",
+            "description": "Collection of drug generic names and brand names",
+            "url": "https://pharmacy-flashcards-2027.lol/cards/Pharmacy/groupA.cards"
+          },
+          "drugs_group_b": {
+            "name": "Drugs Group B",
+            "description": "Collection of drug generic names and brand names",
+            "url": "https://pharmacy-flashcards-2027.lol/cards/Pharmacy/GroupB.cards"
+          },
+          "drugs_group_c": {
+            "name": "Drugs Group C",
+            "description": "Collection of drug generic names and brand names",
+            "url": "https://pharmacy-flashcards-2027.lol/cards/Pharmacy/GroupC.cards"
+          },
+          "drugs_group_d": {
+            "name": "Drugs Group D",
+            "description": "Collection of drug generic names and brand names",
+            "url": "https://pharmacy-flashcards-2027.lol/cards/Pharmacy/GroupD.cards"
+          }
         }
       ],
       "DeveloperTest": [
-        "multiple_select_test":{
-            "name": "Multiple Choice Selection Test",
-            "description": "Developer test of multiple choice select",
-            "url": "https://kenji776.github.io/SimpleFlashChard/cards/DeveloperTest/multipleChoice.cards"
-        }	
+        {
+			    "multiple_select_test":{
+	            "name": "Multiple Choice Selection Test",
+				      "description": "Developer test of multiple choice select",
+				      "url": "https://kenji776.github.io/SimpleFlashChard/cards/DeveloperTest/multipleChoice.cards"
+			    }		
+        }
       ]
     }
   }
