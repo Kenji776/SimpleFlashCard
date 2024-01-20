@@ -1,4 +1,4 @@
-var cardStack = '';
+var cardLibrary = {};
 var currentCard = {};
 var cardIndex = 0;
 var promptKey = 'brandName';
@@ -14,14 +14,14 @@ var availableCards = [];
 var hintText = 'Stuck? Try clicking Show Drug Class or Show Next Letter!';
 var historyEntryToWrite;
 var showHistory = true;
-var selectedDeckCategory = 'pharmacy'
+var selectedDeckCategory = 'Pharmacy'
 var showUi = false;
 var categories = [];
 
 async function loadCardLibrary(){
     console.log('Loading card library');
     const response = await fetch("https://pharmacy-flashcards-2027.lol/cardLibrary.json?cache-invalidate="+Date.now(), {cache: "no-store"});
-    const cardLibrary = await response.json();
+    cardLibrary = await response.json();
     console.log(cardLibrary);
 
     setDeckCategories(cardLibrary);
@@ -45,24 +45,25 @@ function setDeckCategories(deckData){
 
     console.log('Writting options array');
     console.log(optionsArray);
-    setSelectOptions('deck-category', optionsArray, null, false, false)
+    setSelectOptions('deck-category', optionsArray, null, false, true)
     return categories;
 }
 
 /*
 * @description Populates the 'card-deck' select with options from the selected deck category
 */
-function setDeckOptions(cardLibrary){
+function setDeckOptions(){
 
     let optionsArray = [];
-    [].forEach.call(cardLibrary.card_stacks.categories[selectedDeckCategory], function(category) {
-        for(deck in category){
-            console.log(category[deck]);
-            optionsArray.push({'value':category[deck].url,'label':category[deck].name});
-        }
+    console.log('Select deck options for selectedDeck ' + selectedDeckCategory);
+    console.log(cardLibrary)
+    for(let deckIndex in cardLibrary.card_stacks.categories[selectedDeckCategory]){
+        let deck = cardLibrary.card_stacks.categories[selectedDeckCategory][deckIndex];
 
-    });
-    setSelectOptions('card-deck', optionsArray, null, false, false)
+        console.log(deck);
+        optionsArray.push({'value':deck.url,'label':deck.name});
+    }
+    setSelectOptions('card-deck', optionsArray, null, false, true)
 }
 
 function setSelectedDeckCategory(categoryId){
