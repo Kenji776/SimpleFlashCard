@@ -92,15 +92,15 @@
 					<img src="media/question.png" id="help-icon" style="float:left" />
 					<div id="hint-title">Hints</div>
 					<div id="hint-text"></div>
-					<div id="drug-class"></div>
+					<div id="clue-text"></div>
 				</div>
 
 				<div id="button-container" class="center">
-					<button type="button" class="button" onclick="loadPrev()">Previous</button>
-					<button type="button" class="button" onclick="showDrugClass()">Show Drug Class</button>
+					<button type="button" class="button" id="prev-button" onclick="loadPrev()">Previous</button>
+					<button type="button" class="button" id="clue-button" onclick="showClue()">Clue</button>
 					<img src="media/flip.png" onclick="showAnswer()" id="flip-button" />
-					<button type="button" class="button" onclick="showNextHintLetter()">Show Next Letter</button>
-					<button type="button" class="button" onclick="loadNext()">Next</button>
+					<button type="button" class="button" id="next-letter-button" onclick="showNextHintLetter()">Show Next Letter</button>
+					<button type="button" class="button" id="next-button" onclick="loadNext()">Next</button>
 				</div>
 			</div>
         </div>

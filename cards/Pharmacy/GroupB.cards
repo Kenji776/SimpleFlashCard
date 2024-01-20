@@ -23,10 +23,12 @@
     ],
     "defaultPrompt": "genericName",
     "defaultAnswer": "brandName",
+    "clueTextKey": drugClassName,
     "labels": {
       "genericName": "Generic Name",
       "brandName": "Brand Name",
-      "drugClassName": "Drug Class Name"
+      "drugClassName": "Drug Class Name",
+      "clueButtonName": "Drug Class Name"
     }
   },
   "cards": [

@@ -23,10 +23,12 @@
     ],
     "defaultPrompt": "genericName",
     "defaultAnswer": "brandName",
+    "clueTextKey": drugClassName,
     "labels": {
       "genericName": "Generic Name",
       "brandName": "Brand Name",
-      "drugClassName": "Drug Class Name"
+      "drugClassName": "Drug Class Name",
+      "clueButtonName": "Drug Class Name"
     }
   },
   "cards": [
@@ -505,7 +507,7 @@
     "id": "lmtum4utqsnx84823zg"
   },
   {
-    "genericName": "* Misspelled in Sigler’s",
+    "genericName": "* Misspelled in Siglerï¿½s",
     "brandName": "",
     "drugClassName": "",
     "id": "lmtum4utoyutvwdgib"

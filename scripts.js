@@ -17,6 +17,7 @@ var showHistory = true;
 var selectedDeckCategory = 'Pharmacy'
 var showUi = false;
 var categories = [];
+var answerResults = [];
 
 async function loadCardLibrary(){
     console.log('Loading card library');
@@ -87,11 +88,15 @@ async function loadDeck(deckUrl){
         console.log(selectedValue);
         deckUrl = selectedValue;
         console.log('Deck url is...' + deckUrl);
+
+        var clueBtn = document.getElementById("clue-button");
+        clueBtn.name = config?.label?.clueButtonName ? config.label.clueButtonName : 'Clue';
     }
     viewedCards = [];
     availableCards = [];
     cards = [];
     cardIndex = 0;
+    answerResults = [];
 
     if(!deckUrl || deckUrl == 'none'){
         console.warn('No deck URL provided to load deck. Aborting');
@@ -240,15 +245,16 @@ function loadCard(cardId, forceIndex){
     document.getElementById("prompt").innerHTML= `${selectedPromptKeyText}<br/> <span class="prompt-text">${currentCard[promptVal]}</span>`; 
     
     if(currentCard.type == 'choice'){
-        document.getElementById("answer").innerHTML= generateSelectListFromOptions(currentCard.options,currentCard.correctAnswerValue);
+        document.getElementById("answer").innerHTML= document.getElementById("prompt").innerHTML;
+        document.getElementById("answer").appendChild(generateSelectListFromOptions(currentCard.options,currentCard.correctAnswerValue));
     }else{
         document.getElementById("answer").innerHTML= `${generateAnswerText(currentCard)}`;
     }
     
     
-    document.getElementById("drug-class").innerHTML=currentCard.drugClassName;
+    document.getElementById("clue-text").innerHTML=currentCard[config.clueTextKey];
     //document.getElementById('answer').style.visibility='hidden';
-    document.getElementById('drug-class').style.visibility='hidden';
+    document.getElementById('clue-text').style.visibility='hidden';
     document.getElementById('hint-text').style.visibility='hidden';
 
     document.getElementById("viewed-total").innerHTML = `${viewedCards.length} / ${cards.length}`;
@@ -282,13 +288,29 @@ function setSelectedHistoryCard(cardId){
 function generateAnswerText(card){
     let answerString = '';
     for (const [key, value] of Object.entries(card)) {
-        if(key == 'id') continue;
+        if(key == 'id' || typeof value === 'object') continue;
         let keyLabel = config.labels.hasOwnProperty(key) ? config.labels[key] : key;
         answerString += `${keyLabel}: ${value} </br>`;
     }
     return answerString;
 }
 
+function recordQuestionResponse(card,givenAnswer,correctAnswer,scoreMod){
+    answerResults.push({
+        "card": card,
+        "givenAnswer": givenAnswer,
+        "correctAnswer": correctAnswer,
+        "scoreMod": scoreMod,
+        "wasCorrect": givenAnswer == correctAnswer ? true : false 
+    });
+
+    console.log('Question Response Recorded!');
+    console.log(answerResults);
+}
+
+function modifyScore(modifyValue){
+
+}
 function loadNext(){
     console.log('---------------------------------- Loading next card. Card Index: ' + cardIndex);
     console.log(viewedCards);
@@ -386,8 +408,8 @@ function setRandom(){
     useRandom = !useRandom;
 }
 
-function showDrugClass() {
-    document.getElementById('drug-class').style.visibility='visible';
+function showClue() {
+    document.getElementById('clue-text').style.visibility='visible';
     
 }
 
@@ -413,6 +435,40 @@ function generateSelectListFromOptions(optionsArray,correctValue){
         form.appendChild(createOptionRadio(option,correctValue));
     }
     //optionsArray.forEach(({ option }) => form.appendChild(createOptionRadio(option)));
+
+    const answerBtn = document.createElement('input');
+    answerBtn.type = 'button';
+    answerBtn.className = 'answer-button';
+    answerBtn.value = `Submit Answer`;
+    answerBtn.id = `answer-btn`;
+    answerBtn.name = `answer-btn`;
+    answerBtn.setAttribute('data-correct-value',correctValue);
+    answerBtn.onclick = function(event){
+        var options = document.getElementsByName('question-options');
+        var selectedOptionValue;
+
+        console.log('Target is: ' + event);
+        console.log(event.target);
+        for(var i = 0; i < options.length; i++){
+            if(options[i].checked){
+                selectedOptionValue = options[i].value;
+            }
+        }
+
+        let pointsMod = currentCard.points ? currentCard.points : 1;
+        console.log(event.target.getAttribute('data-correct-value') + ' vs ' + selectedOptionValue);
+        if(event.target.getAttribute('data-correct-value') === selectedOptionValue){
+            alert(config.correctAnswerText);
+        }else
+        {
+            alert(config.wrongAnswerText);
+            pointsMod = pointsMod * -1;
+        }
+
+        recordQuestionResponse(currentCard,selectedOptionValue,event.target.getAttribute('data-correct-value'),pointsMod);
+    }
+
+    form.appendChild(answerBtn);
     container.appendChild(form);
 
     return container;
@@ -428,9 +484,9 @@ function createOptionRadio(optionData,correctValue){
     input.className = 'question-option';
     input.value = optionData.value;
     input.id = `option-${optionData.value}`;
-    input.name = `option-${optionData.value}`;
+    input.name = `question-options`;
     
-    if(optionData.value == correctValue) input.setAttribute('data-correct',true);
+    if(optionData.value == correctValue) input.setAttribute('data-correct-value',true);
 
     const label = document.createElement('label');
     label.for = input.name;
