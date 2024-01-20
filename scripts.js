@@ -178,30 +178,41 @@ function loadCard(cardId, forceIndex){
     
     removeCardFromAvailable(currentCard.id);
 
-    if(currentCard.hasOwnProperty('options')){
-        console.log('Multiple Choice Card Selected');
-        let selectHtml = generateSelectListFromOptions(currentCard.options);
 
-        //document.body.appendChild(selectHtml);
-
-        console.log(selectHtml);
-    }
     
     let promptVal = promptKey;
     let answerVal = answerKey;
-    
-    if(promptKey == 'random'){
-        console.log('Randomizing prompt value');	
-        promptVal = config.promptKeys[Math.floor(Math.random()*config.promptKeys.length)].value;
-    }
-    if(answerKey == 'random'){
-        console.log('Randomizing answer value');
-        answerVal = config.answerKeys[Math.floor(Math.random()*config.answerKeys.length)].value;		
+    let selectedAnswerKeyText = '';
+    let selectedPromptKeyText = '';
+
+ 
+
+    //if this is a multple choice question then we can't randomize the answers
+    if(currentCard.hasOwnProperty('options')){
+        console.log('Multiple Choice Card Selected');
+        console.log(currentCard);
+
+    }else{
+        try{
+            if(promptKey == 'random'){
+                console.log('Randomizing prompt value');	
+                promptVal = config.promptKeys[Math.floor(Math.random()*config.promptKeys.length)].value;
+            }
+            if(answerKey == 'random'){
+                console.log('Randomizing answer value');
+                answerVal = config.answerKeys[Math.floor(Math.random()*config.answerKeys.length)].value;		
+            }
+        }catch(ex){
+            console.warn('Unable to randomize question');
+            console.error(ex);
+        }
+        selectedAnswerKeyText = config.answerKeys.find(x => x.value === answerVal).label;
+        selectedPromptKeyText = config.promptKeys.find(x => x.value === promptVal).label;
     }
 
-    var selectedAnswerKeyText = config.answerKeys.find(x => x.value === answerVal).label;
-    var selectedPromptKeyText = config.promptKeys.find(x => x.value === promptVal).label;
-   
+
+
+
     //create the history entry if it doesn't exist for this card.
     if(!viewedCards.some(e => e.id === currentCard.id)) {
         console.log('Viewed cards does not have an entry for id: ' + currentCard.id);
@@ -227,7 +238,13 @@ function loadCard(cardId, forceIndex){
     console.log(config.answerKeys);
     */
     document.getElementById("prompt").innerHTML= `${selectedPromptKeyText}<br/> <span class="prompt-text">${currentCard[promptVal]}</span>`; 
-    document.getElementById("answer").innerHTML= `${generateAnswerText(currentCard)}`;
+    
+    if(currentCard.type == 'choice'){
+        document.getElementById("answer").innerHTML= generateSelectListFromOptions(currentCard.options,currentCard.correctAnswerValue);
+    }else{
+        document.getElementById("answer").innerHTML= `${generateAnswerText(currentCard)}`;
+    }
+    
     
     document.getElementById("drug-class").innerHTML=currentCard.drugClassName;
     //document.getElementById('answer').style.visibility='hidden';
@@ -383,32 +400,41 @@ function showNextHintLetter(){
     
 }
 
-function generateSelectListFromOptions(optionsArray){
+function generateSelectListFromOptions(optionsArray,correctValue){
     const container = document.createElement('div');
     container.className = 'question-container';
 
+    console.log('Options array...');
+    console.log(optionsArray);
+
     const form = document.createElement('form');
-    optionsArray.forEach(({ option }) => form.appendChild(createOptionRadio(option)));
+    form.setAttribute('data-correct-value',correctValue);
+    for(let option of optionsArray){
+        form.appendChild(createOptionRadio(option,correctValue));
+    }
+    //optionsArray.forEach(({ option }) => form.appendChild(createOptionRadio(option)));
     container.appendChild(form);
 
     return container;
 }
 
-function createOptionRadio(option){
+function createOptionRadio(optionData,correctValue){
     console.log('Creating radio option from');
-    console.log(option);
+    console.log(optionData);
     const container = document.createElement('div');
 
     const input = document.createElement('input');
     input.type = 'radio';
     input.className = 'question-option';
-    input.value = value;
-    input.id = `option-${option.value}`;
-    input.name = `option-${option.value}`;
+    input.value = optionData.value;
+    input.id = `option-${optionData.value}`;
+    input.name = `option-${optionData.value}`;
+    
+    if(optionData.value == correctValue) input.setAttribute('data-correct',true);
 
     const label = document.createElement('label');
     label.for = input.name;
-    label.textContent = option.label[0].toUpperCase() + option.label.slice(1);
+    label.textContent = optionData.label[0].toUpperCase() + optionData.label.slice(1);
 
     container.appendChild(input);
     container.appendChild(label);

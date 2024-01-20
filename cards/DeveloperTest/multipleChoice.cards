@@ -25,6 +25,7 @@
   },
   "cards": [
     {
+      "type": "choice",
       "questionText": "Choose the correct answer (2 is correct)",
       "correctAnswerValue": 2,
       "options": [
@@ -35,6 +36,7 @@
       ]
     },
     {
+      "type": "choice",
       "questionText": "Choose the correct answer (4 is correct)",
       "correctAnswerValue": 4,
       "options": [
@@ -45,6 +47,7 @@
       ]
     },
     {
+      "type": "choice",
       "questionText": "Choose the correct answer (1 is correct)",
       "correctAnswerValue": 1,
       "options": [
@@ -55,6 +58,7 @@
       ]
     },
     {
+      "type": "choice",
       "questionText": "Choose the correct answer (3 is correct)",
       "correctAnswerValue": 3,
       "options": [
