@@ -57,8 +57,8 @@ function setDeckOptions(){
     let optionsArray = [];
     console.log('Select deck options for selectedDeck ' + selectedDeckCategory);
     console.log(cardLibrary)
-    for(let deckIndex in cardLibrary.card_stacks.categories[selectedDeckCategory]){
-        let deck = cardLibrary.card_stacks.categories[selectedDeckCategory][deckIndex];
+    for(let deckIndex in cardLibrary.card_stacks.categories[selectedDeckCategory][0]){
+        let deck = cardLibrary.card_stacks.categories[selectedDeckCategory][0][deckIndex];
 
         console.log(deck);
         optionsArray.push({'value':deck.url,'label':deck.name});
@@ -73,6 +73,21 @@ function setSelectedDeckCategory(categoryId){
 
 async function loadDeck(deckUrl){
     
+    if(!deckUrl) {
+        console.log('Setting deck url to...');
+        var select = document.getElementById("card-deck");
+        selectedIndex = select.selectedIndex;
+        console.log('selected index: '  +selectedIndex);
+        var options = select.options;
+        console.log('options:');
+        console.log(options);
+        var selectedValue = options[selectedIndex].value;
+        
+        console.log('selected value:');
+        console.log(selectedValue);
+        deckUrl = selectedValue;
+        console.log('Deck url is...' + deckUrl);
+    }
     viewedCards = [];
     availableCards = [];
     cards = [];
@@ -162,6 +177,15 @@ function loadCard(cardId, forceIndex){
     setSelectedHistoryCard(currentCard.id);
     
     removeCardFromAvailable(currentCard.id);
+
+    if(currentCard.hasOwnProperty('options')){
+        console.log('Multiple Choice Card Selected');
+        let selectHtml = generateSelectListFromOptions(currentCard.options);
+
+        //document.body.appendChild(selectHtml);
+
+        console.log(selectHtml);
+    }
     
     let promptVal = promptKey;
     let answerVal = answerKey;
@@ -358,6 +382,39 @@ function showNextHintLetter(){
      
     
 }
+
+function generateSelectListFromOptions(optionsArray){
+    const container = document.createElement('div');
+    container.className = 'question-container';
+
+    const form = document.createElement('form');
+    optionsArray.forEach(({ option }) => form.appendChild(createOptionRadio(option)));
+    container.appendChild(form);
+
+    return container;
+}
+
+function createOptionRadio(option){
+    console.log('Creating radio option from');
+    console.log(option);
+    const container = document.createElement('div');
+
+    const input = document.createElement('input');
+    input.type = 'radio';
+    input.className = 'question-option';
+    input.value = value;
+    input.id = `option-${option.value}`;
+    input.name = `option-${option.value}`;
+
+    const label = document.createElement('label');
+    label.for = input.name;
+    label.textContent = option.label[0].toUpperCase() + option.label.slice(1);
+
+    container.appendChild(input);
+    container.appendChild(label);
+
+    return container;
+};
 
 function setSelectOptions(selectId, optionsArray, defaultValue, includeRandom, clearExisting){
 

@@ -15,8 +15,8 @@
     ],
     "defaultPrompt": "questionText",
     "defaultAnswer": "brandName",
-	"correctAnswerText": "Woo, nice job!",
-	"wrongAnswerText": "Dumbass",
+    "correctAnswerText": "Woo, nice job!",
+    "wrongAnswerText": "Dumbass",
     "labels": {
       "questionText": "",
       "brandName": "Brand Name",
@@ -26,43 +26,43 @@
   "cards": [
     {
       "questionText": "Choose the correct answer (2 is correct)",
-	  "correctAnswerIndex": 2,
-	  "options": [
-		"Answer 1",
-		"Answer 2",
-		"Answer 3",
-		"Answer 4"
-	  ]
-    },
-    {
-      "questionText": "Choose the correct answer (1 is correct)",
-	  "correctAnswerIndex": 1,
-	  "options": [
-		"Answer 1",
-		"Answer 2",
-		"Answer 3",
-		"Answer 4"
-	  ]
-    },
-    {
-      "questionText": "Choose the correct answer (3 is correct)",
-	  "correctAnswerIndex": 3,
-	  "options": [
-		"Answer 1",
-		"Answer 2",
-		"Answer 3",
-		"Answer 4"
-	  ]
+      "correctAnswerValue": 2,
+      "options": [
+        {"value":1,"label":"Option 1"},
+        {"value":2,"label":"Option 2"},
+        {"value":3,"label":"Option 3"},
+        {"value":4,"label":"Option 4"}
+      ]
     },
     {
       "questionText": "Choose the correct answer (4 is correct)",
-	  "correctAnswerIndex": 4,
-	  "options": [
-		"Answer 1",
-		"Answer 2",
-		"Answer 3",
-		"Answer 4"
-	  ]
+      "correctAnswerValue": 4,
+      "options": [
+        {"value":1,"label":"Option 1"},
+        {"value":2,"label":"Option 2"},
+        {"value":3,"label":"Option 3"},
+        {"value":4,"label":"Option 4"}
+      ]
+    },
+    {
+      "questionText": "Choose the correct answer (1 is correct)",
+      "correctAnswerValue": 1,
+      "options": [
+        {"value":1,"label":"Option 1"},
+        {"value":2,"label":"Option 2"},
+        {"value":3,"label":"Option 3"},
+        {"value":4,"label":"Option 4"}
+      ]
+    },
+    {
+      "questionText": "Choose the correct answer (3 is correct)",
+      "correctAnswerValue": 3,
+      "options": [
+        {"value":1,"label":"Option 1"},
+        {"value":2,"label":"Option 2"},
+        {"value":3,"label":"Option 3"},
+        {"value":4,"label":"Option 4"}
+      ]
     }
   ]
 }
