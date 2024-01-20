@@ -16,17 +16,23 @@
             <span class="sub-header">Settings</span>
                 
             <div>
+				<div>
+					<label for="deck-category">Category</label>
+                    <select name="deck-category" id="deck-category" onchange="setDeckCategory(this.value)">
+                        <option value="none" selected>Select A Category</option>
+                    </select>
+				</div>
                 <div>
                     <label for="card-deck">Card Deck:</label>
                     <select name="card-deck" id="card-deck" onchange="loadDeck(this.value)">
-                        <option value="none" selected>Select a Card Deck</option>
+                        <option value="none" selected>Select A Card Deck</option>
                     </select>
                 </div>
 
 				<div id="deck-controls">
 					<div>
 						<input type="checkbox" onclick="setRandom()" name="randomize"></input>				
-						<label for="randomize"> Randomize Deck</label>
+						<label for="randomize"> Randomize Card</label>
 					</div>
 
 					<div>
@@ -48,17 +54,6 @@
 						<label for="answerKey">Answer:</label>
 						<select name="answerKey" id="answerKey" onchange="setAnswerKey(this.value)"></select>
 					-->
-
-					<!--
-					<div>
-						<input type="checkbox" onclick="setTimer()" name="setTimer"></input>				
-						<label for="setTimer"> Enable Timer</label>
-
-						<div id="timer-controls">
-							<span id="timer-display">Timer Placeholder</span>
-						</div>
-					</div>
-					-->
 				</div>
             </div>
  
@@ -70,18 +65,16 @@
         </div>
 
         <div class="footer center panel"> 
-			Like this application? Consider donating to support it. Venmo: @Kenji776 | Square Cash: $Kenji776 | PayPal: 
-			<form action="https://www.paypal.com/donate" method="post" target="_top" style="display:inline">
+			<form action="https://www.paypal.com/donate" method="post" target="_top">
 				<input type="hidden" name="business" value="Q47GJHW3JH6GJ" />
 				<input type="hidden" name="no_recurring" value="0" />
 				<input type="hidden" name="currency_code" value="USD" />
-				<input type="image" src="https://www.paypalobjects.com/en_US/i/btn/btn_donate_SM.gif" style="vertical-align: middle; " border="0" name="submit" title="PayPal - The safer, easier way to pay online!" alt="Donate with PayPal button" />
-				<img alt="" border="0" style="vertical-align: middle; " src="https://www.paypal.com/en_US/i/scr/pixel.gif" width="1" height="1" />
+				<input type="image" src="https://www.paypalobjects.com/en_US/i/btn/btn_donate_SM.gif" border="0" name="submit" title="PayPal - The safer, easier way to pay online!" alt="Donate with PayPal button" />
+				<img alt="" border="0" src="https://www.paypal.com/en_US/i/scr/pixel.gif" width="1" height="1" />
 			</form>
-			
         </div>
 
-        <div class="content panel">   
+        <div class="content panel" id="center-view">   
             <div class="flip-card" id="answer-card">
                 <div class="flip-card-inner">
                 <div class="flip-card-front">

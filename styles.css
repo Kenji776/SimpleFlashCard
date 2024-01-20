@@ -20,7 +20,10 @@ body{
       "settings content history"
       "settings footer history"; 
   }
-  
+
+#center-view{
+    overflow:hidden;
+}
 .header { 
     grid-area: header; 
     height:6vh; 
@@ -45,7 +48,7 @@ body{
 .footer { grid-area: footer; 
     position: relative;
     width: 60vw;
-    height:4vh;
+    height:2vh;
 
 }
 .content { 
@@ -159,7 +162,6 @@ body{
     border-radius:10px;
     background-color:rgb(231, 233, 235);
     padding:15px;
-    overflow:auto;
 }
 
 .flip-card {
@@ -296,8 +298,4 @@ select:invalid { color: gray; }
     font-weight: 900;
     color: #04AA6D;
     /*text-shadow: black 0.1em 0.1em 0.2em*/
-}
-
-.history-item-review{
-    color:red;
 }

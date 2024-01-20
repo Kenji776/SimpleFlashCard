@@ -16,10 +16,7 @@ var historyEntryToWrite;
 var showHistory = true;
 var selectedDeckCategory = 'pharmacy'
 var showUi = false;
-var useTimer = false;
-var timerSeconds = 10;
-var timer;
-var elapsedSeconds = 0;
+var categories = [];
 
 async function loadCardLibrary(){
     console.log('Loading card library');
@@ -27,9 +24,34 @@ async function loadCardLibrary(){
     const cardLibrary = await response.json();
     console.log(cardLibrary);
 
+    setDeckCategories(cardLibrary);
+
     setDeckOptions(cardLibrary);
 }
 
+
+/**
+ * @description sets all of the potential deck category options from the card library
+ * @param {} deckData 
+ * @returns 
+ */
+function setDeckCategories(deckData){
+    console.log('Getting categories from deckData');
+    console.log(deckData);
+    let optionsArray = [];
+    for(let categoryName in deckData.card_stacks.categories){
+        optionsArray.push({'value': categoryName, 'label': categoryName});
+    }
+
+    console.log('Writting options array');
+    console.log(optionsArray);
+    setSelectOptions('deck-category', optionsArray, null, false, false)
+    return categories;
+}
+
+/*
+* @description Populates the 'card-deck' select with options from the selected deck category
+*/
 function setDeckOptions(cardLibrary){
 
     let optionsArray = [];
@@ -41,6 +63,11 @@ function setDeckOptions(cardLibrary){
 
     });
     setSelectOptions('card-deck', optionsArray, null, false, false)
+}
+
+function setSelectedDeckCategory(categoryId){
+    selectedDeckCategory = categoryId;
+    setDeckOptions()
 }
 
 async function loadDeck(deckUrl){
@@ -85,11 +112,13 @@ async function loadDeck(deckUrl){
     document.getElementById("prompt").innerHTML= `Press Next To Begin`;
 }
 
+
+
 /**
- * @description ensures that every card has a unique ID so that can be identified between the stack containing all cards (window.cards) and all available cards (window.availableCards)
- * @param {Array} cards a array of card objects which to assign ids if they do not posses one.
- * @returns list of cards with set modified ids
- */
+* @description ensures that every card has a unique ID so that can be identified between the stack containing all cards (window.cards) and all available cards (window.availableCards)
+* @param {Array} cards a array of card objects which to assign ids if they do not posses one.
+* @returns list of cards with set modified ids
+*/
 function assignCardIds(cards){
     for(card in cards){
         if(!card.hasOwnProperty('id')){
@@ -103,43 +132,14 @@ function getCardById(cardId){
     return cards.find(card => card.id === cardId);
 }
 
-function clearTimer(){
-    elapsedSeconds = 0;
-    clearInterval(timer);
-}
-
-function updateTimer(){
-    elapsedSeconds++;
-    try{
-        console.log(document.getElementById('timer-display'));
-
-        if(elapsedSeconds > timerSeconds){
-            clearTimer();
-            loadNext(true);
-        }
-        document.getElementById('timer-display').innerHTML = `Time ${elapsedSeconds} / ${timerSeconds}`;
-    }catch(ex){
-        console.error(ex);
-    }
-}
-
 /**
- * @description Loads a requested card into view. If the card already exists in the stack, it moves to that index position and displayed it. If not
- * the card is loaded from the available stack and displayed. The card is then removed from the available list
- * @param {*} cardId 
- * @param {*} forceIndex 
- */
-function loadCard(cardId, forceIndex, markForReview){
+* @description Loads a requested card into view. If the card already exists in the stack, it moves to that index position and displayed it. If not
+* the card is loaded from the available stack and displayed. The card is then removed from the available list
+* @param {*} cardId 
+* @param {*} forceIndex 
+*/
+function loadCard(cardId, forceIndex){
 
-    /*
-    if(useTimer){
-        clearTimer();
-
-        console.log('Resetting Timer');
-
-        timer = setInterval(updateTimer, 1000);
-    }
-    */
     //flip the card back to the question side
     document.getElementById('answer-card').classList.remove("flip-card-flipped")
     
@@ -183,7 +183,7 @@ function loadCard(cardId, forceIndex, markForReview){
         console.log(viewedCards)
         console.log('Creating history item for card');
         console.log(currentCard);
-        createHistoryEntry(currentCard,viewedCards.length,currentCard[promptVal], markForReview);
+        createHistoryEntry(currentCard,viewedCards.length,currentCard[promptVal]);
         viewedCards.push(currentCard);
     }
 
@@ -247,7 +247,7 @@ function generateAnswerText(card){
     return answerString;
 }
 
-function loadNext(markLastForReview=false){
+function loadNext(){
     console.log('---------------------------------- Loading next card. Card Index: ' + cardIndex);
     console.log(viewedCards);
     
@@ -270,7 +270,7 @@ function loadNext(markLastForReview=false){
     if(viewedCards.length > cardIndex){
         console.log('Exising card in stack. Loading card at index: ' + cardIndex);
         cardIndex++;
-        loadCard(viewedCards[cardIndex].id,false,markLastForReview);
+        loadCard(viewedCards[cardIndex].id);
     }		
     else {
         if(!useRandom){
@@ -290,7 +290,7 @@ function loadNext(markLastForReview=false){
         cardIndex++;
         document.getElementById("history-items").scrollIntoView({ behavior: 'smooth', block: 'end' });
         
-        loadCard(cardToLoad.id,false,markLastForReview);
+        loadCard(cardToLoad.id);
     }
         
     
@@ -299,7 +299,7 @@ function loadNext(markLastForReview=false){
 }
 
 
-function createHistoryEntry(cardData,navigationPosition,entryLabel, markForReview){
+function createHistoryEntry(cardData,navigationPosition,entryLabel){
     var div = document.createElement('div');
 
     //TODO - Replace this with whatever 
@@ -307,9 +307,6 @@ function createHistoryEntry(cardData,navigationPosition,entryLabel, markForRevie
     div.setAttribute('class', 'history-item');
     div.setAttribute('onClick', `loadCard('${cardData.id}',${navigationPosition})`);
     div.setAttribute('data-card-id', `${cardData.id}`);
-    if(markForReview){
-        div.setAttribute('class', 'history-item history-item-review');
-    }
     //stack the entry into the div
     historyEntryToWrite = div;
 }
@@ -339,7 +336,6 @@ function loadPrev(){
 }
 
 function showAnswer(){
-    clearTimer();
     document.getElementById('answer').style.visibility='visible';
     let card = document.getElementById('answer-card').classList.toggle("flip-card-flipped")
 }
@@ -420,17 +416,6 @@ function setUi(enableUi){
     }
     
     
-}
-
-function setTimer(){
-    useTimer = !useTimer;
-
-    if(useTimer){
-        document.getElementById('timer-controls').style.visibility='visible';
-    }else{
-        document.getElementById('timer-controls').style.visibility='hidden'
-        clearTimer();
-    }
 }
 
 window.onload = function() {
