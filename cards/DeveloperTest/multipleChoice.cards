@@ -16,8 +16,10 @@
     "defaultPrompt": "questionText",
     "correctAnswerText": "Woo, nice job!",
     "wrongAnswerText": "Dumbass",
+    "clueTextKey": "hint",
     "labels": {
-      "questionText": "Answer me this!"
+      "questionText": "Answer me this!",
+      "clueButtonName": "Seriously. A hint?"
     }
   },
   "cards": [
@@ -26,6 +28,7 @@
       "questionText": "Choose the correct answer (2 is correct).",
       "correctAnswerValue": 2,
       "points": 1,
+      "hint": "The answer is 2. What the hell is wrong with you? It's in the question?",
       "options": [
         {"value":1,"label":"Option 1"},
         {"value":2,"label":"Option 2"},
@@ -38,6 +41,7 @@
       "questionText": "Choose the correct answer (4 is correct)",
       "correctAnswerValue": 4,
       "points": 5,
+      "hint": "It 4. Seriously. It's 4. It's right there.",
       "options": [
         {"value":1,"label":"Option 1"},
         {"value":2,"label":"Option 2"},
@@ -50,6 +54,7 @@
       "questionText": "Choose the correct answer (1 is correct)",
       "correctAnswerValue": 1,
       "points": 2,
+      "hint": "Are you illiterate? It says the answer right in the quesiton. Holy shit.",
       "options": [
         {"value":1,"label":"Option 1"},
         {"value":2,"label":"Option 2"},
@@ -62,6 +67,7 @@
       "questionText": "Choose the correct answer (3 is correct)",
       "correctAnswerValue": 3,
       "points": 1,
+      "hint": "I can't. I just fucking can't with you. How many times do I have to point out the answer is in the question?",
       "options": [
         {"value":1,"label":"Option 1"},
         {"value":2,"label":"Option 2"},

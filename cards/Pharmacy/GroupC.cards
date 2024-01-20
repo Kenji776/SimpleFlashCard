@@ -23,7 +23,7 @@
     ],
     "defaultPrompt": "genericName",
     "defaultAnswer": "brandName",
-    "clueTextKey": drugClassName,
+    "clueTextKey": "drugClassName",
     "labels": {
       "genericName": "Generic Name",
       "brandName": "Brand Name",

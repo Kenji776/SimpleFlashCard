@@ -264,6 +264,15 @@ body{
     
 }
 
+.history-item.correct-answer{
+    color:#04AA6D;
+}
+
+.history-item.incorrect-answer{
+    color:red;
+    text-decoration: line-through;
+}
+
 .selected-history-item{
     background-color: #04AA6D!important;
     color: #ffffff!important;

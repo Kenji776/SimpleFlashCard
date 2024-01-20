@@ -325,6 +325,8 @@ function loadNext(){
         historyEntryToWrite = null;
     }
 
+    setHistoryItemStyles();
+
     if(cardIndex == cards.length){
         alert('End of deck reached');
         return;
@@ -373,6 +375,40 @@ function createHistoryEntry(cardData,navigationPosition,entryLabel){
     div.setAttribute('data-card-id', `${cardData.id}`);
     //stack the entry into the div
     historyEntryToWrite = div;
+}
+
+function setHistoryItemStyles(){
+    let answerMap = {};
+    for(let answerindex in answerResults){
+        console.log('Parsing incorrect answers in history list');
+        answerMap[answerResults[answerindex].card.id] = answerResults[answerindex].wasCorrect;
+    }
+
+    let historyItems = document.querySelectorAll('.history-item');
+
+    for(let thisItem of historyItems){
+
+        console.log(thisItem.getAttribute('data-card-id') + ' has answer logged? ' + answerMap.hasOwnProperty(thisItem.getAttribute('data-card-id')));
+
+        let isCorrect = answerMap.hasOwnProperty(thisItem.getAttribute('data-card-id')) ? answerMap[thisItem.getAttribute('data-card-id')] : false;
+
+        if(answerMap.hasOwnProperty(thisItem.getAttribute('data-card-id'))){
+            console.log('this question has been answered. Applying styling class!');
+            if(isCorrect){
+                thisItem.classList.remove("incorrect-answer");
+                thisItem.classList.add("correct-answer");
+            }
+
+            if(!isCorrect){
+                thisItem.classList.remove("correct-answer");
+                thisItem.classList.add("incorrect-answer");
+            }
+        }else{
+            console.log('Question does not seem to have been answered. Does not exist in answer object. Skipping')
+        }
+
+        
+    }
 }
 /**
 * if the previous card index is less than 0, don't go back.
@@ -442,13 +478,12 @@ function generateSelectListFromOptions(optionsArray,correctValue){
     answerBtn.value = `Submit Answer`;
     answerBtn.id = `answer-btn`;
     answerBtn.name = `answer-btn`;
+    answerBtn.className = 'button';
     answerBtn.setAttribute('data-correct-value',correctValue);
     answerBtn.onclick = function(event){
         var options = document.getElementsByName('question-options');
         var selectedOptionValue;
 
-        console.log('Target is: ' + event);
-        console.log(event.target);
         for(var i = 0; i < options.length; i++){
             if(options[i].checked){
                 selectedOptionValue = options[i].value;
@@ -466,6 +501,8 @@ function generateSelectListFromOptions(optionsArray,correctValue){
         }
 
         recordQuestionResponse(currentCard,selectedOptionValue,event.target.getAttribute('data-correct-value'),pointsMod);
+
+        setHistoryItemStyles();
     }
 
     form.appendChild(answerBtn);
