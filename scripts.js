@@ -88,20 +88,16 @@ async function loadDeck(deckUrl){
         console.log(selectedValue);
         deckUrl = selectedValue;
         console.log('Deck url is...' + deckUrl);
-
-        var clueBtn = document.getElementById("clue-button");
-        clueBtn.name = config?.label?.clueButtonName ? config.label.clueButtonName : 'Clue';
     }
-    viewedCards = [];
-    availableCards = [];
-    cards = [];
-    cardIndex = 0;
-    answerResults = [];
+
+    
 
     if(!deckUrl || deckUrl == 'none'){
         console.warn('No deck URL provided to load deck. Aborting');
         return;
     }
+
+    resetHistory();
 
     console.log('Loading card library: ' + deckUrl);
     const response = await fetch(deckUrl+'?cache-invalidate='+Date.now(), {cache: "no-store"});
@@ -126,6 +122,12 @@ async function loadDeck(deckUrl){
     setSelectOptions('prompt-key', config.promptKeys, promptKey, true, true);
     //setSelectOptions('answerKey', config.answerKeys, answerKey, true);
     //loadCard(0);
+
+    var clueBtn = document.getElementById("clue-button");
+    clueBtn.innerHTML  = config?.labels?.clueButtonName ? config.labels.clueButtonName : 'Clue';
+
+    console.log('Set clue button name to: ' + clueBtn.innerHTML );
+    console.log(config.labels);
 
     setUi(true);
 
@@ -229,7 +231,22 @@ function loadCard(cardId, forceIndex){
     }
 
 
-    currentAnswer = promptVal == config.defaultPrompt ? currentCard[config.defaultAnswer] : currentCard[config.defaultPrompt];
+    if(currentCard.type == 'choice'){
+        console.log('current card is a choice type. Attempting to read current answer from options index!');
+        //get the text of the current correct answer for a choice question by using the correctAnswerValue property of the question definition to then read that object's label
+        currentAnswer = currentCard.options.find(function(o){ return o.value===currentCard.correctAnswerValue}).label;
+    }else{
+        console.log('current card is unknown type. Prompt text');
+        currentAnswer = promptVal == config.defaultPrompt ? currentCard[config.defaultAnswer] : currentCard[config.defaultPrompt];
+    }
+
+    if(!currentAnswer || currentAnswer.length === 0){
+        alert('Unable to determin correct answer for this card. Please check card definition to ensure it has all properties set. See developer console for card info.');
+        console.warn('Incomplete card info');
+        console.log(currentCard);
+    }else{
+        console.log('Current correct answer is: ' + currentAnswer);
+    }
     /*
     
     console.log('Prompt Key: ' + promptVal);
@@ -253,6 +270,11 @@ function loadCard(cardId, forceIndex){
     
     
     document.getElementById("clue-text").innerHTML=currentCard[config.clueTextKey];
+
+    console.log('Set clue to: ' + currentCard[config.clueTextKey]);
+    console.log(currentCard);
+    console.log(config);
+
     //document.getElementById('answer').style.visibility='hidden';
     document.getElementById('clue-text').style.visibility='hidden';
     document.getElementById('hint-text').style.visibility='hidden';
@@ -295,12 +317,13 @@ function generateAnswerText(card){
     return answerString;
 }
 
-function recordQuestionResponse(card,givenAnswer,correctAnswer,scoreMod){
+function recordQuestionResponse(card,givenAnswer,correctAnswer,awardedPoints){
     answerResults.push({
         "card": card,
         "givenAnswer": givenAnswer,
         "correctAnswer": correctAnswer,
-        "scoreMod": scoreMod,
+        "awardedPoints": awardedPoints,
+        "possiblePoints" : card.points ? card.points : 1,
         "wasCorrect": givenAnswer == correctAnswer ? true : false 
     });
 
@@ -308,9 +331,99 @@ function recordQuestionResponse(card,givenAnswer,correctAnswer,scoreMod){
     console.log(answerResults);
 }
 
-function modifyScore(modifyValue){
+function calculateScore(){
+    let returnObj = {
+        "currentPoints": 0, 
+        "possiblePoints" : 0, 
+        "numberCorrect": 0, 
+        "numberOfQuestions":0, 
+        "numberIncorrect" : 0,
+        "numberUnanswered" : 0,
+        "pointsScorePercent": 0,
+        "correctPercent": 0,
+        "pointsGrade" : '-',
+        "numberCorrectGrade": '-'
+    }
+
+    returnObj.numberOfQuestions = cards.length;
+
+    let finalAnswers = {};
+    for(let answer of answerResults){
+        console.log('Looking at recorded answer');
+        console.log(answer);
+        returnObj.currentPoints += answer.awardedPoints;
+        returnObj.possiblePoints += answer.possiblePoints;
+
+
+        finalAnswers[answer.card.id] = answer;
+
+    }
+
+    console.log('Final Answers object');
+    console.log(finalAnswers);
+
+    for(let thisCard of cards){
+        console.log('Iterating cards');
+        console.log(thisCard);
+        if(finalAnswers.hasOwnProperty(thisCard.id)){
+            if(finalAnswers[thisCard.id].wasCorrect){
+                returnObj.numberCorrect++;
+            }else{
+                returnObj.numberIncorrect++;
+            }
+        }else{
+            console.log('No answer found for  ' + thisCard.id)
+            returnObj.numberUnanswered++;
+        }
+    }
+
+    returnObj.pointsScorePercent = ((returnObj.currentPoints / returnObj.possiblePoints) * 100).toPrecision(2);
+    returnObj.correctPercent = ((returnObj.numberCorrect / (returnObj.numberOfQuestions-returnObj.numberUnanswered)) * 100).toPrecision(2);
+
+    returnObj.pointsGrade = getLetterGrade(returnObj.pointsScorePercent);
+    returnObj.numberCorrectGrade = getLetterGrade(returnObj.correctPercent);
+
+    document.getElementById('score-total').innerHTML =`${returnObj.numberCorrect} / ${returnObj.numberOfQuestions-returnObj.numberUnanswered}`;
+    document.getElementById('points-total').innerHTML =`${returnObj.currentPoints} / ${returnObj.possiblePoints}`;
+
+    document.getElementById('score-grade').innerHTML =`${returnObj.numberCorrectGrade}`;
+    document.getElementById('points-grade').innerHTML =`${returnObj.pointsGrade}`;
+
+    document.getElementById('score-grade').setAttribute('data-grade',returnObj.numberCorrectGrade.slice(0,1).toLowerCase());
+    document.getElementById('points-grade').setAttribute('data-grade',returnObj.pointsGrade.slice(0,1).toLowerCase());
+
+    
+    
+    return returnObj;
 
 }
+
+function getLetterGrade(numberGrade) {
+    let letter;
+    if (numberGrade == 100){
+        letter = 'S';
+    }else if (numberGrade >= 97) {
+      letter = 'A+';
+    }else if (numberGrade >= 94) {
+        letter = 'A';
+    }else if (numberGrade >= 90) {
+        letter = 'A-';
+    } else if (numberGrade >= 87) {
+      letter = 'B+';
+    } else if (numberGrade >= 84) {
+        letter = 'B';
+    } else if (numberGrade >= 80) {
+        letter = 'B-';
+    } else if (numberGrade >= 77) {
+      letter = 'C+';
+    } else if (numberGrade >= 70) {
+        letter = 'C';
+    } else {
+      letter = 'F';
+    }
+    return letter;
+}
+
 function loadNext(){
     console.log('---------------------------------- Loading next card. Card Index: ' + cardIndex);
     console.log(viewedCards);
@@ -475,7 +588,7 @@ function generateSelectListFromOptions(optionsArray,correctValue){
     const answerBtn = document.createElement('input');
     answerBtn.type = 'button';
     answerBtn.className = 'answer-button';
-    answerBtn.value = `Submit Answer`;
+    answerBtn.value = `Submit Answer ${currentCard.points ? currentCard.points : 1} ${currentCard.points && currentCard.points > 1 ? 'Points' : 'Point'}`;
     answerBtn.id = `answer-btn`;
     answerBtn.name = `answer-btn`;
     answerBtn.className = 'button';
@@ -497,10 +610,15 @@ function generateSelectListFromOptions(optionsArray,correctValue){
         }else
         {
             alert(config.wrongAnswerText);
-            pointsMod = pointsMod * -1;
+            pointsMod = 0;
         }
 
         recordQuestionResponse(currentCard,selectedOptionValue,event.target.getAttribute('data-correct-value'),pointsMod);
+
+        let currentScore = calculateScore();
+
+        console.log('Current score info');
+        console.log(currentScore);
 
         setHistoryItemStyles();
     }
@@ -595,7 +713,24 @@ function setUi(enableUi){
     
 }
 
-window.onload = function() {
+function resetHistory(){
+    try{
+        historyEntryToWrite = null;
+        viewedCards = [];
+        availableCards = [];
+        cards = [];
+        cardIndex = 0;
+        answerResults = [];
+        answerResults = [];
+        document.getElementById("hint-text").innerHTML = '';
+        document.getElementById("clue-text").innerHTML = '';
+        document.getElementById('history-items').innerHTML = '';
+    }catch(ex){
+        console.log('Error resetting history');
+        console.error(ex);
+    }
     
+}
+window.onload = function() {
     loadCardLibrary();
 };

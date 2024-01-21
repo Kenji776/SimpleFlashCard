@@ -60,9 +60,52 @@
  
         </div>
 
-        <div class="history panel">
-            <span class="sub-header" style="text-align:center">History <span id="viewed-total"></span></span>   
-            <div id="history-items"></div>
+		<!--
+		<span class="grade-output" data-grade="a">A</span>
+		<span class="grade-output" data-grade="b">B</span>
+		<span class="grade-output" data-grade="c">C</span>
+		<span class="grade-output" data-grade="d">D</span>
+		<span class="grade-output" data-grade="f">F</span>
+
+		<span class="grade-output" data-grade="s">S
+
+
+		</span>
+		-->
+
+
+		<!--
+					<svg id="one" width="100" height="100" viewBox="0 0 75 75">
+						<g id="copy-1" class="group">
+						<g class="large">
+							<path id="large" d="M41.25,40 L42.5,10 L43.75,40 L45,41.25 L75,42.5 L45,43.75 L43.75,45 L42.5,75 L41.25,45 L40,43.75 L10,42.5 L40,41.25z" fill="gold" />
+						</g>
+						<g class="large-2" transform="rotate(45)">
+							<use xlink:href="#large" />
+						</g>
+						<g class="small">
+							<path id="small" d="M41.25,40 L42.5,25 L43.75,40 L45,41.25 L60,42.5 L45,43.75 L43.75,45 L42.5,60 L41.25,45 L40,43.75 L25,42.5 L40,41.25z" fill="gold" />
+						</g>
+						</g>
+					</svg>
+		-->
+
+
+
+        <div class=" panel no-background" >
+			<div class="score panel">
+				<div id="score" class="sub-header" >
+					Score: <span id="score-total"></span><span id="score-grade" class="grade-output"></span><br/>
+					Points: <span id="points-total"></span><span id="points-grade" class="grade-output"></span>
+				</div>
+			</div>
+			
+			<div class="spacer"></div>
+			<div class="panel history">
+				<span class="sub-header" style="text-align:center">History <span id="viewed-total"></span></span>
+				<div id="history-items"></div>
+			</div>
+	
         </div>
 
         <div class="footer center panel"> 

@@ -24,6 +24,20 @@ body{
 #center-view{
     overflow:hidden;
 }
+
+.spacer{
+    margin:10px;
+}
+.no-background{
+    background-color: transparent !important;
+    box-shadow: none  !important;
+    border-style: none  !important;
+    -webkit-box-shadow: none  !important;
+    margin: 0px !important;
+    padding: 0px !important;
+
+}
+
 .header { 
     grid-area: header; 
     height:6vh; 
@@ -34,6 +48,9 @@ body{
     margin-right:auto;
 }
 
+.score{
+    height:10vh;
+}
 .settings { 
     grid-area: settings; 
     width:15vw;
@@ -41,7 +58,7 @@ body{
 }
 .history { 
     grid-area: history; 
-    height:80vh;
+    height:60vh;
     overflow-y:auto;
     width:18vw;
 }
@@ -303,8 +320,179 @@ select{
 
 select:invalid { color: gray; }
 
+@font-face {
+    font-family: 'Rocher';
+    src: url('media/font/RocherColorGX.woff2');
+  }
+
+.grade-output{
+    font-family: 'Rocher';
+    text-align: center;
+    margin-left: 25px;
+    font-size:40px;
+}
+
+@font-palette-values --Green {
+    font-family: Rocher;
+    base-palette: 2;
+}
+
+@font-palette-values --Blue {
+    font-family: Rocher;
+    base-palette: 4;
+}
+
+@font-palette-values --Yellow {
+    font-family: Rocher;
+    base-palette: 5;
+}
+@font-palette-values --Orange {
+    font-family: Rocher;
+    base-palette: 8;
+}  
+@font-palette-values --Red {
+    font-family: Rocher;
+    base-palette: 1;
+}
+@font-palette-values --Special {
+    font-family: Rocher;
+    base-palette: 3;
+}
+
+.grade-output[data-grade="s"] {
+    font-palette: --Special;
+}
+
+.grade-output[data-grade="a"] {
+    font-palette: --Green;
+}
+.grade-output[data-grade="b"] {
+    font-palette: --Blue;
+}
+.grade-output[data-grade="c"] {
+    font-palette: --Yellow;
+}
+.grade-output[data-grade="d"]  {
+    font-palette: --Orange;
+}
+.grade-output[data-grade="f"]  {
+    font-palette: --Red;
+}
+
 .prompt-text{
     font-weight: 900;
     color: #04AA6D;
     /*text-shadow: black 0.1em 0.1em 0.2em*/
+}
+
+
+svg#one {
+	position: absolute;
+	
+}
+.group {
+    -webkit-transform: translate(42.5px,42.5px);
+    -moz-transform: translate(42.5px,42.5px);
+    transform: translate(42.5px, 42.5px);
+}
+path {
+    -webkit-transform: translate(-42.50px,-42.50px);
+    -moz-transform: translate(-42.50px,-42.50px);
+    transform: translate(-42.50px,-42.50px);
+}
+.large {
+	-webkit-animation: large 2.5s infinite;
+	-moz-animation: large 2.5s infinite;
+}
+.large-2 {
+	-webkit-animation: large-2 2.5s infinite;
+	-moz-animation: large-2 2.5s infinite;
+}
+.small {
+	-webkit-animation: small 2.5s infinite;
+	-moz-animation: small 2.5s infinite;
+}
+@-webkit-keyframes large {
+	0% {
+		opacity: 0;
+		-webkit-transform: rotate(0deg) scale(0);
+		transform: rotate(0deg) scale(0);
+	}
+	50% {
+		opacity: 1;
+	}
+	100% {
+		opacity: 0;
+		-webkit-transform: rotate(360deg) scale(1.5);
+		transform: rotate(360deg) scale(1.5);
+	}
+}
+@-moz-keyframes large {
+	0% {
+		opacity: 0;
+		transform: rotate(0deg) scale(0);
+	}
+	50% {
+		opacity: 1;
+	}
+	100% {
+		opacity: 0;
+		transform: rotate(360deg) scale(1.5);
+	}
+}
+@-webkit-keyframes large-2 {
+	0% {
+		opacity: 0;
+		-webkit-transform: rotate(45deg) scale(0);
+		transform: rotate(45deg) scale(0);
+	}
+	50% {
+		opacity: 1;
+	}
+	100% {
+		opacity: 0;
+		-webkit-transform: rotate(405deg) scale(1.1);
+		transform: rotate(405deg) scale(1.1);
+	}
+}
+@-moz-keyframes large-2 {
+	0% {
+		opacity: 0;
+		transform: rotate(45deg) scale(0);
+	}
+	50% {
+		opacity: 1;
+	}
+	100% {
+		opacity: 0;
+		transform: rotate(405deg) scale(1.1);
+	}
+}
+@-webkit-keyframes small {
+	0% {
+		opacity: 0;
+		-webkit-transform: rotate(0deg) scale(0);
+		transform: rotate(0deg) scale(0);
+	}
+	50% {
+		opacity: 1;
+	}
+	100% {
+		opacity: 0;
+		-webkit-transform: rotate(-360deg) scale(1);
+		transform: rotate(-360deg) scale(1.5);
+	}
+}
+@-moz-keyframes small {
+	0% {
+		opacity: 0;
+		transform: rotate(0deg) scale(0);
+	}
+	50% {
+		opacity: 1;
+	}
+	100% {
+		opacity: 0;
+		transform: rotate(-360deg) scale(1.5);
+	}
 }
