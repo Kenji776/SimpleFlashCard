@@ -36,31 +36,21 @@ let timer = {
     runTimer: function(scope){
         scope.tens++;
     
+        
         //------------------------ Tenths of Seconds ----------------------//
-        if (scope.tens <= 9) {
-            scope.appendTens.innerHTML = "0" + scope.tens;
-        }
-    
-        if (scope.tens > 9) {
-            scope.appendTens.innerHTML = scope.tens;
-        }
+        scope.appendTens.innerHTML = scope.tens >=10 ? scope.tens : "0" + scope.tens;
     
         //------------------------ Seconds ----------------------//
         if (scope.tens > 99) {
             scope.seconds++;
-            scope.appendSeconds.innerHTML = "0" + scope.seconds;
+            scope.appendSeconds.innerHTML = scope.seconds >=10 ? scope.seconds : "0" + scope.seconds;
             scope.tens = 0;
             scope.appendTens.innerHTML = "0" + 0;
         }
     
-        if (scope.seconds <= 9) {
-            scope.appendSeconds.innerHTML = scope.seconds;
-        }
-
 
         //------------------------ Minutes ----------------------//
         if (scope.seconds > 60){
-            console.log('Adding a minute');
             scope.mins++;
             scope.appendMins.innerHTML = scope.mins >=10 ? scope.mins : "0" + scope.mins;
             scope.seconds = 0;
