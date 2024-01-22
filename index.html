@@ -5,7 +5,7 @@
 <!--  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/design-system/2.5.0/styles/salesforce-lightning-design-system.min.css"> -->
 <script type="text/javascript" language="javascript" src="scripts.js"></script> 
 <script type="text/javascript" language="javascript" src="ui.js"></script> 
- 
+<script type="text/javascript" language="javascript" src="timer.js"></script> 
 
 <body>
     <div class="container">
@@ -13,7 +13,14 @@
         <div class="header panel center" id="content-header">
             Simple Flash Card Viewer
         </div>    
-        
+
+		<div id="timer">
+			<p><span id="mins">00</span>:<span id="seconds">00</span>:<span id="tens">00</span></p>
+			<button id="timer-button-start" onclick="timer.startTimer()">Start</button>
+			<button id="timer-button-stop"  onclick="timer.stopTimer()">Stop</button>
+			<button id="timer-button-reset"  onclick="timer.resetTimer()">Reset</button>
+		</div> 
+
         <div class="settings panel">
             <span class="sub-header">Settings</span>
                 
@@ -43,6 +50,10 @@
 						<label for="toggleHistory"> Hide History Display</label>
 					</div>
         
+					<div>
+						<input type="checkbox" onclick="ui.toggleDisplay('#timer')" name="toggleTimer"></input>
+						<label for="toggleTimer"> Hide Timer Display</label>
+					</div>
 					
 					<!--
 						<input type="checkbox" onclick="setPreventDupes()" name="prevent-dupes"></input>

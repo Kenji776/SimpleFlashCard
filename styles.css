@@ -51,21 +51,25 @@ body{
 .score{
     height:10vh;
 }
+
 .settings { 
     grid-area: settings; 
     width:15vw;
     height:80vh;
 }
+
 .history { 
     grid-area: history; 
     height:60vh;
     overflow-y:auto;
     width:18vw;
 }
+
 .footer { grid-area: footer; 
     position: relative;
     width: 60vw;
     height:2vh;
+
 
 }
 .content { 
@@ -139,6 +143,15 @@ body{
     left:10px;
     padding-top:1px;
 }
+
+#timer{
+    border-radius: 10px;
+    border-style: solid;
+    border-width: 5px;
+    padding:5px;
+    border-color: #04AA6D;
+}
+
 .button{
     background-color:#0a0a23;
     color: #fff;
@@ -197,44 +210,44 @@ body{
 
 /* This container is needed to position the front and back side */
 .flip-card-inner {
-  position: relative;
-  width: 100%;
-  height: 100%;
-  text-align: center;
-  transition: transform 0.8s;
-  transform-style: preserve-3d;
-  background-color:rgb(231, 233, 235);
-  border-radius:10px;
-  line-height: 50px;
-  border-style: solid;
+    position: relative;
+    width: 100%;
+    height: 100%;
+    text-align: center;
+    transition: transform 0.8s;
+    transform-style: preserve-3d;
+    background-color:rgb(231, 233, 235);
+    border-radius:10px;
+    line-height: 50px;
+    border-style: solid;
     border-width: 5px;
     border-color: #04AA6D;
 }
 
 /* Do an horizontal flip when you move the mouse over the flip box container */
 .flip-card-flipped .flip-card-inner {
-  transform: rotateY(180deg);
+    transform: rotateY(180deg);
 }
 
 /* Position the front and back side */
 .flip-card-front, .flip-card-back {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  -webkit-backface-visibility: hidden; /* Safari */
-  backface-visibility: hidden;
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    -webkit-backface-visibility: hidden; /* Safari */
+    backface-visibility: hidden;
 }
 
 /* Style the front side (fallback if image is missing) */
 .flip-card-front {
-  color: black;
+    color: black;
 }
 
 /* Style the back side */
 .flip-card-back {
-  background-color:rgb(231, 233, 235);
-  transform: rotateY(180deg);
-  border-radius:10px;
+    background-color:rgb(231, 233, 235);
+    transform: rotateY(180deg);
+    border-radius:10px;
 }
 
 #flip-button{
@@ -273,12 +286,10 @@ body{
     cursor:pointer;
     border-radius:5px;
     padding:3px;
-    
 }
 .history-item:hover{
     background-color: #04AA6D!important;
     color: #ffffff!important;
-    
 }
 
 .history-item.correct-answer{
@@ -499,4 +510,12 @@ path {
 		opacity: 0;
 		transform: rotate(-360deg) scale(1.5);
 	}
+}
+
+#timer{
+    position:absolute;
+    top:0px;
+    right:0px;
+    text-align: center;
+    border-style:solid;
 }

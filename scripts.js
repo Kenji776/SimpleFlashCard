@@ -452,7 +452,10 @@ function loadNext(){
     let cardToLoad;
 
 
-
+    if(timer && timer.timerInterval && cardIndex == 0){
+        timer.startTimer();
+    }
+    
     if(historyEntryToWrite != null){
         document.getElementById('history-items').appendChild(historyEntryToWrite);
         historyEntryToWrite = null;
@@ -461,6 +464,8 @@ function loadNext(){
     setHistoryItemStyles();
 
     if(cardIndex == cards.length){
+        if(timer) timer.stopTimer();
+
         alert('End of deck reached');
         return;
     }
