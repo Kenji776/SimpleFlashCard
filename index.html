@@ -10,8 +10,8 @@
 <body>
     <div class="container">
 		<!---->
-        <div class="header panel center" id="content-header">
-            Simple Flash Card Viewer
+        <div class="header panel center" >
+            <span class="header-text" id="content-header">Flash Cards.lol</span>
         </div>    
 
 		<div id="timer">
@@ -22,7 +22,7 @@
 		</div> 
 
         <div class="settings panel">
-            <span class="sub-header">Settings</span>
+            <span class="sub-header-text">Settings</span>
                 
             <div>
 				<div>
@@ -46,21 +46,25 @@
 					</div>
 
 					<div>
-						<input type="checkbox" onclick="ui.toggleDisplay('history-items')" name="toggleHistory"></input>
+						<input type="checkbox" onclick="ui.toggleDisplay('history-items')" name="toggleHistory" id="toggleHistory"></input>
 						<label for="toggleHistory"> Hide History Display</label>
 					</div>
         
 					<div>
-						<input type="checkbox" onclick="ui.toggleDisplay('#timer')" name="toggleTimer"></input>
+						<input type="checkbox" onclick="ui.toggleDisplay('#timer')" name="toggleTimer" id="toggleTimer"></input>
 						<label for="toggleTimer"> Hide Timer Display</label>
 					</div>
-					
+
+					<div>
+						<input type="checkbox" onclick="toggleValue('autoLoadNextCardOnAnswer')" name="autoProgressOnAnswer" id="autoProgressOnAnswer" checked="true"></input>
+						<label for="autoProgressOnAnswer"> Auto Progress On Answer</label>
+					</div>
 					<!--
 						<input type="checkbox" onclick="setPreventDupes()" name="prevent-dupes"></input>
 						<label for="prevent-dupes">Prevent Duplicates</label><br>
 					-->
 					<div>
-						<input type="checkbox" onclick="ui.toggleDisplay('score-panel')" name="toggleScoreDisplay"></input>
+						<input type="checkbox" onclick="ui.toggleDisplay('score-panel')" name="toggleScoreDisplay" id="toggleScoreDisplay"></input>
 						<label for="toggleScoreDisplay"> Hide Score Display</label>
 					</div>
 					<div>
@@ -98,7 +102,7 @@
 					Score: 
 					<div id="score-total-animations" class="inline">
 						<span id="score-total">0</span><span id="score-grade" class="grade-output">-</span>
-						<span class="sparkle" id="score-sparkles">
+						<span class="sparkle hidden" id="score-sparkles" >
 							<svg id="one" width="25" height="25" viewBox="0 0 50 50" style="margin-left:-15">
 								<g id="copy-1" class="group">
 								<g class="large">
@@ -143,14 +147,15 @@
 			
 			<div class="spacer"></div>
 			<div class="panel history">
-				<span class="sub-header" style="text-align:center">History <span id="viewed-total"></span></span>
+				<span class="sub-header-text" style="text-align:center">History <span id="viewed-total"></span></span>
 				<div id="history-items"></div>
 			</div>
 	
         </div>
 
         <div class="footer center panel"> 
-			<form action="https://www.paypal.com/donate" method="post" target="_top">
+			Like this application? Consider donating to support it. Venmo: @Kenji776 | Square Cash: $Kenji776 | PayPal: 
+			<form action="https://www.paypal.com/donate" method="post" target="_top" style="display:inline">
 				<input type="hidden" name="business" value="Q47GJHW3JH6GJ" />
 				<input type="hidden" name="no_recurring" value="0" />
 				<input type="hidden" name="currency_code" value="USD" />
@@ -163,17 +168,21 @@
             <div class="flip-card" id="answer-card">
                 <div class="flip-card-inner">
                 <div class="flip-card-front">
-                    <div id="prompt">Load Deck To Begin</div>
+                    <div id="prompt"><div id="load-deck-message" class="bounce"><span class="animated-heading ">Load Deck To Begin</span></div></div>
                 </div>
                 <div class="flip-card-back">
                     <div id="answer"></div>
+					<div id="answer-buttons">
+						<img src="media/accept.png" id="correct-icon-button" class="animated-button" onclick="answerCorrect()"  data-correct-value=""/>
+						<img src="media/close.png" id="incorrect-icon-button" class="animated-button" onclick="answerIncorrect()" data-correct-value=""/>
+					</div>
                 </div>
                 </div>
             </div>
 
 			<div id="controls">
 				<div class="panel center" id="hint-container">
-					<img src="media/question.png" id="help-icon" style="float:left" />
+					<img src="media/question.png" id="help-icon" style="float:left" class="animated-button" />
 					<div id="hint-title">Hints</div>
 					<div id="hint-text"></div>
 					<div id="clue-text"></div>
@@ -189,24 +198,5 @@
 			</div>
         </div>
     </div>
-
-	Score: <span id="score-total"></span><span id="score-grade2" class="grade-output">
-		<div class="pulse">S</span>
-			<span class="sparkle" id="score-sparkles2">
-				<svg id="one" width="25" height="25" viewBox="0 0 50 50" style="margin-left:-15">
-					<g id="copy-1" class="group">
-					<g class="large">
-						<path id="large" d="M41.25,40 L42.5,10 L43.75,40 L45,41.25 L75,42.5 L45,43.75 L43.75,45 L42.5,75 L41.25,45 L40,43.75 L10,42.5 L40,41.25z" fill="gold" />
-					</g>
-					<g class="large-2" transform="rotate(45)">
-						<use xlink:href="#large" />
-					</g>
-					<g class="small">
-						<path id="small" d="M41.25,40 L42.5,25 L43.75,40 L45,41.25 L60,42.5 L45,43.75 L43.75,45 L42.5,60 L41.25,45 L40,43.75 L25,42.5 L40,41.25z" fill="gold" />
-					</g>
-					</g>
-				</svg>
-			</span>
-		</div>
 </body>
 </html>

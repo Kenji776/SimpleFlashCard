@@ -83,6 +83,10 @@ body{
     text-align:center;
 }
 
+.hidden {
+    visibility: hidden;
+}
+
 #hint-container{
     margin:auto;
     margin-top:15px;
@@ -347,6 +351,14 @@ select:invalid { color: gray; }
     font-size:40px;
 }
 
+.animated-heading{
+    font-family: 'Rocher';
+    text-align: center;
+    margin-left: 25px;
+    font-size:40px;
+    font-palette: --Orange;
+}
+
 @font-palette-values --Green {
     font-family: Rocher;
     base-palette: 2;
@@ -392,6 +404,20 @@ select:invalid { color: gray; }
 }
 .grade-output[data-grade="f"]  {
     font-palette: --Red;
+}
+
+.header-text{
+    font-family: 'Rocher';
+    text-align: center;
+    font-size:55px;
+    font-palette: --Green;
+}
+
+.sub-header-text{
+    font-family: 'Rocher';
+    text-align: center;
+    font-size:35px;
+    font-palette: --Green;   
 }
 
 .prompt-text{

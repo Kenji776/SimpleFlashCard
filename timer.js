@@ -1,5 +1,5 @@
 let timer = {
-	seconds: 50,
+	seconds: 0,
 	tens: 0,
     mins: 0,
 	appendTens: document.getElementById("tens"),
@@ -25,10 +25,12 @@ let timer = {
     
     resetTimer: function() {
         clearInterval(this.timerInterval);
-        this.tens = "00";
-        this.seconds = "00";
-        this.appendTens.innerHTML = this.tens;
-        this.appendSeconds.innerHTML = this.seconds;
+        this.tens = 0;
+        this.seconds = 0;
+        this.minutes = 0;
+        this.appendTens.innerHTML = "00";
+        this.appendSeconds.innerHTML = "00";
+        this.appendMinutes.innerHTML = "00";
     },
     
     runTimer: function(scope){
@@ -52,7 +54,7 @@ let timer = {
         }
     
         if (scope.seconds <= 9) {
-            scope.appendSeconds.innerHTML = "0" + scope.seconds;
+            scope.appendSeconds.innerHTML = scope.seconds;
         }
 
 

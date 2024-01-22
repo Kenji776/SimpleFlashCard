@@ -47,6 +47,26 @@ ui.toggleUiLock = function(enableUi){
     }
 }
 
+ui.setAttribute = function(elements,property,value){
+    let elementsList = [];
+    if(typeof elements === 'string') elementsList = elementsList.concat(elements.split(','));
+    else if(isArray(element)) elementsList = element;
+    for(let element of elementsList){
+        thisElement = element;
+        if(typeof element === 'string') thisElement = ui.getElements(element)[0];
+
+        console.log('Setting attribute on:');
+        console.log(thisElement);
+        try{
+            thisElement.dataset[property] = value;//(property,value);
+        }catch(ex){
+            console.log('Error setting property ' + property + ' to value ' + value + ' on element');
+            console.log(thisElement);
+            console.error(ex);
+        }
+    }
+}
+
 
 //------------------- Private Methods --------------------------//
 ui.getVisibilityById = function(elements){
@@ -78,12 +98,13 @@ ui.getVisibilityById = function(elements){
     return allVisible; //style.display === 'none' ? true : false;
 }
 
-ui.hideElements = function(elementId){
-    ui.setElementVisibility(ui.getElements(elementId),false);
+ui.hideElements = function(elements){
+    ui.setElementVisibility(elements,false);
+
 }
 
-ui.showElements = function(elementId){
-    ui.setElementVisibility(ui.getElements(elementId),true);
+ui.showElements = function(elements){
+    ui.setElementVisibility(elements,true);
 }
 
 ui.addClass = function(elements,className){
@@ -121,10 +142,16 @@ ui.setElementVisibility = function(elements,visible){
     else elementsToProcess = elements;
     let visiblityWord = visible ? 'visible' : 'hidden';
 
+    console.log('Setting visibility of elements');
+    console.log(elementsToProcess);
     for(let element of elementsToProcess){
+        console.log('Setting visibility of ' + element + ' type: ' + typeof element);
+
         //if this element is an object, we can assume it is an html node and modify it directly.
         if(typeof element === 'object' ) element.style.visibility=visiblityWord;
-        else ui.getElements(element)[0].style.visibility=visiblityWord;
+        if(typeof element === 'string') ui.getElements(element)[0].style.visibility=visiblityWord;
+        console.log('Setting visibility of ' + element);
+   
     }
     return elementsToProcess;
 }

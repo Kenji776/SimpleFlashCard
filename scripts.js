@@ -18,6 +18,7 @@ var selectedDeckCategory = 'Pharmacy'
 var showUi = false;
 var categories = [];
 var answerResults = [];
+var autoLoadNextCardOnAnswer = true;
 
 async function loadCardLibrary(){
     console.log('Loading card library');
@@ -185,8 +186,6 @@ function loadCard(cardId, forceIndex){
     
     removeCardFromAvailable(currentCard.id);
 
-
-    
     let promptVal = promptKey;
     let answerVal = answerKey;
     let selectedAnswerKeyText = '';
@@ -230,7 +229,7 @@ function loadCard(cardId, forceIndex){
         viewedCards.push(currentCard);
     }
 
-
+    ui.hideElements('answer-buttons');
     if(currentCard.type == 'choice'){
         console.log('current card is a choice type. Attempting to read current answer from options index!');
         //get the text of the current correct answer for a choice question by using the correctAnswerValue property of the question definition to then read that object's label
@@ -238,10 +237,15 @@ function loadCard(cardId, forceIndex){
     }else{
         console.log('current card is unknown type. Prompt text');
         currentAnswer = promptVal == config.defaultPrompt ? currentCard[config.defaultAnswer] : currentCard[config.defaultPrompt];
+
+        ui.setAttribute('correct-icon-button','correctValue,',selectedAnswerKeyText);
+        ui.setAttribute('incorrect-icon-button','correctValue,',selectedAnswerKeyText);
+
+        ui.showElements('answer-buttons');
     }
 
     if(!currentAnswer || currentAnswer.length === 0){
-        alert('Unable to determin correct answer for this card. Please check card definition to ensure it has all properties set. See developer console for card info.');
+        alert('Unable to determine correct answer for this card. Please check card definition to ensure it has all properties set. See developer console for card info.');
         console.warn('Incomplete card info');
         console.log(currentCard);
     }else{
@@ -329,6 +333,8 @@ function recordQuestionResponse(card,givenAnswer,correctAnswer,awardedPoints){
 
     console.log('Question Response Recorded!');
     console.log(answerResults);
+
+    if(autoLoadNextCardOnAnswer) loadNext();
 }
 
 function calculateScore(){
@@ -404,7 +410,7 @@ function calculateScore(){
     */
 
     
-    if(returnObj.correctPercent === 100) {
+    if(returnObj.correctPercent === 100 && returnObj.numberOfQuestions > 0) {
         ui.showElements('score-sparkles');
         ui.addClass('score-total-animations','pulse');
     }
@@ -455,7 +461,7 @@ function loadNext(){
     if(timer && timer.timerInterval && cardIndex == 0){
         timer.startTimer();
     }
-    
+
     if(historyEntryToWrite != null){
         document.getElementById('history-items').appendChild(historyEntryToWrite);
         historyEntryToWrite = null;
@@ -596,6 +602,29 @@ function showNextHintLetter(){
     
 }
 
+function answerCorrect(event){
+    console.log(currentCard);
+    let pointsMod = currentCard.points ? currentCard.points : 1;
+    recordQuestionResponse(currentCard,currentCard.genericName,currentCard.genericName,pointsMod);
+    let currentScore = calculateScore();
+
+    console.log('Current score info');
+    console.log(currentScore);
+
+    setHistoryItemStyles();
+}
+
+function answerIncorrect(event){
+    console.log(currentCard);
+    recordQuestionResponse(currentCard,currentCard.genericName,'miss',0);
+    let currentScore = calculateScore();
+
+    console.log('Current score info');
+    console.log(currentScore);
+
+    setHistoryItemStyles();
+}
+
 function generateSelectListFromOptions(optionsArray,correctValue){
     const container = document.createElement('div');
     container.className = 'question-container';
@@ -631,10 +660,10 @@ function generateSelectListFromOptions(optionsArray,correctValue){
         let pointsMod = currentCard.points ? currentCard.points : 1;
         console.log(event.target.getAttribute('data-correct-value') + ' vs ' + selectedOptionValue);
         if(event.target.getAttribute('data-correct-value') === selectedOptionValue){
-            alert(config.correctAnswerText);
+            //alert(config.correctAnswerText);
         }else
         {
-            alert(config.wrongAnswerText);
+            //alert(config.wrongAnswerText);
             pointsMod = 0;
         }
 
@@ -728,7 +757,10 @@ function setUi(enableUi){
     
     
 }
-
+function toggleValue(paramName){
+    console.log('Switching ' + paramName + ' from ' + this[paramName] + ' to ' + !this[paramName]);
+    this[paramName] = !this[paramName];
+}
 function resetHistory(){
     try{
         historyEntryToWrite = null;
