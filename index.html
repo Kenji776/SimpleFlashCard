@@ -1,8 +1,10 @@
 <html>
 <title>Simple Flash Card Viewer</title>
 <link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="animations.css">
 <!--  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/design-system/2.5.0/styles/salesforce-lightning-design-system.min.css"> -->
 <script type="text/javascript" language="javascript" src="scripts.js"></script> 
+<script type="text/javascript" language="javascript" src="ui.js"></script> 
  
 
 <body>
@@ -37,16 +39,21 @@
 					</div>
 
 					<div>
-						<input type="checkbox" onclick="toggleHistory()" name="toggleHistory"></input>
+						<input type="checkbox" onclick="ui.toggleDisplay('history-items')" name="toggleHistory"></input>
 						<label for="toggleHistory"> Hide History Display</label>
 					</div>
         
+					
 					<!--
 						<input type="checkbox" onclick="setPreventDupes()" name="prevent-dupes"></input>
 						<label for="prevent-dupes">Prevent Duplicates</label><br>
 					-->
 					<div>
-						<label for="prompt-key">Prompt:</label>
+						<input type="checkbox" onclick="ui.toggleDisplay('score-panel')" name="toggleScoreDisplay"></input>
+						<label for="toggleScoreDisplay"> Hide Score Display</label>
+					</div>
+					<div>
+						<label for="prompt-key">Question Prompt:</label>
 						<select name="prompt-key" id="prompt-key" onchange="setPromptKey(this.value)"></select>
 					</div>
                 
@@ -67,36 +74,59 @@
 		<span class="grade-output" data-grade="d">D</span>
 		<span class="grade-output" data-grade="f">F</span>
 
-		<span class="grade-output" data-grade="s">S
+		
 
 
 		</span>
 		-->
 
 
-		<!--
-					<svg id="one" width="100" height="100" viewBox="0 0 75 75">
-						<g id="copy-1" class="group">
-						<g class="large">
-							<path id="large" d="M41.25,40 L42.5,10 L43.75,40 L45,41.25 L75,42.5 L45,43.75 L43.75,45 L42.5,75 L41.25,45 L40,43.75 L10,42.5 L40,41.25z" fill="gold" />
-						</g>
-						<g class="large-2" transform="rotate(45)">
-							<use xlink:href="#large" />
-						</g>
-						<g class="small">
-							<path id="small" d="M41.25,40 L42.5,25 L43.75,40 L45,41.25 L60,42.5 L45,43.75 L43.75,45 L42.5,60 L41.25,45 L40,43.75 L25,42.5 L40,41.25z" fill="gold" />
-						</g>
-						</g>
-					</svg>
-		-->
-
-
-
         <div class=" panel no-background" >
-			<div class="score panel">
+			<div class="score panel" id="score-panel">
 				<div id="score" class="sub-header" >
-					Score: <span id="score-total"></span><span id="score-grade" class="grade-output"></span><br/>
-					Points: <span id="points-total"></span><span id="points-grade" class="grade-output"></span>
+					Score: 
+					<div id="score-total-animations" class="inline">
+						<span id="score-total">0</span><span id="score-grade" class="grade-output">-</span>
+						<span class="sparkle" id="score-sparkles">
+							<svg id="one" width="25" height="25" viewBox="0 0 50 50" style="margin-left:-15">
+								<g id="copy-1" class="group">
+								<g class="large">
+									<path id="large" d="M41.25,40 L42.5,10 L43.75,40 L45,41.25 L75,42.5 L45,43.75 L43.75,45 L42.5,75 L41.25,45 L40,43.75 L10,42.5 L40,41.25z" fill="gold" />
+								</g>
+								<g class="large-2" transform="rotate(45)">
+									<use xlink:href="#large" />
+								</g>
+								<g class="small">
+									<path id="small" d="M41.25,40 L42.5,25 L43.75,40 L45,41.25 L60,42.5 L45,43.75 L43.75,45 L42.5,60 L41.25,45 L40,43.75 L25,42.5 L40,41.25z" fill="gold" />
+								</g>
+								</g>
+							</svg>
+						</span>
+					</div>
+					<br/>
+
+					Points: 
+					<div id="points-total-animations" class="inline">
+						<span id="points-total">0</span>
+						<!--
+						<span id="points-grade" class="grade-output">-</span>
+						<span class="sparkle" id="point-sparkles" >
+							<svg id="one" width="25" height="25" viewBox="0 0 50 50" style="margin-left:-15">
+								<g id="copy-1" class="group">
+								<g class="large">
+									<path id="large" d="M41.25,40 L42.5,10 L43.75,40 L45,41.25 L75,42.5 L45,43.75 L43.75,45 L42.5,75 L41.25,45 L40,43.75 L10,42.5 L40,41.25z" fill="gold" />
+								</g>
+								<g class="large-2" transform="rotate(45)">
+									<use xlink:href="#large" />
+								</g>
+								<g class="small">
+									<path id="small" d="M41.25,40 L42.5,25 L43.75,40 L45,41.25 L60,42.5 L45,43.75 L43.75,45 L42.5,60 L41.25,45 L40,43.75 L25,42.5 L40,41.25z" fill="gold" />
+								</g>
+								</g>
+							</svg>
+						</span>
+						-->
+					</div>
 				</div>
 			</div>
 			
@@ -148,5 +178,24 @@
 			</div>
         </div>
     </div>
+
+	Score: <span id="score-total"></span><span id="score-grade2" class="grade-output">
+		<div class="pulse">S</span>
+			<span class="sparkle" id="score-sparkles2">
+				<svg id="one" width="25" height="25" viewBox="0 0 50 50" style="margin-left:-15">
+					<g id="copy-1" class="group">
+					<g class="large">
+						<path id="large" d="M41.25,40 L42.5,10 L43.75,40 L45,41.25 L75,42.5 L45,43.75 L43.75,45 L42.5,75 L41.25,45 L40,43.75 L10,42.5 L40,41.25z" fill="gold" />
+					</g>
+					<g class="large-2" transform="rotate(45)">
+						<use xlink:href="#large" />
+					</g>
+					<g class="small">
+						<path id="small" d="M41.25,40 L42.5,25 L43.75,40 L45,41.25 L60,42.5 L45,43.75 L43.75,45 L42.5,60 L41.25,45 L40,43.75 L25,42.5 L40,41.25z" fill="gold" />
+					</g>
+					</g>
+				</svg>
+			</span>
+		</div>
 </body>
 </html>

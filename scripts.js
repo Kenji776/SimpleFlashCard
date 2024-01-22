@@ -377,8 +377,8 @@ function calculateScore(){
         }
     }
 
-    returnObj.pointsScorePercent = ((returnObj.currentPoints / returnObj.possiblePoints) * 100).toPrecision(2);
-    returnObj.correctPercent = ((returnObj.numberCorrect / (returnObj.numberOfQuestions-returnObj.numberUnanswered)) * 100).toPrecision(2);
+    returnObj.pointsScorePercent = Math.round( (returnObj.currentPoints / (returnObj.possiblePoints)) * 100);
+    returnObj.correctPercent = Math.round( (returnObj.numberCorrect / (returnObj.numberOfQuestions-returnObj.numberUnanswered)) * 100);
 
     returnObj.pointsGrade = getLetterGrade(returnObj.pointsScorePercent);
     returnObj.numberCorrectGrade = getLetterGrade(returnObj.correctPercent);
@@ -387,13 +387,33 @@ function calculateScore(){
     document.getElementById('points-total').innerHTML =`${returnObj.currentPoints} / ${returnObj.possiblePoints}`;
 
     document.getElementById('score-grade').innerHTML =`${returnObj.numberCorrectGrade}`;
-    document.getElementById('points-grade').innerHTML =`${returnObj.pointsGrade}`;
+    //document.getElementById('points-grade').innerHTML =`${returnObj.pointsGrade}`;
 
     document.getElementById('score-grade').setAttribute('data-grade',returnObj.numberCorrectGrade.slice(0,1).toLowerCase());
-    document.getElementById('points-grade').setAttribute('data-grade',returnObj.pointsGrade.slice(0,1).toLowerCase());
+    //document.getElementById('points-grade').setAttribute('data-grade',returnObj.pointsGrade.slice(0,1).toLowerCase());
+
+    /*
+    if(returnObj.pointsScorePercent === 100) {
+        ui.showElements('point-sparkles');
+        ui.addClass('points-total-animations','pulse');
+    }
+    else  {
+        ui.hideElements('point-sparkles');
+        ui.removeClass('points-total-animations','pulse');
+    }
+    */
 
     
+    if(returnObj.correctPercent === 100) {
+        ui.showElements('score-sparkles');
+        ui.addClass('score-total-animations','pulse');
+    }
+    else  {
+        ui.hideElements('score-sparkles');
+        ui.removeClass('score-total-animations','pulse');
+    }
     
+
     return returnObj;
 
 }
@@ -686,15 +706,6 @@ function setPreventDupes(){
     preventDuplicates = !preventDuplicates;
 }
 
-function toggleHistory(){
-    showHistory = !showHistory;
-
-    if(showHistory){
-        document.getElementById('history-items').style.visibility='visible';
-    }else{
-        document.getElementById('history-items').style.visibility='hidden';
-    }
-}
 
 function setUi(enableUi){
 
@@ -720,7 +731,6 @@ function resetHistory(){
         availableCards = [];
         cards = [];
         cardIndex = 0;
-        answerResults = [];
         answerResults = [];
         document.getElementById("hint-text").innerHTML = '';
         document.getElementById("clue-text").innerHTML = '';

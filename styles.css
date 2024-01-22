@@ -320,6 +320,10 @@ select{
 
 select:invalid { color: gray; }
 
+.inline{
+    display: inline-block;
+}
+
 @font-face {
     font-family: 'Rocher';
     src: url('media/font/RocherColorGX.woff2');
@@ -391,9 +395,9 @@ svg#one {
 	
 }
 .group {
-    -webkit-transform: translate(42.5px,42.5px);
-    -moz-transform: translate(42.5px,42.5px);
-    transform: translate(42.5px, 42.5px);
+    -webkit-transform: translate(25px,25px);
+    -moz-transform: translate(25px,25px);
+    transform: translate(25px,25px);
 }
 path {
     -webkit-transform: translate(-42.50px,-42.50px);
