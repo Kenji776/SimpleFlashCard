@@ -23,7 +23,7 @@ body{
     grid-template-columns: 0.5fr 2.2fr 0.3fr; 
     grid-template-rows: 0.3fr 2.5fr 0.2fr; 
     width:95vw;
-    gap: 10px 10px; 
+    gap: 5px 5px; 
     
     
     grid-template-areas: 
@@ -63,17 +63,22 @@ body{
     height:10vh;
 }
 
+.timer{
+    height:10vh;
+}
+
 .settings { 
     grid-area: settings; 
     width:15vw;
-    height:80vh;
+    height:85vh;
 }
 
 .history { 
     grid-area: history; 
-    height:50vh;
+    height: 50vh;
     overflow-y:auto;
     width:18vw;
+    grid-auto-rows: 1fr;
 }
 
 .footer { grid-area: footer; 
@@ -205,6 +210,7 @@ body{
     /*background-color:rgb(231, 233, 235);*/
     background-color: rgb(48 49 51);
     padding:15px;
+    margin-bottom:10px;
 }
 
 .flip-card {
@@ -608,5 +614,13 @@ path {
 		opacity: 0;
 		transform: rotate(-360deg) scale(1.5);
 	}
+}
+
+.deck-intro-image{
+    position:absolute;
+    bottom:0px;
+    left:15px;
+    width: 314px;
+    height: 395px;
 }
 

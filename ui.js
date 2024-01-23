@@ -140,6 +140,7 @@ ui.setElementVisibility = function(elements,visible){
     if(!isArray(elements)) elementsToProcess.push(elements);
     else elementsToProcess = elements;
     let visiblityWord = visible ? 'visible' : 'hidden';
+    let displayWord = visible ? 'block' : 'none';
 
     console.log('Setting visibility of elements');
     console.log(elementsToProcess);
@@ -150,11 +151,13 @@ ui.setElementVisibility = function(elements,visible){
         if(typeof element === 'object' ) {     
             //elm.height='0px';
             element.style.visibility=visiblityWord;
+            elm.style.display=displayWord;
         }
         if(typeof element === 'string') {
             let elm = ui.getElements(element)[0]   
             //elm.height='0px';
             elm.style.visibility=visiblityWord;
+            elm.style.display=displayWord;
         }
         console.log('Setting visibility of ' + element);
    
