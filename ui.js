@@ -100,7 +100,6 @@ ui.getVisibilityById = function(elements){
 
 ui.hideElements = function(elements){
     ui.setElementVisibility(elements,false);
-
 }
 
 ui.showElements = function(elements){
@@ -148,8 +147,15 @@ ui.setElementVisibility = function(elements,visible){
         console.log('Setting visibility of ' + element + ' type: ' + typeof element);
 
         //if this element is an object, we can assume it is an html node and modify it directly.
-        if(typeof element === 'object' ) element.style.visibility=visiblityWord;
-        if(typeof element === 'string') ui.getElements(element)[0].style.visibility=visiblityWord;
+        if(typeof element === 'object' ) {     
+            //elm.height='0px';
+            element.style.visibility=visiblityWord;
+        }
+        if(typeof element === 'string') {
+            let elm = ui.getElements(element)[0]   
+            //elm.height='0px';
+            elm.style.visibility=visiblityWord;
+        }
         console.log('Setting visibility of ' + element);
    
     }

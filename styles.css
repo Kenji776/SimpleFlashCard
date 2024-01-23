@@ -71,7 +71,7 @@ body{
 
 .history { 
     grid-area: history; 
-    height:60vh;
+    height:50vh;
     overflow-y:auto;
     width:18vw;
 }
@@ -438,6 +438,11 @@ th, td {
     margin-right: 15px;  
 }
 
+.sub-header-text-2 span{
+    margin-right: 5px;
+    margin-left:5px;
+}
+
 .prompt-text{
     font-weight: 900;
     color: #04AA6D;
@@ -605,12 +610,3 @@ path {
 	}
 }
 
-#timer{
-    position:absolute;
-    bottom:0px;
-    right:10px;
-    text-align: center;
-    font-family: "Digital7";
-    color: #04AA6D;
-    font-size: 44px;
-}
