@@ -275,7 +275,8 @@ body{
 }
 
 #flip-button:hover{
-    animation: pulse 1s infinite ease-in-out alternate;
+    backface-visibility: visible !important;
+	animation: flip 2s ease infinite;
 
 }
 

@@ -30,7 +30,7 @@ let timer = {
         this.minutes = 0;
         this.appendTens.innerHTML = "00";
         this.appendSeconds.innerHTML = "00";
-        this.appendMinutes.innerHTML = "00";
+        this.appendMins.innerHTML = "00";
     },
     
     runTimer: function(scope){
