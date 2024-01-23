@@ -466,31 +466,73 @@ function getLetterGrade(numberGrade) {
     return letter;
 }
 
+function getCorrectAnswerText(){
+	let defaultResponses = ['Nice Job!','Woo hoo!','Awesome','Sweet!','Your killing it!','Hell yeah!','Dope. Hella Dope','Fish','I\'ll drink to that!','That\'s what I\'m talking about','Git er done!'];
+	let returnString = '';
+	if(config.correctAnswerText){
+		let optionsArray = config.correctAnswerText.split(',');
+		returnString = optionsArray[Math.floor(Math.random()*optionsArray.length)];
+	}else{
+		returnString = defaultResponses[Math.floor(Math.random()*defaultResponses.length)];
+	}
+	return returnString;
+}
+
+function getIncorrectAnswerText(){
+	let defaultResponses = ['Boo!','You Suck!','Dumbass','WTF?! Seriously?','C\'mon are you even trying?','Yeesh, don\'t quit your day job.','Uh yeah... no','Honestly, I\'m embarassed for you'];
+	let returnString = '';
+	if(config.wrongAnswerText){
+		let optionsArray = config.wrongAnswerText.split(',');
+		returnString = optionsArray[Math.floor(Math.random()*optionsArray.length)];
+	}else{
+		returnString = defaultResponses[Math.floor(Math.random()*defaultResponses.length)];
+	}
+	return returnString;
+}
+
 function correctAnswerAlert(){
-    let divid = Math.floor(Math.random() * 101);
-    let div = document.createElement("div");
-    div.id = 'sucess-image-'+divid;
-    div.className = "correct-anwer-image fade-out";
-    console.log(div);
-    document.getElementById('answer-card').appendChild(div);    
+    let divId = Math.floor(Math.random() * 101);
+    let mascotDiv = document.createElement("div");
+    mascotDiv.id = 'sucess-image-'+divId;
+    mascotDiv.className = "correct-anwer-image fade-out";
+    console.log(mascotDiv);
+	
+	let speechBubbleDiv = document.createElement("div");
+	speechBubbleDiv.id = 'speech-bubble-'+divId;
+	speechBubbleDiv.className = "bubble bubble-bottom-right  fade-out";
+	speechBubbleDiv.innerHTML = getCorrectAnswerText();
+	
+	document.getElementById('answer-card').appendChild(speechBubbleDiv);    
+    document.getElementById('answer-card').appendChild(mascotDiv);    
 
     setTimeout(function(elementId){
-        document.getElementById(elementId).remove()
-    },3000,div.id);
+        document.getElementById('sucess-image-'+elementId).remove()
+		document.getElementById('speech-bubble-'+elementId).remove()
+    },3000,divId);
 }
 
 function incorrectAnswerAlert(){
-    let divid = Math.floor(Math.random() * 101);
-    let div = document.createElement("div");
-    div.id = 'fail-image-'+divid;
-    div.className = "incorrect-anwer-image fade-out";
-    console.log(div);
-    document.getElementById('answer-card').appendChild(div);   
+	
+	let divId = Math.floor(Math.random() * 101);
+    let mascotDiv = document.createElement("div");
+    mascotDiv.id = 'fail-image-'+divId;
+    mascotDiv.className = "incorrect-anwer-image fade-out";
+    console.log(mascotDiv);
+	
+	let speechBubbleDiv = document.createElement("div");
+	speechBubbleDiv.id = 'speech-bubble-'+divId;
+	speechBubbleDiv.className = "bubble bubble-bottom-right  fade-out";
+	speechBubbleDiv.innerHTML = getIncorrectAnswerText();
+	
+	document.getElementById('answer-card').appendChild(speechBubbleDiv);    
+    document.getElementById('answer-card').appendChild(mascotDiv);    
 
     setTimeout(function(elementId){
-
-        document.getElementById(elementId).remove()
-    },3000,div.id);
+        document.getElementById('fail-image-'+elementId).remove()
+		document.getElementById('speech-bubble-'+elementId).remove()
+    },3000,divId);
+	
+  
 }
 
 
