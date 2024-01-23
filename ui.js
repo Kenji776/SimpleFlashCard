@@ -102,8 +102,8 @@ ui.hideElements = function(elements){
     ui.setElementVisibility(elements,false);
 }
 
-ui.showElements = function(elements){
-    ui.setElementVisibility(elements,true);
+ui.showElements = function(elements,displayType){
+    ui.setElementVisibility(elements,true,displayType);
 }
 
 ui.addClass = function(elements,className){
@@ -135,12 +135,13 @@ ui.removeClass = function(elements,className){
 * @param {boolean} visible Visibility stat of elements 
 * @returns boolean. True if visibility set to false. False if visibility was not set.
 */
-ui.setElementVisibility = function(elements,visible){
+ui.setElementVisibility = function(elements,visible,displayType){
     let elementsToProcess = [];
     if(!isArray(elements)) elementsToProcess.push(elements);
     else elementsToProcess = elements;
     let visiblityWord = visible ? 'visible' : 'hidden';
     let displayWord = visible ? 'block' : 'none';
+    if(displayType) displayWord = displayType;
 
     console.log('Setting visibility of elements');
     console.log(elementsToProcess);

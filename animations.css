@@ -114,7 +114,7 @@
 }
 
 .fade-out {
-  animation: fade-out 2s linear infinite;
+  animation: fade-out 3s linear infinite;
 }
 @keyframes fade-out {
   from { opacity: 1; }

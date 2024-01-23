@@ -19,6 +19,7 @@ var showUi = false;
 var categories = [];
 var answerResults = [];
 var autoLoadNextCardOnAnswer = true;
+var streakCount = 0;
 
 async function loadCardLibrary(){
     console.log('Loading card library');
@@ -130,10 +131,12 @@ async function loadDeck(deckUrl){
     console.log('Set clue button name to: ' + clueBtn.innerHTML );
     console.log(config.labels);
 
+    ui.hideElements('intro-slide-image');
+    ui.showElements('deck-loaded-image');
     setUi(true);
 
     
-    document.getElementById("prompt").innerHTML= `Press Next To Begin`;
+    document.getElementById("prompt").innerHTML= `${config.name} Loaded. Press Next To Begin`;
 }
 
 
@@ -164,6 +167,7 @@ function getCardById(cardId){
 */
 function loadCard(cardId, forceIndex){
 
+    
     //flip the card back to the question side
     document.getElementById('answer-card').classList.remove("flip-card-flipped")
     
@@ -334,6 +338,14 @@ function recordQuestionResponse(card,givenAnswer,correctAnswer,awardedPoints){
     console.log('Question Response Recorded!');
     console.log(answerResults);
 
+    if(givenAnswer == correctAnswer) {
+        correctAnswerAlert()
+        streakCount++;
+    }
+    else {
+        incorrectAnswerAlert();
+        streakCount = 0;
+    }
     if(autoLoadNextCardOnAnswer) loadNext();
 }
 
@@ -348,7 +360,8 @@ function calculateScore(){
         "pointsScorePercent": 0,
         "correctPercent": 0,
         "pointsGrade" : '-',
-        "numberCorrectGrade": '-'
+        "numberCorrectGrade": '-',
+        "streak": 0
     }
 
     returnObj.numberOfQuestions = cards.length;
@@ -359,10 +372,7 @@ function calculateScore(){
         console.log(answer);
         returnObj.currentPoints += answer.awardedPoints;
         returnObj.possiblePoints += answer.possiblePoints;
-
-
         finalAnswers[answer.card.id] = answer;
-
     }
 
     console.log('Final Answers object');
@@ -391,12 +401,17 @@ function calculateScore(){
 
     document.getElementById('score-total').innerHTML =`${returnObj.numberCorrect} / ${returnObj.numberOfQuestions-returnObj.numberUnanswered}`;
     document.getElementById('points-total').innerHTML =`${returnObj.currentPoints} / ${returnObj.possiblePoints}`;
+    document.getElementById('streak-total').innerHTML = streakCount;
+    
 
     document.getElementById('score-grade').innerHTML =`${returnObj.numberCorrectGrade}`;
     //document.getElementById('points-grade').innerHTML =`${returnObj.pointsGrade}`;
 
     document.getElementById('score-grade').setAttribute('data-grade',returnObj.numberCorrectGrade.slice(0,1).toLowerCase());
     //document.getElementById('points-grade').setAttribute('data-grade',returnObj.pointsGrade.slice(0,1).toLowerCase());
+
+    document.getElementById('streak-total').setAttribute('data-grade',returnObj.numberCorrectGrade.slice(0,1).toLowerCase());
+    
 
     /*
     if(returnObj.pointsScorePercent === 100) {
@@ -411,7 +426,7 @@ function calculateScore(){
 
     
     if(returnObj.correctPercent === 100 && returnObj.numberOfQuestions > 0) {
-        ui.showElements('score-sparkles');
+        ui.showElements('score-sparkles','inline');
         ui.addClass('score-total-animations','pulse');
     }
     else  {
@@ -450,6 +465,34 @@ function getLetterGrade(numberGrade) {
     return letter;
 }
 
+function correctAnswerAlert(){
+    let divid = Math.floor(Math.random() * 101);
+    let div = document.createElement("div");
+    div.id = 'sucess-image-'+divid;
+    div.className = "correct-anwer-image fade-out";
+    console.log(div);
+    document.getElementById('answer-card').appendChild(div);    
+
+    setTimeout(function(elementId){
+        document.getElementById(elementId).remove()
+    },3000,div.id);
+}
+
+function incorrectAnswerAlert(){
+    let divid = Math.floor(Math.random() * 101);
+    let div = document.createElement("div");
+    div.id = 'fail-image-'+divid;
+    div.className = "incorrect-anwer-image fade-out";
+    console.log(div);
+    document.getElementById('answer-card').appendChild(div);   
+
+    setTimeout(function(elementId){
+
+        document.getElementById(elementId).remove()
+    },3000,div.id);
+}
+
+
 function loadNext(){
     console.log('---------------------------------- Loading next card. Card Index: ' + cardIndex);
     console.log(viewedCards);
@@ -459,6 +502,7 @@ function loadNext(){
 
 
     if(timer && timer.timerInterval && cardIndex == 0){
+        ui.hideElements('deck-loaded-image');
         timer.startTimer();
     }
 
@@ -753,10 +797,9 @@ function setUi(enableUi){
         console.log('Hiding ui')
         document.getElementById('deck-controls').style.visibility='hidden';
         document.getElementById('controls').style.visibility='hidden';
-    }
-    
-    
+    }   
 }
+
 function toggleValue(paramName){
     console.log('Switching ' + paramName + ' from ' + this[paramName] + ' to ' + !this[paramName]);
     this[paramName] = !this[paramName];
