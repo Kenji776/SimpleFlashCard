@@ -118,6 +118,7 @@ async function loadDeck(deckUrl){
     console.log('Config');
     console.log(config);
     document.getElementById("content-header").innerHTML= `Card Stack: ${config.name} - ${cards.length} Cards`; 
+    document.title = config.name;
     
     setPromptKey(config.defaultPrompt);
     
