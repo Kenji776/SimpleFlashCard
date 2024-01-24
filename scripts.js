@@ -486,7 +486,7 @@ function getCorrectAnswerText(){
 }
 
 function getIncorrectAnswerText(){
-	let defaultResponses = ['Boo!','You Suck!','Dumbass','WTF?! Seriously?','C\'mon are you even trying?','Yeesh, don\'t quit your day job.','Uh yeah... no','Honestly, I\'m embarassed for you'];
+	let defaultResponses = ['Boo!','I\m not angry. Just disappointed','Sigh...','WTF?! Seriously?','C\'mon are you even trying?','Yeesh, don\'t quit your day job.','Uh yeah... no','Honestly, I\'m embarassed for you'];
 	let returnString = '';
 	if(config.wrongAnswerText){
 		let optionsArray = config.wrongAnswerText.split(',');
