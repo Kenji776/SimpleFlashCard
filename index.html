@@ -177,12 +177,15 @@
 
 			<div id="timer" class="panel timer">
 				<span class="sub-header-text" style="text-align:center">Time</span>
-				<span class="sub-header-text-2" >
-					<span id="mins" >00</span>:<span id="seconds">00</span>:<span id="tens">00</span><br/>
+				<span class="sub-header-text-2 timer-output" >
+					<span id="mins">00</span>:<span id="seconds">00</span>:<span id="tens">00</span><br/>
 				</span>
-				<input type="button" id="timer-button-start" onclick="timer.startTimer()" value="Start"></input>
-				<input type="button" id="timer-button-stop"  onclick="timer.stopTimer()" value="Stop"></input>
-				<input type="button" id="timer-button-reset"  onclick="timer.resetTimer()" value="Reset"></input>
+				
+				<div id="timer-control-buttons">
+					<input type="button" id="timer-button-start" onclick="timer.startTimer()" value="Start"></input>
+					<input type="button" id="timer-button-stop"  onclick="timer.stopTimer()" value="Stop"></input>
+					<input type="button" id="timer-button-reset"  onclick="timer.resetTimer()" value="Clear"></input>
+				</div>
 			</div> 
 
 			<div class="panel history">
@@ -246,13 +249,15 @@
 					<div id="clue-text"></div>
 				</div>
 
-				<div id="button-container" class="center">
+				<div id="button-container">
 					<input type="button" class="big-button" id="prev-button" onclick="loadPrev()" value="Previous"></input>
 					<input type="button" class="big-button" id="clue-button" onclick="showClue()" value="Clue"></input>
 					<img src="media/flip.png" onclick="showAnswer()" id="flip-button" />
-					<input type="button" class="big-button" id="next-letter-button" onclick="showNextHintLetter()" value="Show Next Letter"></input>
+					<input type="button" class="big-button" id="next-letter-button" onclick="showNextHintLetter()" value="Next Letter"></input>
 					<input type="button" class="big-button" id="next-button" onclick="loadNext()"value="Next"></input>
 				</div>
+				
+				<div class="spacer"></div>
 			</div>
         </div>
     </div>

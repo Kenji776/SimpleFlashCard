@@ -67,6 +67,17 @@ body{
     height:10vh;
 	min-height:100px;
 }
+.timer-output{
+	min-width:30px;
+	display:inline;
+	margin-left:0px !important;
+	margin-right:0px !important;
+	
+}
+
+#timer-control-buttons{
+	white-space: nowrap;
+}
 
 .settings { 
     grid-area: settings; 
@@ -188,10 +199,10 @@ body{
     font-size:1.5rem;
     font-weight:bold;
 }
-#button-container  > * {
-    
-    display: inline-block;
-    vertical-align: middle;
+#button-container {
+	vertical-align: middle;
+	display: flex;
+	justify-content: center;
     
 }
 
@@ -443,11 +454,6 @@ th, td {
     margin-right: 15px;  
 }
 
-.sub-header-text-2 span{
-    margin-right: 5px;
-    margin-left:5px;
-}
-
 .prompt-text{
     font-weight: 900;
     color: #04AA6D;
@@ -472,7 +478,7 @@ input[type=button] {
 }
 
 .big-button{
-    min-width:150px !important;
+    min-width:100px !important;
     line-height:65px;
     height:70px;
     margin-left:15px;
