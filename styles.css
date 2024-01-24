@@ -8,14 +8,11 @@
 }  
 body{
     width:100%;
-    /*
-    background: rgb(2,0,36);
-    background: linear-gradient(90deg, rgba(2,0,36,1) 0%, rgba(9,62,121,1) 6%, rgba(0,212,255,1) 100%);
-    */
     background-color:rgb(0, 0, 0);
     font-family: -apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica,Arial,sans-serif,Apple Color Emoji,Segoe UI Emoji,Segoe UI Symbol;
     color:#CBCBCB;
     overflow-x:hidden;
+	font-size:1rem;
 }
 
 .container {
@@ -24,13 +21,14 @@ body{
     grid-template-rows: 0.3fr 2.5fr 0.2fr; 
     width:95vw;
     gap: 5px 5px; 
+	min-height:600px;
     
     
     grid-template-areas: 
       "header header header"
       "settings content history"
       "settings footer history"; 
-  }
+	}
 
 #center-view{
     overflow:hidden;
@@ -52,25 +50,28 @@ body{
 .header { 
     grid-area: header; 
     height:6vh; 
-    font-size:30px;
+    font-size:1.875px;
     font-weight:bold;
     width: 98.5%;
     margin-left:auto;
     margin-right:auto;
+	min-height:65px;
 }
 
 .score{
     height:15vh;
+	min-height:115px;
 }
 
 .timer{
     height:10vh;
+	min-height:100px;
 }
 
 .settings { 
     grid-area: settings; 
     width:15vw;
-    height:85vh;
+	min-height:300px;
 }
 
 .history { 
@@ -85,6 +86,7 @@ body{
     position: relative;
     width: 60vw;
     height:2vh;
+	font-size: 0.625rem;
 
 
 }
@@ -115,7 +117,7 @@ body{
 #prompt{
     margin-left:auto;
     margin-right:auto;
-    font-size:28px;
+    font-size:1.5rem;
     font-weight:bold;
     margin:20px;
     text-align:center;
@@ -124,7 +126,7 @@ body{
 #answer{
     margin-left:auto;
     margin-right:auto;
-    font-size:22px;
+    font-size:1.125rem;
     font-weight:bold;
     margin:20px;
     text-align:center;
@@ -132,12 +134,13 @@ body{
 
 #settings{
     position:absolute;
-    min-height:200px;
+    min-height:500px;
     min-width:100px;
     top:20px;
     right:10px; 
     height:500px;
     text-align:left;
+	height: 100%;
 }
 
 #deck-controls{
@@ -182,7 +185,7 @@ body{
 
 
 .sub-header{
-    font-size:24px;
+    font-size:1.5rem;
     font-weight:bold;
 }
 #button-container  > * {
@@ -221,7 +224,6 @@ body{
     padding:0px;
     font-family: 'Work Sans', sans-serif;
     font-weight: 900;
-    font-size: 8vw;
     text-transform: uppercase;
     
 
@@ -343,11 +345,7 @@ body{
     background-color: #909090;
 }
 
-select{
-    margin-top:5px;
-}
 
-select:invalid { color: gray; }
 
 .inline{
     display: inline-block;
@@ -364,14 +362,14 @@ th, td {
     font-family: 'Rocher';
     text-align: center;
     margin-left: 25px;
-    font-size:40px;
+    font-size:3rem;
 }
 
 .animated-heading{
     font-family: 'Rocher';
     text-align: center;
     margin-left: 25px;
-    font-size:40px;
+    font-size:3rem;
     font-palette: --Orange;
 }
 
@@ -425,14 +423,14 @@ th, td {
 .header-text{
     font-family: 'Rocher';
     text-align: center;
-    font-size:55px;
+    font-size:4rem;
     font-palette: --Green;
 }
 
 .sub-header-text{
     font-family: 'Rocher';
     text-align: center;
-    font-size:35px;
+    font-size:1.8rem;
     font-palette: --Green;   
     margin-right: 15px;
 }
@@ -440,7 +438,7 @@ th, td {
 .sub-header-text-2{
     font-family: 'Rocher';
     text-align: center;
-    font-size:35px;
+    font-size:2rem;
     font-palette: --Yellow; 
     margin-right: 15px;  
 }
@@ -465,7 +463,7 @@ input[type=button] {
     text-align: center;
     text-decoration: none;
     display: inline-block;
-    font-size: 16px;
+    font-size: 0.875rem;
     cursor:hand;
     border-radius: 5px;
     min-width: 60px;
@@ -490,7 +488,7 @@ select select{
     background: transparent;
     width: 268px;
     padding: 5px;
-    font-size: 16px;
+    font-size: 0.875rem;
     line-height: 1;
     border: 0;
     border-radius: 0;
@@ -499,10 +497,11 @@ select select{
 }
 
 select {
-    width: 240px;
+    width: 100%;
     height: 34px;
     overflow: hidden;
     background: url(new_arrow.png) no-repeat right #ddd;
+	margin-top:5px;
     border: 1px solid #ccc;
 }
 
@@ -627,8 +626,9 @@ path {
 
 .deck-bottom-image{
     position:absolute;
-    bottom:-40px;
-    left:335px;
+    bottom:-40px;	
+	right: 50%;
+    transform: translateX(50%);
 }
 
 fieldset {
@@ -642,7 +642,7 @@ fieldset {
 }
 
 legend {
-	font-size: 28px;
+	font-size: 1.5rem;
 	font-weight: bold;
 	background: rgba(255, 255, 255, 0.1);
 	backdrop-filter: blur(2px);
@@ -752,9 +752,8 @@ input[type="checkbox"]:checked::before {
 	}
 }
 
-.correct-anwer-image{
-    background-image: url("media/shibaHappy.png");
-    position:absolute;
+#mascot-response-container{
+	position:absolute;
     bottom:-10;
     right: 20;
     width:150px;
@@ -762,14 +761,17 @@ input[type="checkbox"]:checked::before {
     z-index:100;
 }
 
-.incorrect-anwer-image{
-    background-image: url("media/shibaSad.png");
-    position:absolute;
-    bottom:-10;
-    right: 20;
+#mascot-response-container div{
     width:150px;
     height:150px;
-    z-index:100;
+}
+
+.correct-anwer-image{
+    background-image: url("media/shibaHappy.png");
+}
+
+.incorrect-anwer-image{
+    background-image: url("media/shibaSad.png");
 }
 
 .bubble {
@@ -777,7 +779,7 @@ input[type="checkbox"]:checked::before {
   bottom:120px;
   right:10px;
   font-family: sans-serif;
-  font-size: 18px;
+  font-size: 1.125rem;
   line-height: 24px;
   width: 300px;
   background: #fff;

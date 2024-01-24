@@ -502,8 +502,8 @@ function correctAnswerAlert(){
 	speechBubbleDiv.className = "bubble bubble-bottom-right  fade-out";
 	speechBubbleDiv.innerHTML = getCorrectAnswerText();
 	
-	document.getElementById('answer-card').appendChild(speechBubbleDiv);    
-    document.getElementById('answer-card').appendChild(mascotDiv);    
+	document.getElementById('mascot-response-container').appendChild(speechBubbleDiv);    
+    document.getElementById('mascot-response-container').appendChild(mascotDiv);    
 
     setTimeout(function(elementId){
         document.getElementById('sucess-image-'+elementId).remove()
@@ -524,8 +524,8 @@ function incorrectAnswerAlert(){
 	speechBubbleDiv.className = "bubble bubble-bottom-right  fade-out";
 	speechBubbleDiv.innerHTML = getIncorrectAnswerText();
 	
-	document.getElementById('answer-card').appendChild(speechBubbleDiv);    
-    document.getElementById('answer-card').appendChild(mascotDiv);    
+	document.getElementById('mascot-response-container').appendChild(speechBubbleDiv);    
+    document.getElementById('mascot-response-container').appendChild(mascotDiv);    
 
     setTimeout(function(elementId){
         document.getElementById('fail-image-'+elementId).remove()

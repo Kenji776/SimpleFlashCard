@@ -22,17 +22,17 @@ HTMLElement.prototype.toggle = function(element){
 
 
 //------------------------------------------------- UTILITY FUNCTIONS -------------------------------------//
-ui.toggleDisplay = function(elementId){
+ui.toggleDisplay = function(elements, forceHide){
 
-    console.log('Toggling: ' + elementId+ '. Visible: ' + ui.getVisibilityById(elementId));
-    if(ui.getVisibilityById(elementId)){
-        console.log('Hiding: ' + elementId)
-        ui.hideElements(elementId);
-        console.log('Visiblity: ' + ui.getVisibilityById(elementId))
+    console.log('Toggling: ' + elements+ '. Visible: ' + ui.getVisibilityById(elements));
+    if(ui.getVisibilityById(elements) || forceHide){
+        console.log('Hiding: ' + elements)
+        ui.hideElements(elements);
+        console.log('Visiblity: ' + ui.getVisibilityById(elements))
     }else{
-        console.log('Showing: ' + elementId)
-        ui.showElements(elementId);
-        console.log('Visiblity: ' + ui.getVisibilityById(elementId))
+        console.log('Showing: ' + elements)
+        ui.showElements(elements);
+        console.log('Visiblity: ' + ui.getVisibilityById(elements))
     }
 }
 
@@ -155,10 +155,11 @@ ui.setElementVisibility = function(elements,visible,displayType){
             elm.style.display=displayWord;
         }
         if(typeof element === 'string') {
-            let elm = ui.getElements(element)[0]   
-            //elm.height='0px';
-            elm.style.visibility=visiblityWord;
-            elm.style.display=displayWord;
+            for(let elm of ui.getElements(element)){  
+				//elm.height='0px';
+				elm.style.visibility=visiblityWord;
+				elm.style.display=displayWord;
+			}
         }
         console.log('Setting visibility of ' + element);
    

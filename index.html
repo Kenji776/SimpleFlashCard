@@ -40,22 +40,22 @@
 					<span class="sub-header-text">Options</span>
 					<div>
 						<input type="checkbox" onclick="setRandom()" name="randomize"></input>				
-						<label for="randomize"> Randomize Card Order</label>
+						<label for="randomize">Randomize Card Order</label>
 					</div>
 
 					<div>
 						<input type="checkbox" onclick="ui.toggleDisplay('history-items')" name="toggleHistory" id="toggleHistory"></input>
-						<label for="toggleHistory"> Hide History Display</label>
+						<label for="toggleHistory">Hide History Display</label>
 					</div>
         
 					<div>
 						<input type="checkbox" onclick="ui.toggleDisplay('#timer')" name="toggleTimer" id="toggleTimer"></input>
-						<label for="toggleTimer"> Hide Timer Display</label>
+						<label for="toggleTimer">Hide Timer Display</label>
 					</div>
 
 					<div>
 						<input type="checkbox" onclick="toggleValue('autoLoadNextCardOnAnswer')" name="autoProgressOnAnswer" id="autoProgressOnAnswer" checked="true"></input>
-						<label for="autoProgressOnAnswer"> Auto Progress On Answer</label>
+						<label for="autoProgressOnAnswer">Auto Progress On Answer</label>
 					</div>
 					<!--
 						<input type="checkbox" onclick="setPreventDupes()" name="prevent-dupes"></input>
@@ -63,7 +63,11 @@
 					-->
 					<div>
 						<input type="checkbox" onclick="ui.toggleDisplay('score-panel')" name="toggleScoreDisplay" id="toggleScoreDisplay"></input>
-						<label for="toggleScoreDisplay"> Hide Score Display</label>
+						<label for="toggleScoreDisplay">Hide Score Display</label>
+					</div>
+					<div>
+						<input type="checkbox" onclick="ui.toggleDisplay('.mascot',true)" name="toggleMascotDisplay" id="toggleMascotDisplay"></input>
+						<label for="toggleMascotDisplay">Hide Mascots</label>
 					</div>
 					<div>
 						<label for="prompt-key">Question Prompt:</label>
@@ -77,6 +81,8 @@
 					-->
 				</div>
             </div>
+			
+			<div style="clear:both"></div>
  
         </div>
 
@@ -200,35 +206,38 @@
         <div class="content panel" id="center-view">   
             <div class="flip-card" id="answer-card">
                 <div class="flip-card-inner">
-                <div class="flip-card-front">
-                    <div id="prompt">
-						<div id="load-deck-message" class="bounce">
-							<span class="animated-heading ">Load Deck To Begin</span>
+					<div class="flip-card-front">
+						<div id="prompt">
+							<div id="load-deck-message" class="bounce">
+								<span class="animated-heading ">Load Deck To Begin</span>
+							</div>
 						</div>
+						<img src="media/shibeleft.png" class="deck-intro-image mascot" id="intro-slide-image"/>
+						<img src="media/bottomShiba.png" class="deck-bottom-image hidden mascot" id="deck-loaded-image"/>
 					</div>
-					<img src="media/shibeleft.png" class="deck-intro-image" id="intro-slide-image"/>
-					<img src="media/bottomShiba.png" class="deck-bottom-image hidden" id="deck-loaded-image"/>
-                </div>
-                <div class="flip-card-back">
-                    <div id="answer"></div>
-					<div id="answer-buttons" class="center">
-						<table class="center" callp>
-							<tr>
-								<td><img src="media/accept.png" id="correct-icon-button" class="animated-button" onclick="answerCorrect()"  data-correct-value=""/></td>
-								<td><img src="media/close.png" id="incorrect-icon-button" class="animated-button" onclick="answerIncorrect()" data-correct-value=""/></td>
-							</tr>
-							<tr>
-								<td>Yup, I Got It!</td>
-								<td>Nope, Didn't know it.</td>
-							</tr>
-						</table>
+					<div class="flip-card-back">
+						<div id="answer"></div>
+						<div id="answer-buttons" class="center">
+							<table class="center">
+								<tr>
+									<td><img src="media/accept.png" id="correct-icon-button" class="animated-button" onclick="answerCorrect()"  data-correct-value=""/></td>
+									<td><img src="media/close.png" id="incorrect-icon-button" class="animated-button" onclick="answerIncorrect()" data-correct-value=""/></td>
+								</tr>
+								<tr>
+									<td>Yup, I Got It!</td>
+									<td>Nope, Didn't know it.</td>
+								</tr>
+							</table>
+						</div>
 						
 						
 					</div>
+					
                 </div>
-                </div>
+				<div class="mascot" id="mascot-response-container"></div> 
             </div>
-
+			
+			
 			<div id="controls">
 				<div class="panel center" id="hint-container">
 					<img src="media/question.png" id="help-icon" style="float:left" />
@@ -238,16 +247,11 @@
 				</div>
 
 				<div id="button-container" class="center">
-					<table>
-						<tr>
-							<td><input type="button" class="big-button" id="prev-button" onclick="loadPrev()" value="Previous"></input></td>
-							<td><input type="button" class="big-button" id="clue-button" onclick="showClue()" value="Clue"></input></td>
-							<td><img src="media/flip.png" onclick="showAnswer()" id="flip-button" /></td>
-							<td><input type="button" class="big-button" id="next-letter-button" onclick="showNextHintLetter()" value="Show Next Letter"></input></td>
-							<td><input type="button" class="big-button" id="next-button" onclick="loadNext()"value="Next"></input></td>
-						</tr>
-
-					</table>
+					<input type="button" class="big-button" id="prev-button" onclick="loadPrev()" value="Previous"></input>
+					<input type="button" class="big-button" id="clue-button" onclick="showClue()" value="Clue"></input>
+					<img src="media/flip.png" onclick="showAnswer()" id="flip-button" />
+					<input type="button" class="big-button" id="next-letter-button" onclick="showNextHintLetter()" value="Show Next Letter"></input>
+					<input type="button" class="big-button" id="next-button" onclick="loadNext()"value="Next"></input>
 				</div>
 			</div>
         </div>
