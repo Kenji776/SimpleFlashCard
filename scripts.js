@@ -585,7 +585,7 @@ function loadNext(){
         console.log('Card to load set to:');
         console.log(cardToLoad);
         cardIndex++;
-        document.getElementById("history-items").scrollIntoView({ behavior: 'smooth', block: 'end' });
+        //document.getElementById("history-items").scrollIntoView({ behavior: 'smooth', block: 'end' });
         
         loadCard(cardToLoad.id);
     }

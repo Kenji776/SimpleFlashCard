@@ -479,8 +479,8 @@ input[type=button] {
 
 .big-button{
     min-width:100px !important;
-    line-height:65px;
-    height:70px;
+    line-height:45px;
+    height:50px;
     margin-left:15px;
     margin-right:15px;
     font-weight: bolder;
