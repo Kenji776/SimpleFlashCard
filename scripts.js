@@ -405,12 +405,19 @@ function calculateScore(){
     document.getElementById('streak-total').innerHTML = streakCount;
     
 
-    document.getElementById('score-grade').innerHTML =`${returnObj.numberCorrectGrade}`;
-    //document.getElementById('points-grade').innerHTML =`${returnObj.pointsGrade}`;
-
-    document.getElementById('score-grade').setAttribute('data-grade',returnObj.numberCorrectGrade.slice(0,1).toLowerCase());
-    //document.getElementById('points-grade').setAttribute('data-grade',returnObj.pointsGrade.slice(0,1).toLowerCase());
-
+	if(returnObj.numberOfQuestions-returnObj.numberUnanswered > 1){
+		document.getElementById('score-grade').innerHTML =`${returnObj.numberCorrectGrade}`;
+		document.getElementById('score-grade').setAttribute('data-grade',returnObj.numberCorrectGrade.slice(0,1).toLowerCase());
+	}else{
+		document.getElementById('score-grade').innerHTML = '';
+	}
+	
+	if(returnObj.numberOfQuestions-returnObj.numberUnanswered > 1){
+		//document.getElementById('points-grade').innerHTML =`${returnObj.pointsGrade}`;
+		//document.getElementById('points-grade').setAttribute('data-grade',returnObj.pointsGrade.slice(0,1).toLowerCase());
+	}else{
+		//document.getElementById('points-grade').innerHTML = '';
+	}
     document.getElementById('streak-total').setAttribute('data-grade',returnObj.numberCorrectGrade.slice(0,1).toLowerCase());
     
 
@@ -491,6 +498,7 @@ function getIncorrectAnswerText(){
 }
 
 function correctAnswerAlert(){
+	document.getElementById('mascot-response-container').innerHTML = '';
     let divId = Math.floor(Math.random() * 101);
     let mascotDiv = document.createElement("div");
     mascotDiv.id = 'sucess-image-'+divId;
@@ -506,13 +514,12 @@ function correctAnswerAlert(){
     document.getElementById('mascot-response-container').appendChild(mascotDiv);    
 
     setTimeout(function(elementId){
-        document.getElementById('sucess-image-'+elementId).remove()
-		document.getElementById('speech-bubble-'+elementId).remove()
+        document.getElementById('mascot-response-container').innerHTML = '';
     },3000,divId);
 }
 
 function incorrectAnswerAlert(){
-	
+	document.getElementById('mascot-response-container').innerHTML = '';
 	let divId = Math.floor(Math.random() * 101);
     let mascotDiv = document.createElement("div");
     mascotDiv.id = 'fail-image-'+divId;
@@ -528,8 +535,7 @@ function incorrectAnswerAlert(){
     document.getElementById('mascot-response-container').appendChild(mascotDiv);    
 
     setTimeout(function(elementId){
-        document.getElementById('fail-image-'+elementId).remove()
-		document.getElementById('speech-bubble-'+elementId).remove()
+        document.getElementById('mascot-response-container').innerHTML = '';
     },3000,divId);
 	
   
@@ -855,9 +861,23 @@ function resetHistory(){
         cards = [];
         cardIndex = 0;
         answerResults = [];
+		cardLibrary = {};
+	    currentCard = {};
+		config = {};
+		hintIndex = 0;
+		currentAnswer = '';
+		streakCount = 0;
+		
         document.getElementById("hint-text").innerHTML = '';
         document.getElementById("clue-text").innerHTML = '';
         document.getElementById('history-items').innerHTML = '';
+		document.getElementById("viewed-total").innerHTML = `${viewedCards.length} / ${cards.length}`;
+		
+		timer.stopTimer();
+		timer.seconds =0;
+		timer.tens = 0;
+		timer.mins = 0;
+		calculateScore();
     }catch(ex){
         console.log('Error resetting history');
         console.error(ex);
