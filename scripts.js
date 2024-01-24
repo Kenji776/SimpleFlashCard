@@ -405,14 +405,14 @@ function calculateScore(){
     document.getElementById('streak-total').innerHTML = streakCount;
     
 
-	if(returnObj.numberOfQuestions-returnObj.numberUnanswered > 1){
+	if(returnObj.numberOfQuestions-returnObj.numberUnanswered >= 1){
 		document.getElementById('score-grade').innerHTML =`${returnObj.numberCorrectGrade}`;
 		document.getElementById('score-grade').setAttribute('data-grade',returnObj.numberCorrectGrade.slice(0,1).toLowerCase());
 	}else{
 		document.getElementById('score-grade').innerHTML = '';
 	}
 	
-	if(returnObj.numberOfQuestions-returnObj.numberUnanswered > 1){
+	if(returnObj.numberOfQuestions-returnObj.numberUnanswered >= 1){
 		//document.getElementById('points-grade').innerHTML =`${returnObj.pointsGrade}`;
 		//document.getElementById('points-grade').setAttribute('data-grade',returnObj.pointsGrade.slice(0,1).toLowerCase());
 	}else{
