@@ -21,7 +21,7 @@
           "drugs_group_d": {
             "name": "Drugs Group D",
             "description": "Collection of drug generic names and brand names",
-            "url": "https://pharmacy-flashcards-2027.lol/IntroToPharmacy1/Pharmacy/GroupD.cards"
+            "url": "https://pharmacy-flashcards-2027.lol/cards/IntroToPharmacy1/GroupD.cards"
           }
         }
       ],
@@ -30,7 +30,7 @@
           "drugs_group_a": {
             "name": "Drugs Group A",
             "description": "Collection of drug generic names and brand names",
-            "url": "https://pharmacy-flashcards-2027.lol/cards/IntroToPharmacy2/groupA.cards"
+            "url": "https://pharmacy-flashcards-2027.lol/cards/IntroToPharmacy2/GroupA.cards"
           },
           "drugs_group_b": {
             "name": "Drugs Group B",
