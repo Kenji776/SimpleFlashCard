@@ -364,15 +364,15 @@ th, td {
 .grade-output{
     font-family: 'Rocher';
     text-align: center;
-    margin-left: 25px;
-    font-size:3rem;
+    margin-left: 15px;
+    font-size:1.8rem;
 }
 
 .animated-heading{
     font-family: 'Rocher';
     text-align: center;
-    margin-left: 25px;
-    font-size:3rem;
+    margin-left: 15px;
+    font-size:1.8rem;
     font-palette: --Orange;
 }
 
@@ -447,6 +447,7 @@ th, td {
     font-size:1.6rem;
     font-palette: --Yellow; 
     margin-right: 15px;  
+	vertical-align: top;
 }
 
 .prompt-text{
