@@ -118,12 +118,6 @@ body{
     visibility: hidden;
 }
 
-#hint-container{
-    margin:auto;
-    margin-top:15px;
-    margin-bottom:15px;
-    
-}
 
 #prompt{
     margin-left:auto;
@@ -203,6 +197,7 @@ body{
 	vertical-align: middle;
 	display: flex;
 	justify-content: center;
+	margin-top: 25px;
     
 }
 
@@ -305,6 +300,7 @@ body{
 #hint-container{
     height:50px;
     font-weight:bold;
+	margin:auto;
 }
 
 
@@ -857,5 +853,9 @@ input[type="checkbox"]:checked::before {
 	#answer{
 		margin-top: 5px;
 		margin-bottom: 5px;
+	}
+	.grade-output{
+		font-size: 1.8rem;
+		margin-left:5px;
 	}
 }
