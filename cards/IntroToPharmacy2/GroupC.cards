@@ -1,32 +1,32 @@
 {
   "config": {
-    "name": "Group A Drugs",
+    "name": "Group C Drugs",
     "promptKeys": [
       {
         "value": "genericName",
-        "label": "genericName"
+        "label": "Generic Name"
       },
       {
         "value": "brandName",
-        "label": "brandName"
+        "label": "Brand Name"
       }
     ],
     "answerKeys": [
       {
         "value": "genericName",
-        "label": "genericName"
+        "label": "Generic Name"
       },
       {
         "value": "brandName",
-        "label": "brandName"
+        "label": "Brand Name"
       }
     ],
     "defaultPrompt": "genericName",
     "defaultAnswer": "brandName",
     "clueTextKey": "drugClassName",
     "labels": {
-      "genericName": "genericName",
-      "brandName": "brandName",
+      "genericName": "Generic Name",
+      "brandName": "Brand Name",
       "drugClassName": "Drug Class Name",
       "clueButtonName": "Drug Class Name"
     }
