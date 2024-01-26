@@ -6,22 +6,22 @@
           "drugs_group_a": {
             "name": "Drugs Group A",
             "description": "Collection of drug generic names and brand names",
-            "url": "https://pharmacy-flashcards-2027.lol/cards/Pharmacy/groupA.cards"
+            "url": "https://pharmacy-flashcards-2027.lol/cards/IntroToPharmacy1/groupA.cards"
           },
           "drugs_group_b": {
             "name": "Drugs Group B",
             "description": "Collection of drug generic names and brand names",
-            "url": "https://pharmacy-flashcards-2027.lol/cards/Pharmacy/GroupB.cards"
+            "url": "https://pharmacy-flashcards-2027.lol/cards/IntroToPharmacy1/GroupB.cards"
           },
           "drugs_group_c": {
             "name": "Drugs Group C",
             "description": "Collection of drug generic names and brand names",
-            "url": "https://pharmacy-flashcards-2027.lol/cards/Pharmacy/GroupC.cards"
+            "url": "https://pharmacy-flashcards-2027.lol/cards/IntroToPharmacy1/GroupC.cards"
           },
           "drugs_group_d": {
             "name": "Drugs Group D",
             "description": "Collection of drug generic names and brand names",
-            "url": "https://pharmacy-flashcards-2027.lol/cards/Pharmacy/GroupD.cards"
+            "url": "https://pharmacy-flashcards-2027.lol/IntroToPharmacy1/Pharmacy/GroupD.cards"
           }
         }
       ],
@@ -30,17 +30,17 @@
           "drugs_group_a": {
             "name": "Drugs Group A",
             "description": "Collection of drug generic names and brand names",
-            "url": "https://pharmacy-flashcards-2027.lol/cards/Pharmacy/groupA.cards"
+            "url": "https://pharmacy-flashcards-2027.lol/cards/IntroToPharmacy2/groupA.cards"
           },
           "drugs_group_b": {
             "name": "Drugs Group B",
             "description": "Collection of drug generic names and brand names",
-            "url": "https://pharmacy-flashcards-2027.lol/cards/Pharmacy/GroupB.cards"
+            "url": "https://pharmacy-flashcards-2027.lol/cards/IntroToPharmacy2/GroupB.cards"
           },
           "drugs_group_c": {
             "name": "Drugs Group C",
             "description": "Collection of drug generic names and brand names",
-            "url": "https://pharmacy-flashcards-2027.lol/cards/Pharmacy/GroupC.cards"
+            "url": "https://pharmacy-flashcards-2027.lol/cards/IntroToPharmacy2/GroupC.cards"
           }
         }
       ],
