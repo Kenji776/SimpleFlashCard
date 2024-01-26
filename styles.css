@@ -68,11 +68,11 @@ body{
 	min-height:100px;
 }
 .timer-output{
-	min-width:30px;
-	display:inline;
+	min-width:185px;
+	display:inline-block;
 	margin-left:0px !important;
 	margin-right:0px !important;
-	
+
 }
 
 #timer-control-buttons{
@@ -190,8 +190,8 @@ body{
 
 
 .sub-header{
-    font-size:1.5rem;
-    font-weight:bold;
+    font-size:1.4rem;
+   
 }
 #button-container {
 	vertical-align: middle;
@@ -298,7 +298,7 @@ body{
 }
 
 #hint-container{
-    height:50px;
+    min-height:70px;
     font-weight:bold;
 	margin:auto;
 }
@@ -433,9 +433,10 @@ th, td {
 .sub-header-text{
     font-family: 'Rocher';
     text-align: center;
-    font-size:1.8rem;
+    font-size:1.6rem;
     font-palette: --Green;   
     margin-right: 15px;
+	vertical-align: top;
 }
 
 
@@ -443,7 +444,7 @@ th, td {
 .sub-header-text-2{
     font-family: 'Rocher';
     text-align: center;
-    font-size:2rem;
+    font-size:1.6rem;
     font-palette: --Yellow; 
     margin-right: 15px;  
 }
