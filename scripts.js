@@ -14,7 +14,7 @@ var availableCards = [];
 var hintText = 'Stuck? Try clicking Show Drug Class or Show Next Letter!';
 var historyEntryToWrite;
 var showHistory = true;
-var selectedDeckCategory = 'Pharmacy'
+var selectedDeckCategory;
 var showUi = false;
 var categories = [];
 var answerResults = [];
@@ -29,7 +29,7 @@ async function loadCardLibrary(){
 
     setDeckCategories(cardLibrary);
 
-    setDeckOptions(cardLibrary);
+    if(selectedDeckCategory) setDeckOptions(cardLibrary);
 }
 
 
@@ -42,6 +42,7 @@ function setDeckCategories(deckData){
     console.log('Getting categories from deckData');
     console.log(deckData);
     let optionsArray = [];
+	optionsArray.push({'value': null, 'label': '--Select One---'});
     for(let categoryName in deckData.card_stacks.categories){
         optionsArray.push({'value': categoryName, 'label': categoryName});
     }
@@ -60,6 +61,8 @@ function setDeckOptions(){
     let optionsArray = [];
     console.log('Select deck options for selectedDeck ' + selectedDeckCategory);
     console.log(cardLibrary)
+	
+	console.log('Selected category: ' + selectedDeckCategory);
     for(let deckIndex in cardLibrary.card_stacks.categories[selectedDeckCategory][0]){
         let deck = cardLibrary.card_stacks.categories[selectedDeckCategory][0][deckIndex];
 
@@ -71,7 +74,7 @@ function setDeckOptions(){
 
 function setSelectedDeckCategory(categoryId){
     selectedDeckCategory = categoryId;
-    setDeckOptions()
+    if(categoryId) setDeckOptions()
 }
 
 async function loadDeck(deckUrl){
