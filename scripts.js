@@ -31,7 +31,49 @@ async function loadCardLibrary(){
 
     if(selectedDeckCategory) setDeckOptions(cardLibrary);
 }
-
+				
+function registerKeyboardShortcuts(){
+	
+	console.log('Registering shortcut keys!');
+	document.onkeydown = function (e) {
+		e = e || window.event;
+		// use e.keyCode
+		console.log(e.keyCode);
+		
+		if (e.keyCode == '38') {
+			//up arrow
+			showAnswer();
+			e.preventDefault();
+		}
+		else if (e.keyCode == '40') {
+			// down arrow
+			showNextHintLetter();
+			e.preventDefault();
+		}
+		else if (e.keyCode == '37') {
+		   // left arrow
+		   loadPrev();
+		   e.preventDefault();
+		}
+		else if (e.keyCode == '39') {
+			//right arrow
+		   loadNext();
+		   e.preventDefault();
+		}
+		else if(e.keyCode == '72'){
+			showClue();
+			e.preventDefault();
+		}
+		else if(e.keyCode == '49'){
+			answerCorrect();
+			e.preventDefault();
+		}
+		else if(e.keyCode == '50'){
+			answerIncorrect();
+			e.preventDefault();
+		}
+	};
+}
 
 /**
  * @description sets all of the potential deck category options from the card library
@@ -889,4 +931,6 @@ function resetHistory(){
 }
 window.onload = function() {
     loadCardLibrary();
+	
+	registerKeyboardShortcuts();
 };
