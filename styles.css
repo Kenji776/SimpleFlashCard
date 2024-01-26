@@ -827,6 +827,7 @@ input[type="checkbox"]:checked::before {
 	}
 	.header{
 		min-height: 28px;
+		height: 2vh;
 	}
 	.header-text{
 		font-size:2rem;
