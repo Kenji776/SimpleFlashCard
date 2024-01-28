@@ -6,17 +6,17 @@ ui.elements = {
 
 //------------------------------------------------- HTML ELEMENT FUNCTIONS -------------------------------------//
 HTMLElement.prototype.hide = function(element){
-    console.log(this + ' hiding says: ' + thing);
+
     ui.setElementVisibility(element,false);
 }
 
 HTMLElement.prototype.show = function(element){
-    console.log(this + ' showing says: ' + thing);
+
     ui.setElementVisibility(element,true);
 }
 
 HTMLElement.prototype.toggle = function(element){
-    console.log(this + ' toggle says: ' + thing);
+
     ui.setElementVisibility(ui.getVisibilityById(element),true);
 }
 
@@ -24,15 +24,11 @@ HTMLElement.prototype.toggle = function(element){
 //------------------------------------------------- UTILITY FUNCTIONS -------------------------------------//
 ui.toggleDisplay = function(elements, forceHide){
 
-    console.log('Toggling: ' + elements+ '. Visible: ' + ui.getVisibilityById(elements));
+  
     if(ui.getVisibilityById(elements) || forceHide){
-        console.log('Hiding: ' + elements)
         ui.hideElements(elements);
-        console.log('Visiblity: ' + ui.getVisibilityById(elements))
     }else{
-        console.log('Showing: ' + elements)
         ui.showElements(elements);
-        console.log('Visiblity: ' + ui.getVisibilityById(elements))
     }
 }
 
@@ -55,8 +51,6 @@ ui.setAttribute = function(elements,property,value){
         thisElement = element;
         if(typeof element === 'string') thisElement = ui.getElements(element)[0];
 
-        console.log('Setting attribute on:');
-        console.log(thisElement);
         try{
             thisElement.dataset[property] = value;//(property,value);
         }catch(ex){
@@ -106,6 +100,31 @@ ui.showElements = function(elements,displayType){
     ui.setElementVisibility(elements,true,displayType);
 }
 
+ui.setContent = function(elements,content){
+    let elementsToProcess = [];
+    if(!isArray(elements)) elementsToProcess.push(elements);
+    else elementsToProcess = elements;
+
+
+    for(let element of elementsToProcess){
+
+        //if this element is an object, we can assume it is an html node and modify it directly.
+        if(typeof element === 'object' ) {     
+            //elm.height='0px';
+            element.innerHTML=content;
+
+        }
+        if(typeof element === 'string') {
+            for(let elm of ui.getElements(element)){  
+				elm.innerHTML=content;
+			}
+        }
+        console.log('Setting visibility of ' + element);
+   
+    }
+    return elementsToProcess;	
+}
+
 ui.addClass = function(elements,className){
     let elementsList = [];
     if(typeof elements === 'string') elementsList = elementsList.concat(elements.split(','));
@@ -143,10 +162,8 @@ ui.setElementVisibility = function(elements,visible,displayType){
     let displayWord = visible ? 'block' : 'none';
     if(displayType) displayWord = displayType;
 
-    console.log('Setting visibility of elements');
-    console.log(elementsToProcess);
     for(let element of elementsToProcess){
-        console.log('Setting visibility of ' + element + ' type: ' + typeof element);
+
 
         //if this element is an object, we can assume it is an html node and modify it directly.
         if(typeof element === 'object' ) {     
@@ -161,8 +178,7 @@ ui.setElementVisibility = function(elements,visible,displayType){
 				elm.style.display=displayWord;
 			}
         }
-        console.log('Setting visibility of ' + element);
-   
+
     }
     return elementsToProcess;
 }

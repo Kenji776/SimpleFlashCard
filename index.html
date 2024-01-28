@@ -2,7 +2,10 @@
 <title>Simple Flash Card Viewer</title>
 <link rel="stylesheet" href="styles.css">
 <link rel="stylesheet" href="animations.css">
-<!--  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/design-system/2.5.0/styles/salesforce-lightning-design-system.min.css"> -->
+<link rel="stylesheet" href="modal.css">
+<link rel="stylesheet" href="confetti.css">
+
+
 <link href='https://fonts.googleapis.com/css?family=Orbitron' rel='stylesheet' type='text/css'>
 <link rel="icon" type="image/png" href="media/favicon-32x32.png" sizes="32x32" />
 <link rel="icon" type="image/png" href="media/favicon-16x16.png" sizes="16x16" />
@@ -10,6 +13,7 @@
 <script type="text/javascript" language="javascript" src="scripts.js"></script> 
 <script type="text/javascript" language="javascript" src="ui.js"></script> 
 <script type="text/javascript" language="javascript" src="timer.js"></script> 
+<script type="text/javascript" language="javascript" src="modal.js"></script> 
 
 <body>
     <div class="container">
@@ -182,7 +186,7 @@
 				<span class="sub-header-text">Time</span>
 				<div class="timer-output">
 					<span class="sub-header-text-2 timer-output" >
-						<span id="mins" class="timer-group">00</span>:<span id="seconds" class="timer-group">00</span>:<span id="tens" class="timer-group">00</span><br/>
+						<span id="mins" class="timer-group">00</span>:<span id="seconds" class="timer-group">00</span> <!--:<span id="tens" class="timer-group">00</span>--><br/>
 					</span>
 					
 					<div id="timer-control-buttons">
@@ -201,14 +205,11 @@
         </div>
 
         <div class="footer center panel"> 
-			Like this application? Consider donating to support it. Venmo: @Kenji776 | Square Cash: $Kenji776 | PayPal: 
-			<form action="https://www.paypal.com/donate" method="post" target="_top" style="display:inline">
-				<input type="hidden" name="business" value="Q47GJHW3JH6GJ" />
-				<input type="hidden" name="no_recurring" value="0" />
-				<input type="hidden" name="currency_code" value="USD" />
-				<input type="image" src="https://www.paypalobjects.com/en_US/i/btn/btn_donate_SM.gif" border="0" name="submit" title="PayPal - The safer, easier way to pay online!" alt="Donate with PayPal button" />
-				<img alt="" border="0" src="https://www.paypal.com/en_US/i/scr/pixel.gif" width="1" height="1" />
-			</form>
+			Like this application? Consider donating to support it. Venmo: @Kenji776 | Square Cash: $Kenji776 | PayPal: <a href="https://www.paypal.com/donate?token=Az8L4GSlpcVGyj2FK-aXnXAVv7PXMS6YoALVc-3KJf-6GhakssojaEHhE1ukx_RRdqVSRYvEszDLgFE0" target="_blank">Donate</a>
+	
+			<div>
+				It's open source too! <a href="https://github.com/Kenji776/SimpleFlashCard">Github Repo</a>
+			</div>
         </div>
 
         <div class="content panel" id="center-view">   
@@ -267,5 +268,161 @@
 			</div>
         </div>
     </div>
+	
+	<!-- MODAL WINDOW -->
+	<!-- The Modal -->
+	<div id="results-modal" class="modal">
+		  <!-- Modal content -->
+		<div class="modal-content">
+			<div class="modal-header">
+				<span class="close-modal-button modal-close">&times;</span>
+				<h2>Deck Complete!</h2>
+			</div>
+			
+			<div class="modal-body">
+				<div style="display: flex; justify-content: space-between;">
+				
+					<div style="vertical-align: top;">
+						<p>
+							<span class="sub-header-text big-text">Final Score: </span><span class="sub-header-text-2 big-text" id="final-score-results"></span>
+						</p>
+						<p>
+							<span class="sub-header-text big-text">Correct Answers: </span><span class="sub-header-text-2 results-fact big-text" id="final-score-correct-answers"></span>
+						</p>
+						<p>
+							<span class="sub-header-text big-text">Incorrect Answers: </span><span class="sub-header-text-2 results-fact big-text" id="final-score-incorrect-answers"></span>
+						</p>
+						<p>
+							<span class="sub-header-text big-text">Longest Streak: </span><span class="sub-header-text-2 results-fact big-text" id="final-score-longest-streak"></span>
+						</p>
+						<p>
+							<span class="sub-header-text big-text">Final Grade: </span><span class="sub-header-text-2 results-fact big-text" id="final-score-grade"></span>
+						</p>
+					</div>
+					
+					<div style="vertical-align: top">
+						<img src="media/doneShiba.jpg" width="306px" height="306px"></img>
+					</div>
+				</div>
+			</div>
+			
+			<div class="modal-footer">
+				<h3>Play again soon!</h3>
+			</div>
+		</div>
+	</div>
+	
+	<div id="confetti_outer">
+		<div class="confetti-container">
+		  <div class="confetti">
+			<i style="--speed: 10; --bg: yellow" class="square"></i>
+			<i style="--speed: 18; --bg: white" class="pentagram"></i>
+			<i style="--speed: 29; --bg: green" class="rectangle"></i>
+			<i style="--speed: 17; --bg: blue" class="hexagram"></i>
+			<i style="--speed: 33; --bg: red" class="pentagram"></i>
+			<i style="--speed: 26; --bg: yellow" class="dodecagram"></i>
+			<i style="--speed: 24; --bg: pink" class="wavy-line"> </i>
+			<i style="--speed: 5; --bg: blue" class="wavy-line"></i>
+			<i style="--speed: 40; --bg: white" class="square"></i>
+			<i style="--speed: 17; --bg: green" class="rectangle"></i>
+			<i style="--speed: 25; --bg: white" class="square"></i>
+			<i style="--speed: 18; --bg: green" class="rectangle"></i>
+			<i style="--speed: 15; --bg: yellow" class="wavy-line"> </i>
+			<i style="--speed: 32; --bg: yellow" class="pentagram"></i>
+			<i style="--speed: 25; --bg: white" class="square"></i>
+			<i style="--speed: 18; --bg: green" class="rectangle"></i>
+			<i style="--speed: 37; --bg: yellow" class="dodecagram"></i>
+			<i style="--speed: 23; --bg: pink" class="wavy-line"></i>
+			<i style="--speed: 37; --bg: red" class="dodecagram"></i>
+			<i style="--speed: 37; --bg: pink" class="wavy-line"></i>
+			<i style="--speed: 36; --bg: white" class="hexagram"></i>
+			<i style="--speed: 32; --bg: green" class="wavy-line"></i>
+			<i style="--speed: 32; --bg: yellow" class="pentagram"></i>
+			<i style="--speed: 29; --bg: white" class="square"></i>
+			<i style="--speed: 18; --bg: green" class="rectangle"></i>
+			<i style="--speed: 37; --bg: red" class="dodecagram"></i>
+			<i style="--speed: 23; --bg: pink" class="wavy-line"> </i>
+			<i style="--speed: 30; --bg: pink" class="rectangle"></i>
+			<i style="--speed: 30; --bg: red" class="square"></i>
+			<i style="--speed: 18; --bg: red" class="pentagram"></i>
+			<i style="--speed: 19; --bg: green" class="rectangle"></i>
+			<i style="--speed: 16; --bg: blue" class="hexagram"></i>
+			<i style="--speed: 23; --bg: red" class="pentagram"></i>
+			<i style="--speed: 34; --bg: yellow" class="dodecagram"></i>
+			<i style="--speed: 39; --bg: pink" class="wavy-line"></i>
+			<i style="--speed: 40; --bg: purple" class="square"></i>
+			<i style="--speed: 21; --bg: green" class="rectangle"></i>
+			<i style="--speed: 14; --bg: white" class="square"></i>
+			<i style="--speed: 38; --bg: green" class="rectangle"></i>
+			<i style="--speed: 19; --bg: red" class="dodecagram"></i>
+			<i style="--speed: 29; --bg: pink" class="wavy-line"> </i>
+			<i style="--speed: 21; --bg: white" class="hexagram"></i>
+			<i style="--speed: 17; --bg: purple" class="wavy-line"></i>
+			<i style="--speed: 32; --bg: yellow" class="pentagram"></i>
+			<i style="--speed: 23; --bg: white" class="square"></i>
+			<i style="--speed: 18; --bg: green" class="rectangle"></i>
+			<i style="--speed: 37; --bg: red" class="dodecagram"></i>
+			<i style="--speed: 48; --bg: pink" class="wavy-line"> </i>
+			<i style="--speed: 38; --bg: pink" class="rectangle"></i>
+			<i style="--speed: 13; --bg: red" class="pentagram"></i>
+			<i style="--speed: 49; --bg: yellow" class="dodecagram"></i>
+			<i style="--speed: 19; --bg: cyan" class="wavy-line"></i>
+			<i style="--speed: 15; --bg: steelblue" class="square"></i>
+			<i style="--speed: 10; --bg: yellow" class="square"></i>
+			<i style="--speed: 18; --bg: white" class="pentagram"></i>
+			<i style="--speed: 29; --bg: green" class="rectangle"></i>
+			<i style="--speed: 17; --bg: blue" class="hexagram"></i>
+			<i style="--speed: 33; --bg: red" class="pentagram"></i>
+			<i style="--speed: 26; --bg: yellow" class="dodecagram"></i>
+			<i style="--speed: 24; --bg: pink" class="wavy-line"> </i>
+			<i style="--speed: 5; --bg: white" class="wavy-line"></i>
+			<i style="--speed: 40; --bg: purple" class="square"></i>
+			<i style="--speed: 17; --bg: green" class="rectangle"></i>
+			<i style="--speed: 25; --bg: white" class="square"></i>
+			<i style="--speed: 18; --bg: green" class="rectangle"></i>
+			<i style="--speed: 15; --bg: cyan" class="wavy-line"> </i>
+			<i style="--speed: 32; --bg: yellow" class="pentagram"></i>
+			<i style="--speed: 45; --bg: white" class="square"></i>
+			<i style="--speed: 18; --bg: green" class="rectangle"></i>
+			<i style="--speed: 37; --bg: red" class="dodecagram"></i>
+			<i style="--speed: 23; --bg: pink" class="wavy-line"> </i>
+			<i style="--speed: 37; --bg: red" class="dodecagram"></i>
+			<i style="--speed: 37; --bg: pink" class="wavy-line"> </i>
+			<i style="--speed: 26; --bg: white" class="hexagram"></i>
+			<i style="--speed: 32; --bg: cyan" class="wavy-line"></i>
+			<i style="--speed: 32; --bg: yellow" class="pentagram"></i>
+			<i style="--speed: 45; --bg: white" class="square"></i>
+			<i style="--speed: 18; --bg: green" class="rectangle"></i>
+			<i style="--speed: 37; --bg: red" class="dodecagram"></i>
+			<i style="--speed: 23; --bg: pink" class="wavy-line"> </i>
+			<i style="--speed: 50; --bg: pink" class="rectangle"></i>
+			<i style="--speed: 30; --bg: red" class="square"></i>
+			<i style="--speed: 18; --bg: red" class="pentagram"></i>
+			<i style="--speed: 19; --bg: green" class="rectangle"></i>
+			<i style="--speed: 16; --bg: blue" class="hexagram"></i>
+			<i style="--speed: 23; --bg: red" class="pentagram"></i>
+			<i style="--speed: 33; --bg: yellow" class="dodecagram"></i>
+			<i style="--speed: 39; --bg: white" class="wavy-line"></i>
+			<i style="--speed: 40; --bg: orange" class="square"></i>
+			<i style="--speed: 21; --bg: green" class="rectangle"></i>
+			<i style="--speed: 14; --bg: white" class="square"></i>
+			<i style="--speed: 38; --bg: green" class="rectangle"></i>
+			<i style="--speed: 19; --bg: red" class="dodecagram"></i>
+			<i style="--speed: 29; --bg: pink" class="wavy-line"> </i>
+			<i style="--speed: 34; --bg: white" class="hexagram"></i>
+			<i style="--speed: 17; --bg: indigo" class="wavy-line"></i>
+			<i style="--speed: 32; --bg: yellow" class="pentagram"></i>
+			<i style="--speed: 23; --bg: white" class="square"></i>
+			<i style="--speed: 18; --bg: green" class="rectangle"></i>
+			<i style="--speed: 37; --bg: red" class="dodecagram"></i>
+			<i style="--speed: 48; --bg: pink" class="wavy-line"> </i>
+			<i style="--speed: 38; --bg: pink" class="rectangle"></i>
+			<i style="--speed: 13; --bg: red" class="pentagram"></i>
+			<i style="--speed: 49; --bg: yellow" class="dodecagram"></i>
+			<i style="--speed: 19; --bg: purple" class="wavy-line"></i>
+			<i style="--speed: 15; --bg: cyan" class="square"></i>
+		  </div>
+		</div>
+	</div>
 </body>
 </html>

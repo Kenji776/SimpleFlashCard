@@ -9,11 +9,11 @@ let timer = {
 
     startTimer: function() {
         console.log('Start timer clicked');
-        this.appendTens = document.getElementById("tens");
+        //this.appendTens = document.getElementById("tens");
         this.appendSeconds = document.getElementById("seconds");
         this.appendMins = document.getElementById("mins");
         if(this.timerInterval) clearInterval(this.timerInterval);
-        this.timerInterval = setInterval(this.runTimer, 10, this);
+        this.timerInterval = setInterval(this.runTimer, 1000, this);
 
         console.log(this);
     },
@@ -34,18 +34,18 @@ let timer = {
     },
     
     runTimer: function(scope){
-        scope.tens++;
+        scope.tens = scope.tens + 1000;
     
         
         //------------------------ Tenths of Seconds ----------------------//
-        scope.appendTens.innerHTML = scope.tens >=10 ? scope.tens : "0" + scope.tens;
+        //scope.appendTens.innerHTML = scope.tens >=10 ? scope.tens : "0" + scope.tens;
     
         //------------------------ Seconds ----------------------//
         if (scope.tens > 99) {
             scope.seconds++;
             scope.appendSeconds.innerHTML = scope.seconds >=10 ? scope.seconds : "0" + scope.seconds;
             scope.tens = 0;
-            scope.appendTens.innerHTML = "0" + 0;
+            //scope.appendTens.innerHTML = "0" + 0;
         }
     
 

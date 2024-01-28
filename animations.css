@@ -277,7 +277,7 @@
 }
 
 .bounce-in-right {
-  animation: bounce-in-right 2s ease infinite;
+  animation: bounce-in-right 2s ease 1;
 }
 @keyframes bounce-in-right {
   0% {

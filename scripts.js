@@ -1,3 +1,5 @@
+var resultsModal;
+
 var cardLibrary = {};
 var currentCard = {};
 var cardIndex = 0;
@@ -19,7 +21,49 @@ var showUi = false;
 var categories = [];
 var answerResults = [];
 var autoLoadNextCardOnAnswer = true;
-var streakCount = 0;
+
+
+//final score tally objects
+var scoreTally = {
+	targetNode: {},
+	tallyAnimationInterval: {}, //interval timer
+	currentTally: 0, //current value of score tally
+	totalScore: 0, //score to reach to clear tally
+	tallyIntervalMS: 1 //how often to incriment the display
+}
+
+var performance = {
+	currentPoints: 0, 
+	possiblePoints : 0, 
+	numberCorrect: 0, 
+	numberOfQuestions:0, 
+	numberIncorrect : 0,
+	numberUnanswered : 0,
+	pointsScorePercent: 0,
+	correctPercent: 0,
+	pointsGrade : '-',
+	numberCorrectGrade: '-',
+	streak: 0,
+	longestStreak: 0,
+	runningTotalScore: 0
+}
+
+
+
+function init(){
+	loadCardLibrary();
+	
+	registerKeyboardShortcuts();
+	
+	resultsModal = new Modal();
+	
+	resultsModal.registerModal('results-modal');
+	
+	resultsModal.registerModalCloseHandler(function(scope){
+		ui.hideElements('confetti_outer');
+	});		
+		
+}
 
 async function loadCardLibrary(){
     console.log('Loading card library');
@@ -70,6 +114,10 @@ function registerKeyboardShortcuts(){
 		}
 		else if(e.keyCode == '50'){
 			answerIncorrect();
+			e.preventDefault();
+		}
+		else if(e.keyCode == '35'){
+			deckCompleteEvents();
 			e.preventDefault();
 		}
 	};
@@ -386,36 +434,36 @@ function recordQuestionResponse(card,givenAnswer,correctAnswer,awardedPoints){
 
     if(givenAnswer == correctAnswer) {
         correctAnswerAlert()
-        streakCount++;
+        performance.streak++;
+		
+		let newPoints = performance.streak * (awardedPoints * 10);
+		console.log(`Adding ${newPoints} to total  ${performance.runningTotalScore}.  ${performance.streak} * (${awardedPoints} * 10)`);
+		
+		performance.runningTotalScore += newPoints;
+		if(performance.streak > performance.longestStreak) performance.longestStreak = performance.streak;
     }
     else {
         incorrectAnswerAlert();
-        streakCount = 0;
+        performance.streak = 0;
     }
     if(autoLoadNextCardOnAnswer) loadNext();
 }
 
 function calculateScore(){
-    let returnObj = {
-        "currentPoints": 0, 
-        "possiblePoints" : 0, 
-        "numberCorrect": 0, 
-        "numberOfQuestions":0, 
-        "numberIncorrect" : 0,
-        "numberUnanswered" : 0,
-        "pointsScorePercent": 0,
-        "correctPercent": 0,
-        "pointsGrade" : '-',
-        "numberCorrectGrade": '-',
-        "streak": 0
-    }
 
+	//copy our performance objects so we don't lose anything that was set on it that we arn't calculating here
+	returnObj = performance;
+	
     returnObj.numberOfQuestions = cards.length;
+	returnObj.currentPoints = 0;
+	returnObj.possiblePoints = 0
+	returnObj.numberCorrect = 0;
+	returnObj.numberIncorrect = 0;
+	returnObj.numberUnanswered = 0;
 
     let finalAnswers = {};
+	
     for(let answer of answerResults){
-        console.log('Looking at recorded answer');
-        console.log(answer);
         returnObj.currentPoints += answer.awardedPoints;
         returnObj.possiblePoints += answer.possiblePoints;
         finalAnswers[answer.card.id] = answer;
@@ -425,8 +473,6 @@ function calculateScore(){
     console.log(finalAnswers);
 
     for(let thisCard of cards){
-        console.log('Iterating cards');
-        console.log(thisCard);
         if(finalAnswers.hasOwnProperty(thisCard.id)){
             if(finalAnswers[thisCard.id].wasCorrect){
                 returnObj.numberCorrect++;
@@ -434,11 +480,11 @@ function calculateScore(){
                 returnObj.numberIncorrect++;
             }
         }else{
-            console.log('No answer found for  ' + thisCard.id)
             returnObj.numberUnanswered++;
         }
     }
 
+	
     returnObj.pointsScorePercent = Math.round( (returnObj.currentPoints / (returnObj.possiblePoints)) * 100);
     returnObj.correctPercent = Math.round( (returnObj.numberCorrect / (returnObj.numberOfQuestions-returnObj.numberUnanswered)) * 100);
 
@@ -447,7 +493,7 @@ function calculateScore(){
 
     document.getElementById('score-total').innerHTML =`${returnObj.numberCorrect} / ${returnObj.numberOfQuestions-returnObj.numberUnanswered}`;
     document.getElementById('points-total').innerHTML =`${returnObj.currentPoints} / ${returnObj.possiblePoints}`;
-    document.getElementById('streak-total').innerHTML = streakCount;
+    document.getElementById('streak-total').innerHTML = returnObj.streak;
     
 
 	if(returnObj.numberOfQuestions-returnObj.numberUnanswered >= 1){
@@ -610,7 +656,10 @@ function loadNext(){
     if(cardIndex == cards.length){
         if(timer) timer.stopTimer();
 
-        alert('End of deck reached');
+        //alert('End of deck reached');
+		
+		deckCompleteEvents();
+		
         return;
     }
 
@@ -662,7 +711,6 @@ function createHistoryEntry(cardData,navigationPosition,entryLabel){
 function setHistoryItemStyles(){
     let answerMap = {};
     for(let answerindex in answerResults){
-        console.log('Parsing incorrect answers in history list');
         answerMap[answerResults[answerindex].card.id] = answerResults[answerindex].wasCorrect;
     }
 
@@ -670,12 +718,9 @@ function setHistoryItemStyles(){
 
     for(let thisItem of historyItems){
 
-        console.log(thisItem.getAttribute('data-card-id') + ' has answer logged? ' + answerMap.hasOwnProperty(thisItem.getAttribute('data-card-id')));
-
         let isCorrect = answerMap.hasOwnProperty(thisItem.getAttribute('data-card-id')) ? answerMap[thisItem.getAttribute('data-card-id')] : false;
 
         if(answerMap.hasOwnProperty(thisItem.getAttribute('data-card-id'))){
-            console.log('this question has been answered. Applying styling class!');
             if(isCorrect){
                 thisItem.classList.remove("incorrect-answer");
                 thisItem.classList.add("correct-answer");
@@ -744,10 +789,10 @@ function answerCorrect(event){
     console.log(currentCard);
     let pointsMod = currentCard.points ? currentCard.points : 1;
     recordQuestionResponse(currentCard,currentCard.genericName,currentCard.genericName,pointsMod);
-    let currentScore = calculateScore();
+    performance = calculateScore();
 
     console.log('Current score info');
-    console.log(currentScore);
+    console.log(performance);
 
     setHistoryItemStyles();
 }
@@ -755,12 +800,71 @@ function answerCorrect(event){
 function answerIncorrect(event){
     console.log(currentCard);
     recordQuestionResponse(currentCard,currentCard.genericName,'miss',0);
-    let currentScore = calculateScore();
+    performance = calculateScore();
 
     console.log('Current score info');
-    console.log(currentScore);
+    console.log(performance);
 
     setHistoryItemStyles();
+}
+
+
+function deckCompleteEvents(){
+	ui.showElements('confetti_outer');
+	ui.hideElements('.results-fact');
+	resultsModal.showModal();
+	
+	console.log('Performance Info');
+	console.log(performance);
+	
+	animateScoreTally(performance.runningTotalScore);
+	
+	//set the contents of the results divs
+	ui.setContent('final-score-correct-answers',`${performance.numberCorrect} / ${performance.numberOfQuestions}`);
+	ui.setContent('final-score-incorrect-answers',`${performance.numberIncorrect } / ${performance.numberOfQuestions}`);
+	ui.setContent('final-score-grade',`${performance.pointsGrade}`);
+	ui.setContent('final-score-longest-streak',`${performance.longestStreak}`);
+	
+	scoreTally.resultFacts = document.getElementsByClassName('results-fact');
+	scoreTally.resultFactIndex = 0;
+	
+	scoreTally.resultFactInterval = setInterval(function(scope){
+		scoreTally.resultFacts[scoreTally.resultFactIndex].classList.add('bounce-in-right');
+		scoreTally.resultFacts[scoreTally.resultFactIndex].style.visibility = 'visible';
+		scoreTally.resultFacts[scoreTally.resultFactIndex].style.display = 'inline-block';	
+		scoreTally.resultFactIndex++;
+		if(scoreTally.resultFactIndex == scoreTally.resultFacts.length) clearInterval(scoreTally.resultFactInterval);
+		
+		setTimeout(function(index){
+			console.log('Removing bounce style from ');
+			console.log(scoreTally.resultFacts[index]);
+			scoreTally.resultFacts[index].classList.remove('bounce-in-right');
+		},2000,scoreTally.resultFactIndex);
+		
+	},1000,this);
+	
+
+}
+
+function animateScoreTally(score){
+	scoreTally.targetNode = ui.getElements('#final-score-results')[0];
+	scoreTally.totalScore = score;
+	
+	console.log(scoreTally);
+	
+	scoreTally.tallyAnimationInterval  = setInterval(function(scope){
+
+		scoreTally.currentTally = scoreTally.currentTally + 10;
+		
+		if(scoreTally.currentTally >= scoreTally.totalScore) {
+			clearInterval(scoreTally.tallyAnimationInterval);
+			scoreTally.currentTally = scoreTally.totalScore;
+			scoreTally.targetNode.classList.add('bounce');
+		}
+		
+		scoreTally.targetNode.innerHTML = scoreTally.currentTally;
+		
+	}, scoreTally.tallyIntervalMS, this);
 }
 
 function generateSelectListFromOptions(optionsArray,correctValue){
@@ -807,7 +911,7 @@ function generateSelectListFromOptions(optionsArray,correctValue){
 
         recordQuestionResponse(currentCard,selectedOptionValue,event.target.getAttribute('data-correct-value'),pointsMod);
 
-        let currentScore = calculateScore();
+        performance = calculateScore();
 
         console.log('Current score info');
         console.log(currentScore);
@@ -843,7 +947,7 @@ function createOptionRadio(optionData,correctValue){
     container.appendChild(label);
 
     return container;
-};
+}
 
 function setSelectOptions(selectId, optionsArray, defaultValue, includeRandom, clearExisting){
 
@@ -898,6 +1002,7 @@ function toggleValue(paramName){
     console.log('Switching ' + paramName + ' from ' + this[paramName] + ' to ' + !this[paramName]);
     this[paramName] = !this[paramName];
 }
+
 function resetHistory(){
     try{
         historyEntryToWrite = null;
@@ -911,7 +1016,32 @@ function resetHistory(){
 		config = {};
 		hintIndex = 0;
 		currentAnswer = '';
-		streakCount = 0;
+
+
+		//final score tally objects
+		scoreTally = {
+			targetNode: {},
+			tallyAnimationInterval: {}, //interval timer
+			currentTally: 0, //current value of score tally
+			totalScore: 0, //score to reach to clear tally
+			tallyIntervalMS: 1 //how often to incriment the display
+		}
+
+		performance = {
+			currentPoints: 0, 
+			possiblePoints : 0, 
+			numberCorrect: 0, 
+			numberOfQuestions:0, 
+			numberIncorrect : 0,
+			numberUnanswered : 0,
+			pointsScorePercent: 0,
+			correctPercent: 0,
+			pointsGrade : '-',
+			numberCorrectGrade: '-',
+			streak: 0,
+			longestStreak: 0,
+			runningTotalScore: 0
+		}
 		
         document.getElementById("hint-text").innerHTML = '';
         document.getElementById("clue-text").innerHTML = '';
@@ -930,7 +1060,5 @@ function resetHistory(){
     
 }
 window.onload = function() {
-    loadCardLibrary();
-	
-	registerKeyboardShortcuts();
+	init();
 };
