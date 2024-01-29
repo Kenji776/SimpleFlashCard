@@ -128,7 +128,7 @@ ui.setContent = function(elements,content){
 ui.addClass = function(elements,className){
     let elementsList = [];
     if(typeof elements === 'string') elementsList = elementsList.concat(elements.split(','));
-    else if(isArray(element)) elementsList = element;
+    else if(isArray(elements)) elementsList = elements;
     for(let element of elementsList){
         thisElement = element;
         if(typeof element === 'string') thisElement = ui.getElements(element)[0];
@@ -136,10 +136,32 @@ ui.addClass = function(elements,className){
     }
 }
 
+ui.disable  = function(elements,className){
+    let elementsList = [];
+    if(typeof elements === 'string') elementsList = elementsList.concat(elements.split(','));
+    else if(isArray(elements)) elementsList = elements;
+    for(let element of elementsList){
+        thisElement = element;
+        if(typeof element === 'string') thisElement = ui.getElements(element)[0];
+        thisElement.disabled = true;
+    }	
+}
+
+ui.enable  = function(elements,className){
+    let elementsList = [];
+    if(typeof elements === 'string') elementsList = elementsList.concat(elements.split(','));
+    else if(isArray(elements)) elementsList = elements;
+    for(let element of elementsList){
+        thisElement = element;
+        if(typeof element === 'string') thisElement = ui.getElements(element)[0];
+        thisElement.disabled = false;
+    }	
+}
+
 ui.removeClass = function(elements,className){
     let elementsList = [];
     if(typeof elements === 'string') elementsList = elementsList.concat(elements.split(','));
-    else if(isArray(element)) elementsList = element;
+    else if(isArray(elements)) elementsList = elements;
     for(let element of elementsList){
         thisElement = element;
         if(typeof element === 'string') thisElement = ui.getElements(element)[0];

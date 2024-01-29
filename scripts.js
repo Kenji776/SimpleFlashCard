@@ -1,4 +1,10 @@
-var resultsModal;
+const settingsCookieName = 'SimpleFlashCardSettings';
+const scoresCookieName = 'SimpleFlashCardHighScores';
+//class objects
+var resultsModal; //instance of Modal
+var settingsCookie; //instance of Cookie
+var scoresCookie; //instance of Cookie
+
 
 var cardLibrary = {};
 var currentCard = {};
@@ -32,6 +38,7 @@ var scoreTally = {
 	tallyIntervalMS: 1 //how often to incriment the display
 }
 
+//overall score/performance data
 var performance = {
 	currentPoints: 0, 
 	possiblePoints : 0, 
@@ -46,6 +53,18 @@ var performance = {
 	streak: 0,
 	longestStreak: 0,
 	runningTotalScore: 0
+}
+//options
+var options = {
+	deckControls: {
+		autoProgress: true,
+		randomOrder: true,
+		hideHistory: false,
+		hideTimer: false,
+		hideScore: false,
+		hideMascots: false,
+		promptKey: ''
+	}
 }
 
 
@@ -62,6 +81,15 @@ function init(){
 	resultsModal.registerModalCloseHandler(function(scope){
 		ui.hideElements('confetti_outer');
 	});		
+	
+	settingsCookie = new Cookie(settingsCookieName);
+	console.log('Settings Cookie Data');
+	console.log(settingsCookie);
+	settingsCookie.getPersistentValuesFromUI();
+	
+	scoresCookie = new Cookie(scoresCookieName);
+	console.log('Scores Cookie Data');
+	console.log(scoresCookie);
 		
 }
 
@@ -229,11 +257,14 @@ async function loadDeck(deckUrl){
     ui.showElements('deck-loaded-image');
     setUi(true);
 
-    
+    setNavigationButtonStates(0,cards.length);
+	
     document.getElementById("prompt").innerHTML= `${config.name} Loaded. Press Next To Begin`;
 }
 
-
+function writeCookie(){
+	coo
+}
 
 /**
 * @description ensures that every card has a unique ID so that can be identified between the stack containing all cards (window.cards) and all available cards (window.availableCards)
@@ -633,6 +664,38 @@ function incorrectAnswerAlert(){
 }
 
 
+function setNavigationButtonStates(cardIndex,stackLength){
+	
+	console.log('Setting button navigation states');
+	console.log('card index' + cardIndex + ' stack length ' + stackLength);
+	
+	//if we are the beginning of the deck
+	if(cardIndex == 0){
+		console.log('If block 1');
+		ui.disable(['prev-button','clue-button','next-letter-button']);
+		
+	}
+	
+	//if we are one away from the end of the stack
+	else if(cardIndex+1 == stackLength){
+		console.log('If block 2');
+		ui.getElements('next-button')[0].value = 'Finish';
+	}
+	//if we are somewhere in middle of the stack
+	else if(cardIndex < cards.length){
+		console.log('If block 3');
+		ui.enable(['next-button','prev-button','clue-button','next-letter-button']);
+		ui.getElements('next-button')[0].value = 'Next';
+	}
+	//if we are at the very end of the stack
+	else if(cardIndex == cards.length){
+		console.log('If block 4');
+        if(timer) timer.stopTimer();
+        ui.disable('next-button');
+		deckCompleteEvents();
+    }
+}
+
 function loadNext(){
     console.log('---------------------------------- Loading next card. Card Index: ' + cardIndex);
     console.log(viewedCards);
@@ -653,16 +716,6 @@ function loadNext(){
 
     setHistoryItemStyles();
 
-    if(cardIndex == cards.length){
-        if(timer) timer.stopTimer();
-
-        //alert('End of deck reached');
-		
-		deckCompleteEvents();
-		
-        return;
-    }
-
     //if we are back in the stack, then instead just move up to the next card
     if(viewedCards.length > cardIndex){
         console.log('Exising card in stack. Loading card at index: ' + cardIndex);
@@ -682,17 +735,13 @@ function loadNext(){
             }
         }
         
-        console.log('Card to load set to:');
-        console.log(cardToLoad);
         cardIndex++;
         //document.getElementById("history-items").scrollIntoView({ behavior: 'smooth', block: 'end' });
         
         loadCard(cardToLoad.id);
     }
-        
-    
-    console.log('Card index: ' + cardIndex + '. Card to load: ' + cardToLoad);
-    console.log('----------------------------------');
+	
+	setNavigationButtonStates(cardIndex,cards.length);
 }
 
 

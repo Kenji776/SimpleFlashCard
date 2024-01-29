@@ -1,8 +1,6 @@
 #confetti_outer{
      
      background-color: black;
-     width:100%;
-     height:100%;
      position: absolute;
      top:0;
      bottom:0;
@@ -16,15 +14,11 @@
 }
  .confetti {
      position: fixed;
-     left: 0;
-     right: 0;
+     top:0;
+     bottom:0;
+     left:0;
+     right:0;
      display: flex;
-    /* width: 600px;
-     */
-    /* height: 600px;
-     */
-    /* overflow: hidden;
-     */
 }
  .confetti .square {
      width: 1rem;

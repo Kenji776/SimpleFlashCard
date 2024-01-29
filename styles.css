@@ -66,10 +66,12 @@
  .score{
      height:15vh;
      min-height:115px;
+	 white-space: nowrap;
 }
  .timer{
      height:10vh;
      min-height:100px;
+	 white-space: nowrap;
 }
  .timer-output{
      min-width:185px;
@@ -99,7 +101,7 @@
  .footer {
      grid-area: footer;
      width: 100%;
-     font-size: 0.625rem;
+     font-size: 0.8rem;
 }
  .content {
      grid-area: content;
@@ -167,16 +169,56 @@
  #load-deck-message{
      margin-top: 15%;
 }
- .button{
-     background-color:#0a0a23;
-     color: #fff;
-     border:none;
-     border-radius:10px;
-     padding:15px;
-     min-height:30px;
-     min-width: 120px;
-     cursor:pointer;
+
+input[type=button] {
+     border-color: #04AA6D;
+    /* Green */
+     border: solid;
+     color: #04AA6D;
+     background-color: transparent;
+     padding: 2px 5px;
+     text-align: center;
+     text-decoration: none;
+     display: inline-block;
+     font-size: 0.875rem;
+     cursor:hand;
+     border-radius: 5px;
+     min-width: 60px;
+     margin-top:10px;
+     margin-bottom:10px 
 }
+
+input[type=button]:disabled,button[disabled],button:disabled{
+	border: 1px solid #999999;
+	background-color: #cccccc;
+	color: #666666;
+	cursor:pointer;
+}
+
+.big-button{
+     min-width:100px !important;
+     line-height:45px;
+     height:50px;
+     margin-left:15px;
+     margin-right:15px;
+     font-weight: bolder;
+}
+
+.big-button:disabled{
+	border: 1px solid #999999;
+	background-color: #cccccc;
+	color: #666666;
+	cursor:default;
+}
+
+.big-button:hover{
+     animation: gelatine 1s infinite ease-in-out alternate;
+}
+
+.big-button:disabled:hover{
+     animation: none;
+}
+
  .sub-header{
      font-size:1.4rem;
 }
@@ -401,34 +443,7 @@
      color: #04AA6D;
     /*text-shadow: black 0.1em 0.1em 0.2em*/
 }
- input[type=button] {
-     border-color: #04AA6D;
-    /* Green */
-     border: solid;
-     color: #04AA6D;
-     background-color: transparent;
-     padding: 2px 5px;
-     text-align: center;
-     text-decoration: none;
-     display: inline-block;
-     font-size: 0.875rem;
-     cursor:hand;
-     border-radius: 5px;
-     min-width: 60px;
-     margin-top:10px;
-     margin-bottom:10px 
-}
- .big-button{
-     min-width:100px !important;
-     line-height:45px;
-     height:50px;
-     margin-left:15px;
-     margin-right:15px;
-     font-weight: bolder;
-}
- .big-button:hover{
-     animation: gelatine 1s infinite ease-in-out alternate;
-}
+
  select select{
      background: transparent;
      width: 268px;
