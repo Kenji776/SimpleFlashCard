@@ -883,12 +883,15 @@ function getLetterGrade(numberGrade) {
 
 function getCorrectAnswerText(){
 
-
+    console.log('------------------------------------------------- Getting saying for performance streak: ' + performance.streak);
     if(performance.streak >= 15){
+        console.log('Reading from streak_2_responses responses');
         returnString = mascotWords.streak_2_responses[Math.floor(Math.random()*mascotWords.streak_2_responses.length)];
-    } else if(performance.streak >= 0){
+    } else if(performance.streak >= 5){
+        console.log('Reading from streak_1_responses responses');
         returnString = mascotWords.streak_1_responses[Math.floor(Math.random()*mascotWords.streak_1_responses.length)];
     } else{
+        console.log('Reading from correctAnswerResponses responses');
 	    returnString = mascotWords.correctAnswerResponses[Math.floor(Math.random()*mascotWords.correctAnswerResponses.length)];
     }
 
@@ -1246,9 +1249,6 @@ function generateSelectListFromOptions(optionsArray,correctValues){
     const container = document.createElement('div');
     container.className = 'question-container';
 
-    console.log('Options array...');
-    console.log(optionsArray);
-
     const form = document.createElement('form');
     form.setAttribute('data-correct-value',correctValues);
     for(let option of optionsArray){
@@ -1266,15 +1266,10 @@ function generateSelectListFromOptions(optionsArray,correctValues){
     answerBtn.onclick = function(event){
         let correctAnswersIndexes = event.target.getAttribute('data-correct-value').split(',');
 
-        console.log('Correct Answers From Button');
-        console.log(correctAnswersIndexes);
-
         let options = ui.getElements('.question-option');;
         let selectedOptionIndexes = [];
         let selectedOptionValues = [];
 
-        console.log('Options');
-        console.log(options);
 
         for(let i = 0; i < options.length; i++){
             if(options[i].checked){
@@ -1282,11 +1277,6 @@ function generateSelectListFromOptions(optionsArray,correctValues){
                 selectedOptionValues.push(options[i].value);
             }
         }
-
-        console.log('Comparing Answer Arrays: ' + JSON.stringify(selectedOptionIndexes.sort()) + ' VS ' + JSON.stringify(correctAnswersIndexes.sort()));
-        console.log(selectedOptionIndexes);
-
-        console.log(correctAnswersIndexes);
 
         const isCorrect = JSON.stringify(selectedOptionIndexes.sort()) == JSON.stringify(correctAnswersIndexes.sort()) ? true : false;
 
@@ -1318,8 +1308,6 @@ function createAnswerOptionInput(optionData,correctValues,forceCheckboxList){
 
     if(!isArray(correctValues)) correctValues = [correctValues];
 
-    console.log('Creating radio option from');
-    console.log(optionData);
     const container = document.createElement('div');
     const inputType = correctValues.length > 1 || forceCheckboxList ? 'checkbox' : 'radio';
 
@@ -1346,8 +1334,6 @@ function createOptionRadio(optionData,correctValues){
 
     if(!isArray(correctValues)) correctValues = [correctValues];
 
-    console.log('Creating radio option from');
-    console.log(optionData);
     const container = document.createElement('div');
 
     const input = document.createElement('input');

@@ -15,7 +15,12 @@
         "Oh yeah!",
         "Excellent!",
         "Fantastic, nice work!",
-        "Now your getting it!"
+        "Now your getting it!",
+        "Hard work pays off",
+        "See you can do this!",
+        "Not even suprised. You rock!",
+        "Yeah, keep it up!",
+        "Impressive!"
     ],
 
     "incorrectAnswerResponses":[
@@ -29,14 +34,15 @@
         "That's.... not quite right",
         "You can do it! I beleive in you!",
         "You'll get it next time",
-        "It's tough. I know. Your studying for a reason",
+        "It's tough. I know. You're studying for a reason",
         "If it was easy, everyone would do it",
         "Don't stress. It happens.",
         "Keep at it, you'll get it.",
         "Nothing worth while is easy",
         "I know you can do it. Just focus!",
         "Beleive in the me that beleives in you!",
-        "This thing we call failure is not the falling down, but the staying down"
+        "This thing we call failure is not the falling down, but the staying down",
+        "It's okay, just keep at it"
     ],
 
     "streak_1_responses": [
@@ -45,17 +51,22 @@
         "Holy cow, what a streak!",
         "I'm legit impressed",
         "Are you cheating? You're too good!",
-        "Thats in impressive streak you've got going!"
+        "Thats in impressive streak you've got going!",
+        "You're on a roll now!",
+        "Yeah, keep up the momentum!",
+        "Getting in that flow state, it's all coming easily now"
     ],
 
     "streak_2_responses": [
-        "Yeah, I think your probably ready",
+        "Yeah, I think your probably ready...",
         "Absolutely crushing it...",
         "Your some kind of wonder!",
         "Brings tear to my eye, so beautiful",
         "How long can you keep this up?",
         "I am in the presence of divinity",
         "Absolutely unreal. Your beyond words!",
-        "I don't think I've ever seen someone this good!"
+        "I don't think I've ever seen someone this good!",
+        "I think I'm in love! &#9829;",
+        "Hell yeah I suck toes"
     ]
 }
