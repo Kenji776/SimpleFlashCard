@@ -29,7 +29,18 @@
       "brandName": "Brand Name",
       "drugClassName": "Drug Class Name",
       "clueButtonName": "Drug Class Name"
-    }
+    },
+	"variants" : [{
+		"name": "Multiple Choice By Drug Class Name",
+		"shuffleType": "group-by",
+        "groupBy": "drugClassName",
+        "deckType": "multiple-choice",
+        "minRightAnswers": 1,
+        "minWrongAnswers": 1,
+        "maxAnswerOptions": 5,
+        "answerLabelProperty": "genericName",
+        "answerValueProperty": "genericName"
+	}]
   },
   "cards": [
   {
