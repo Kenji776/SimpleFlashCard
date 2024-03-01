@@ -1241,9 +1241,12 @@ function generateSelectListFromOptions(optionsArray,correctValues){
         console.log('Correct Answers From Button');
         console.log(correctAnswersIndexes);
 
-        let options = document.getElementsByName('question-options');
+        let options = ui.getElements('.question-option');;
         let selectedOptionIndexes = [];
         let selectedOptionValues = [];
+
+        console.log('Options');
+        console.log(options);
 
         for(let i = 0; i < options.length; i++){
             if(options[i].checked){
@@ -1252,7 +1255,7 @@ function generateSelectListFromOptions(optionsArray,correctValues){
             }
         }
 
-        console.log('Comparing Arrays');
+        console.log('Comparing Answer Arrays: ' + JSON.stringify(selectedOptionIndexes.sort()) + ' VS ' + JSON.stringify(correctAnswersIndexes.sort()));
         console.log(selectedOptionIndexes);
 
         console.log(correctAnswersIndexes);
