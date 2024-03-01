@@ -457,7 +457,7 @@ function generateDeckFromData(shuffleConfig=new ShuffleDeckConfig()){
 
                 let newCard = new Card({
                     type: 'choice',
-                    questionText: `Which of the following are ${groupName} (${correctAnswerIndexes.join(',')})`,
+                    questionText: `Which of the following are ${groupName}`, //(${correctAnswerIndexes.join(',')})`,
                     points: 1,
                     hint: 'There are ' + correctAnswerIndexes.length + ' correct answers',
                     options: allOptionsArray,
@@ -722,7 +722,7 @@ function recordQuestionResponse(card,givenAnswers,correctAnswers,awardedPoints){
         "correctAnswers": correctAnswers,
         "awardedPoints": awardedPoints,
         "possiblePoints" : card.points ? card.points : 1,
-        "wasCorrect": givenAnswers.every(elem => correctAnswers.includes(elem))
+        "wasCorrect": JSON.stringify(givenAnswers.sort()) === JSON.stringify(correctAnswers.sort()) ? true : false
     });
 
     if(answerResults[answerResults.length-1].wasCorrect) {
@@ -1079,6 +1079,8 @@ function setRandom(){
 
 function showClue() {
     document.getElementById('clue-text').style.visibility='visible';
+
+    mascotSay(document.getElementById('clue-text').innerHTML,'happy');
     
 }
 
@@ -1255,7 +1257,7 @@ function generateSelectListFromOptions(optionsArray,correctValues){
 
         console.log(correctAnswersIndexes);
 
-        const isCorrect = selectedOptionIndexes.every(elem => correctAnswersIndexes.includes(elem));
+        const isCorrect = JSON.stringify(selectedOptionIndexes.sort()) == JSON.stringify(correctAnswersIndexes.sort()) ? true : false;
 
         let pointsMod = currentCard.points ? currentCard.points : 1;
 
