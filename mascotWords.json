@@ -24,13 +24,6 @@
     ],
 
     "incorrectAnswerResponses":[
-        "Boo!",
-        "I'm not angry. Just disappointed",
-        "Sigh...","WTF?! Seriously?",
-        "C'mon are you even trying?",
-        "Yeesh, don't quit your day job.",
-        "Uh yeah... no",
-        "Honestly, I'm embarassed for you",
         "That's.... not quite right",
         "You can do it! I beleive in you!",
         "You'll get it next time",
@@ -43,6 +36,27 @@
         "Beleive in the me that beleives in you!",
         "This thing we call failure is not the falling down, but the staying down",
         "It's okay, just keep at it"
+    ],
+
+    "fail_streak_1_responses": [
+        "Urgh, not great",
+        "I'm not angry. Just disappointed",
+        "C'mon are you even trying?",
+        "Honestly, I'm embarassed for you",
+        "Slow down, focus!",
+        "Hm, this isn't looking great",
+        "Well Edison failed hundres of times trying to make a light bulb I guess..."
+    ],
+
+    "fail_streak_2_responses": [
+        "Sigh...",
+        "WTF?! Seriously?",
+        "C'mon are you even trying?",
+        "Yeesh, don't quit your day job.",
+        "Uh yeah... no",
+        "Honestly, I'm embarassed for you",
+        "Put down the crack pipe and use your brain",
+        "I uh, I think I should go."
     ],
 
     "streak_1_responses": [
@@ -60,13 +74,14 @@
     "streak_2_responses": [
         "Yeah, I think your probably ready...",
         "Absolutely crushing it...",
-        "Your some kind of wonder!",
+        "You're some kind of wonder!",
         "Brings tear to my eye, so beautiful",
         "How long can you keep this up?",
         "I am in the presence of divinity",
-        "Absolutely unreal. Your beyond words!",
+        "Absolutely unreal. You're beyond words!",
         "I don't think I've ever seen someone this good!",
         "I think I'm in love! &#9829;",
-        "Hell yeah I suck toes"
+        "Hell yeah I suck toes",
+        "Ohhh, I'm getting excited"
     ]
 }

@@ -53,7 +53,8 @@ var performance = {
 	numberCorrectGrade: '-',
 	streak: 0,
 	longestStreak: 0,
-	runningTotalScore: 0
+	runningTotalScore: 0,
+    missStreak: 0
 }
 //options
 var options = {
@@ -749,7 +750,9 @@ function recordQuestionResponse(card,givenAnswers,correctAnswers,awardedPoints){
     });
 
     if(answerResults[answerResults.length-1].wasCorrect) {
+        if(!performance.streak) performance.streak = 0;
         performance.streak++;
+        performance.missStreak=0;
         correctAnswerAlert()
         
 		
@@ -760,8 +763,11 @@ function recordQuestionResponse(card,givenAnswers,correctAnswers,awardedPoints){
 		if(performance.streak > performance.longestStreak) performance.longestStreak = performance.streak;
     }
     else {
-        incorrectAnswerAlert();
+        if(!performance.missStreak) performance.missStreak = 0;
+        performance.missStreak++;
         performance.streak = 0;
+        incorrectAnswerAlert();
+        
     }
     if(autoLoadNextCardOnAnswer) loadNext();
 }
@@ -884,23 +890,31 @@ function getLetterGrade(numberGrade) {
 function getCorrectAnswerText(){
 
     console.log('------------------------------------------------- Getting saying for performance streak: ' + performance.streak);
-    if(performance.streak >= 15){
-        console.log('Reading from streak_2_responses responses');
-        returnString = mascotWords.streak_2_responses[Math.floor(Math.random()*mascotWords.streak_2_responses.length)];
-    } else if(performance.streak >= 5){
-        console.log('Reading from streak_1_responses responses');
-        returnString = mascotWords.streak_1_responses[Math.floor(Math.random()*mascotWords.streak_1_responses.length)];
-    } else{
-        console.log('Reading from correctAnswerResponses responses');
-	    returnString = mascotWords.correctAnswerResponses[Math.floor(Math.random()*mascotWords.correctAnswerResponses.length)];
-    }
 
-    return returnString;
+    wordsToUse = 'correctAnswerResponses';
+
+    if(performance.streak >= 15){
+        wordsToUse='streak_2_responses';
+    } else if(performance.streak >= 5){
+        wordsToUse='streak_1_responses';
+    }     
+    return returnString = mascotWords[wordsToUse][Math.floor(Math.random()*mascotWords[wordsToUse].length)];;
 
 }
 
 function getIncorrectAnswerText(){
-	returnString = mascotWords.incorrectAnswerResponses[Math.floor(Math.random()*mascotWords.incorrectAnswerResponses.length)];
+
+    wordsToUse = 'incorrectAnswerResponses';
+
+    console.log('------------------------------------------------- Getting saying for performance missStreak: ' + performance.missStreak);
+
+    if(performance.missStreak >= 10){
+        wordsToUse = 'fail_streak_2_responses';
+    }else if(performance.missStreak >= 5){
+        wordsToUse = 'fail_streak_1_responses';
+    }
+
+	returnString = mascotWords[wordsToUse][Math.floor(Math.random()*mascotWords[wordsToUse].length)];
 
     return returnString;
 }
