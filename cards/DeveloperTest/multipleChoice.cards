@@ -26,7 +26,7 @@
     {
       "type": "choice",
       "questionText": "Choose the correct answer (2 is correct).",
-      "correctAnswerValue": 2,
+      "correctAnswerValues": 2,
       "points": 1,
       "hint": "The answer is 2. What the hell is wrong with you? It's in the question?",
       "options": [
@@ -39,7 +39,7 @@
     {
       "type": "choice",
       "questionText": "Choose the correct answer (4 is correct)",
-      "correctAnswerValue": 4,
+      "correctAnswerValues": 4,
       "points": 5,
       "hint": "It 4. Seriously. It's 4. It's right there.",
       "options": [
@@ -52,7 +52,7 @@
     {
       "type": "choice",
       "questionText": "Choose the correct answer (1 is correct)",
-      "correctAnswerValue": 1,
+      "correctAnswerValues": 1,
       "points": 2,
       "hint": "Are you illiterate? It says the answer right in the quesiton. Holy shit.",
       "options": [
@@ -65,7 +65,7 @@
     {
       "type": "choice",
       "questionText": "Choose the correct answer (3 is correct)",
-      "correctAnswerValue": 3,
+      "correctAnswerValues": 3,
       "points": 1,
       "hint": "I can't. I just fucking can't with you. How many times do I have to point out the answer is in the question?",
       "options": [
