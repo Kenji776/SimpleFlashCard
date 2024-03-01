@@ -28,7 +28,7 @@ var categories = [];
 var answerResults = [];
 var autoLoadNextCardOnAnswer = true;
 var selectedVariantDeck = '';
-
+var mascotWords = {};
 
 //final score tally objects
 var scoreTally = {
@@ -70,7 +70,7 @@ var options = {
 
 
 
-function init(){
+async function init(){
 	loadCardLibrary();
 	
 	registerKeyboardShortcuts();
@@ -83,6 +83,8 @@ function init(){
 		ui.hideElements('confetti_outer');
 	});		
 	
+    loadMascotWords();
+
 	settingsCookie = new Cookie(settingsCookieName);
 	console.log('Settings Cookie Data');
 	console.log(settingsCookie);
@@ -91,7 +93,17 @@ function init(){
 	scoresCookie = new Cookie(scoresCookieName);
 	console.log('Scores Cookie Data');
 	console.log(scoresCookie);
+
+
 		
+}
+
+async function loadMascotWords(){
+    mascotWordsData = await fetch("https://pharmacy-flashcards-2027.lol/mascotWords.json?cache-invalidate="+Date.now(), {cache: "no-store"});
+    mascotWords = await mascotWordsData.json();
+    console.log('Loaded mascot words');
+    console.log(mascotWords);
+    return mascotWords;
 }
 
 async function loadCardLibrary(){
@@ -737,8 +749,9 @@ function recordQuestionResponse(card,givenAnswers,correctAnswers,awardedPoints){
     });
 
     if(answerResults[answerResults.length-1].wasCorrect) {
-        correctAnswerAlert()
         performance.streak++;
+        correctAnswerAlert()
+        
 		
 		let newPoints = performance.streak * (awardedPoints * 10);
 		console.log(`Adding ${newPoints} to total  ${performance.runningTotalScore}.  ${performance.streak} * (${awardedPoints} * 10)`);
@@ -869,27 +882,24 @@ function getLetterGrade(numberGrade) {
 }
 
 function getCorrectAnswerText(){
-	let defaultResponses = ['Nice Job!','Woo hoo!','Awesome','Sweet!','Your killing it!','Hell yeah!','Dope. Hella Dope','Fish','I\'ll drink to that!','That\'s what I\'m talking about','Git er done!'];
-	let returnString = '';
-	if(config.correctAnswerText){
-		let optionsArray = config.correctAnswerText.split(',');
-		returnString = optionsArray[Math.floor(Math.random()*optionsArray.length)];
-	}else{
-		returnString = defaultResponses[Math.floor(Math.random()*defaultResponses.length)];
-	}
-	return returnString;
+
+
+    if(performance.streak >= 15){
+        returnString = mascotWords.streak_2_responses[Math.floor(Math.random()*mascotWords.streak_2_responses.length)];
+    } else if(performance.streak >= 0){
+        returnString = mascotWords.streak_1_responses[Math.floor(Math.random()*mascotWords.streak_1_responses.length)];
+    } else{
+	    returnString = mascotWords.correctAnswerResponses[Math.floor(Math.random()*mascotWords.correctAnswerResponses.length)];
+    }
+
+    return returnString;
+
 }
 
 function getIncorrectAnswerText(){
-	let defaultResponses = ['Boo!','I\m not angry. Just disappointed','Sigh...','WTF?! Seriously?','C\'mon are you even trying?','Yeesh, don\'t quit your day job.','Uh yeah... no','Honestly, I\'m embarassed for you'];
-	let returnString = '';
-	if(config.wrongAnswerText){
-		let optionsArray = config.wrongAnswerText.split(',');
-		returnString = optionsArray[Math.floor(Math.random()*optionsArray.length)];
-	}else{
-		returnString = defaultResponses[Math.floor(Math.random()*defaultResponses.length)];
-	}
-	return returnString;
+	returnString = mascotWords.incorrectAnswerResponses[Math.floor(Math.random()*mascotWords.incorrectAnswerResponses.length)];
+
+    return returnString;
 }
 
 function correctAnswerAlert(){
