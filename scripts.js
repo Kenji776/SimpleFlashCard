@@ -356,156 +356,161 @@ function generateDeckFromData(shuffleConfig=new ShuffleDeckConfig()){
     console.log('Generating Custom Deck From Config');
     console.log(shuffleConfig);
 
-    let newCards = [];
-    let newConfig = config;
+    try{
 
-    //if we are building a custom deck by grouping cards by a property and generating multiple choice questions then start here
-    if(shuffleConfig.options.shuffleType == 'group-by'){
+        let newCards = [];
+        let newConfig = config;
 
-        let answerLabelProperty = shuffleConfig.options.answerLabelProperty;
-        let answerValueProperty = shuffleConfig.options.answerValueProperty;
-        console.log('Shuffling Deck. Grouping by: ' + shuffleConfig.groupBy);
+        //if we are building a custom deck by grouping cards by a property and generating multiple choice questions then start here
+        if(shuffleConfig.options.shuffleType == 'group-by'){
 
-        let groups = {};
-        //group our cards by the desired key
-        for(let thisCard of shuffleConfig.sourceDeckConfig.cards){
-            let thisGroupCards = groups.hasOwnProperty(thisCard[shuffleConfig.options.groupBy]) ? groups[thisCard[shuffleConfig.options.groupBy]] : [];
-            thisGroupCards.push(thisCard);
-            groups[thisCard[shuffleConfig.options.groupBy]] = thisGroupCards;
+            let answerLabelProperty = shuffleConfig.options.answerLabelProperty;
+            let answerValueProperty = shuffleConfig.options.answerValueProperty;
+            console.log('Shuffling Deck. Grouping by: ' + shuffleConfig.groupBy);
 
-        }
+            let groups = {};
+            //group our cards by the desired key
+            for(let thisCard of shuffleConfig.sourceDeckConfig.cards){
+                let thisGroupCards = groups.hasOwnProperty(thisCard[shuffleConfig.options.groupBy]) ? groups[thisCard[shuffleConfig.options.groupBy]] : [];
+                thisGroupCards.push(thisCard);
+                groups[thisCard[shuffleConfig.options.groupBy]] = thisGroupCards;
 
-        //if building a multiple choice deck...
-        if(shuffleConfig.options.deckType = 'multiple-choice'){
-            
-            console.log('------------- Groups Data');
-            console.log(groups);
-            
-            for(let groupName in groups){
-                let thisGroupCorrectAnswers = [];
-                //first generate list of correct options
-                for(let thisAnswer in groups[groupName]){
-                    let thisOption = {
-                        value: groups[groupName][thisAnswer][answerValueProperty],
-                        label: groups[groupName][thisAnswer][answerLabelProperty]
-                    }
-                    thisGroupCorrectAnswers.push(thisOption);
-                }
-
-                console.log('All Option Answers For: ' + groupName);
-                console.log(thisGroupCorrectAnswers);
-
-                //construct our answer array
-                let allOptionsArray = [];
-                let correctAnswerIndexes = [];
-
-                while(true) {
-                    //decide if we get a correct anwer by 'flipping a coin' and by ensuring there is a correct answer left to get from the source array.
-                    let getCorrectAnswer = randomIntFromInterval(0,1) == 1 && thisGroupCorrectAnswers.length > 0 ? true : false;
-                    console.log('getCorrectAnswer: ' + getCorrectAnswer);
-                    if(getCorrectAnswer){
-                        //get the index of a random card in the correct answers stack
-                        let index = randomIntFromInterval(0,thisGroupCorrectAnswers.length-1);
-
-                        //read that option from the source array and put it into our selectable options array
-                        let randomCorrectAnswer = thisGroupCorrectAnswers[index];
-
-                        allOptionsArray.push(randomCorrectAnswer);
-
-                        if(randomCorrectAnswer.label == undefined || randomCorrectAnswer.value == undefined) debugger;
-
-                        //record the index position of this correct answer
-                        correctAnswerIndexes.push(allOptionsArray.length-1);
-
-                        //remove this element from the source array so it cannot be added again.
-                        thisGroupCorrectAnswers.splice(index,1)
-                    }else{
-                        //get a random different answer from a different group. Use random selection in while loop to prevent selecting this group
-                        let wrongAnswerGroup = '';
-                        while(true){
-                            let keys = Object.keys(groups);
-                            let wrongAnswerGroupName = keys[ keys.length * Math.random() << 0];
-
-                            wrongAnswerGroup = groups[wrongAnswerGroupName];
-                            if(wrongAnswerGroupName != groupName) break;
-                        }
- 
-                        //get the index of a random card in the correct answers stack
-                        let index = randomIntFromInterval(0,wrongAnswerGroup.length-1);
-
-                        //read that option from the source array and put it into our selectable options array
-                        let randomWrongAnswer = wrongAnswerGroup[index];
-
-                        //allOptionsArray.push(randomWrongAnswer);
-
-                        allOptionsArray.push({
-                            label: randomWrongAnswer[answerLabelProperty],
-                            value: randomWrongAnswer[answerValueProperty]
-                        });
-                        
-                    }
-
-                    console.log('Added options to select list');
-                    console.log(allOptionsArray[allOptionsArray.length-1]);
-                   
-
-                    //check all conditions to see if we should stop adding answers
-                    if(allOptionsArray.length >= shuffleConfig.options.maxAnswerOptions && correctAnswerIndexes.length > 0){
-                        break;
-                    }
-                }
-
-                let newCard = new Card({
-                    type: 'choice',
-                    questionText: `Which of the following are ${groupName}`, //(${correctAnswerIndexes.join(',')})`,
-                    points: 1,
-                    hint: 'There are ' + correctAnswerIndexes.length + ' correct answers',
-                    options: allOptionsArray,
-                    correctAnswerValues: correctAnswerIndexes
-                });
-
-                console.log('Pushing new card to array');
-                console.log(newCard);
-
-                newCards.push(newCard);
             }
 
-        }
+            //if building a multiple choice deck...
+            if(shuffleConfig.options.deckType = 'multiple-choice'){
+                
+                console.log('------------- Groups Data');
+                console.log(groups);
+                
+                for(let groupName in groups){
+                    let thisGroupCorrectAnswers = [];
+                    //first generate list of correct options
+                    for(let thisAnswer in groups[groupName]){
+                        let thisOption = {
+                            value: groups[groupName][thisAnswer][answerValueProperty],
+                            label: groups[groupName][thisAnswer][answerLabelProperty]
+                        }
+                        thisGroupCorrectAnswers.push(thisOption);
+                    }
 
-        console.log('Grouped cards is now');
-        console.log(groups);
+                    console.log('All Option Answers For: ' + groupName);
+                    console.log(thisGroupCorrectAnswers);
 
-        console.log('Generated New Card Deck');
-        console.log(newCards);
+                    //construct our answer array
+                    let allOptionsArray = [];
+                    let correctAnswerIndexes = [];
 
-        newConfig = {  
-                "promptKeys": [
-                {
-                    "value": "questionText",
-                    "label": "Question"
-                }],
-                "answerKeys": [
-                {
-                    "value": "questionText",
-                    "label": "Question"
-                }],
-                "defaultPrompt": "questionText",
-                "clueTextKey": "hint",
-                "labels": {
-                    "questionText": "Answer me this!",
-                    "clueButtonName": "Seriously. A hint?"
+                    while(true) {
+                        //decide if we get a correct anwer by 'flipping a coin' and by ensuring there is a correct answer left to get from the source array.
+                        let getCorrectAnswer = randomIntFromInterval(0,1) == 1 && thisGroupCorrectAnswers.length > 0 ? true : false;
+                        console.log('getCorrectAnswer: ' + getCorrectAnswer);
+                        if(getCorrectAnswer){
+                            //get the index of a random card in the correct answers stack
+                            let index = randomIntFromInterval(0,thisGroupCorrectAnswers.length-1);
+
+                            //read that option from the source array and put it into our selectable options array
+                            let randomCorrectAnswer = thisGroupCorrectAnswers[index];
+
+                            allOptionsArray.push(randomCorrectAnswer);
+
+                            if(randomCorrectAnswer.label == undefined || randomCorrectAnswer.value == undefined) debugger;
+
+                            //record the index position of this correct answer
+                            correctAnswerIndexes.push(allOptionsArray.length-1);
+
+                            //remove this element from the source array so it cannot be added again.
+                            thisGroupCorrectAnswers.splice(index,1)
+                        }else{
+                            //get a random different answer from a different group. Use random selection in while loop to prevent selecting this group
+                            let wrongAnswerGroup = '';
+                            while(true){
+                                let keys = Object.keys(groups);
+                                let wrongAnswerGroupName = keys[ keys.length * Math.random() << 0];
+
+                                wrongAnswerGroup = groups[wrongAnswerGroupName];
+                                if(wrongAnswerGroupName != groupName) break;
+                            }
+    
+                            //get the index of a random card in the correct answers stack
+                            let index = randomIntFromInterval(0,wrongAnswerGroup.length-1);
+
+                            //read that option from the source array and put it into our selectable options array
+                            let randomWrongAnswer = wrongAnswerGroup[index];
+
+                            //allOptionsArray.push(randomWrongAnswer);
+
+                            allOptionsArray.push({
+                                label: randomWrongAnswer[answerLabelProperty],
+                                value: randomWrongAnswer[answerValueProperty]
+                            });
+                            
+                        }
+
+                        console.log('Added options to select list');
+                        console.log(allOptionsArray[allOptionsArray.length-1]);
+                    
+
+                        //check all conditions to see if we should stop adding answers
+                        if(allOptionsArray.length >= shuffleConfig.options.maxAnswerOptions && correctAnswerIndexes.length > 0){
+                            break;
+                        }
+                    }
+
+                    let newCard = new Card({
+                        type: 'choice',
+                        questionText: `Which of the following are ${groupName}`, //(${correctAnswerIndexes.join(',')})`,
+                        points: 1,
+                        hint: 'There are ' + correctAnswerIndexes.length + ' correct answers',
+                        options: allOptionsArray,
+                        correctAnswerValues: correctAnswerIndexes
+                    });
+
+                    console.log('Pushing new card to array');
+                    console.log(newCard);
+
+                    newCards.push(newCard);
                 }
-        };
 
-        newConfig.name = 'Custom Deck Build';
-        newConfig.isVariant = true;
-      
-        let cards = assignCardIds(newCards.cards);
-        console.log(JSON.stringify(cards));
-        loadDeck({
-            config: newConfig,
-            cards: newCards
-        });
+            }
+
+            console.log('Grouped cards is now');
+            console.log(groups);
+
+            console.log('Generated New Card Deck');
+            console.log(newCards);
+
+            newConfig = {  
+                    "promptKeys": [
+                    {
+                        "value": "questionText",
+                        "label": "Question"
+                    }],
+                    "answerKeys": [
+                    {
+                        "value": "questionText",
+                        "label": "Question"
+                    }],
+                    "defaultPrompt": "questionText",
+                    "clueTextKey": "hint",
+                    "labels": {
+                        "questionText": "Answer me this!",
+                        "clueButtonName": "Seriously. A hint?"
+                    }
+            };
+
+            newConfig.name = 'Custom Deck Build';
+            newConfig.isVariant = true;
+        
+            let cards = assignCardIds(newCards.cards);
+            console.log(JSON.stringify(cards));
+            loadDeck({
+                config: newConfig,
+                cards: newCards
+            });
+        }
+    }catch(ex){
+        handleError(ex);
     }
 }
 
@@ -535,147 +540,152 @@ function getCardById(cardId){
 */
 function loadCard(cardId, forceIndex){
 
+    try{
     
-    //flip the card back to the question side
-    document.getElementById('answer-card').classList.remove("flip-card-flipped")
-    
-    hintIndex = 0;
+        //flip the card back to the question side
+        document.getElementById('answer-card').classList.remove("flip-card-flipped")
+        
+        hintIndex = 0;
 
-    //find the current card information by using the id
-    console.log('Getting card with id: ' + cardId);
-    currentCard = getCardById(cardId);
-
-
-    if(forceIndex) {
-        console.log('Forcing index to: ' +forceIndex);
-        cardIndex = forceIndex;
-    }
-    
-    console.log(currentCard);
+        //find the current card information by using the id
+        console.log('Getting card with id: ' + cardId);
+        currentCard = getCardById(cardId);
 
 
-    setSelectedHistoryCard(currentCard.id);
-    
-    removeCardFromAvailable(currentCard.id);
-
-    let promptVal = promptKey;
-    let answerVal = answerKey;
-    let selectedAnswerKeyText = '';
-    let selectedPromptKeyText = '';
-
- 
-
-    //if this is a multple choice question then we can't randomize the answers
-    if(currentCard.hasOwnProperty('options')){
-        console.log('Multiple Choice Card Selected');
-        console.log(currentCard);
-
-    }else{
-        try{
-            if(promptKey == 'random'){
-                console.log('Randomizing prompt value');	
-                promptVal = config.promptKeys[Math.floor(Math.random()*config.promptKeys.length)].value;
-            }
-            if(answerKey == 'random'){
-                console.log('Randomizing answer value');
-                answerVal = config.answerKeys[Math.floor(Math.random()*config.answerKeys.length)].value;		
-            }
-        }catch(ex){
-            console.warn('Unable to randomize question');
-            console.error(ex);
+        if(forceIndex) {
+            console.log('Forcing index to: ' +forceIndex);
+            cardIndex = forceIndex;
         }
-        selectedAnswerKeyText = config.answerKeys.find(x => x.value === answerVal).label;
-        selectedPromptKeyText = config.promptKeys.find(x => x.value === promptVal).label;
-    }
-
-
-
-
-    //create the history entry if it doesn't exist for this card.
-    if(!viewedCards.some(e => e.id === currentCard.id)) {
-        console.log('Viewed cards does not have an entry for id: ' + currentCard.id);
-        console.log(viewedCards)
-        console.log('Creating history item for card');
+        
         console.log(currentCard);
-        createHistoryEntry(currentCard,viewedCards.length,currentCard[promptVal]);
-        viewedCards.push(currentCard);
-    }
 
-    ui.hideElements('answer-buttons');
-    if(currentCard.type == 'choice'){
-        console.log('current card is a choice type. Attempting to read current answer from options index!');
 
-        console.log('Current Card Info');
+        setSelectedHistoryCard(currentCard.id);
+        
+        removeCardFromAvailable(currentCard.id);
+
+        let promptVal = promptKey;
+        let answerVal = answerKey;
+        let selectedAnswerKeyText = '';
+        let selectedPromptKeyText = '';
+
+    
+
+        //if this is a multple choice question then we can't randomize the answers
+        if(currentCard.hasOwnProperty('options')){
+            console.log('Multiple Choice Card Selected');
+            console.log(currentCard);
+
+        }else{
+            try{
+                if(promptKey == 'random'){
+                    console.log('Randomizing prompt value');	
+                    promptVal = config.promptKeys[Math.floor(Math.random()*config.promptKeys.length)].value;
+                }
+                if(answerKey == 'random'){
+                    console.log('Randomizing answer value');
+                    answerVal = config.answerKeys[Math.floor(Math.random()*config.answerKeys.length)].value;		
+                }
+            }catch(ex){
+                console.warn('Unable to randomize question');
+                console.error(ex);
+                handleError(ex);
+            }
+            selectedAnswerKeyText = config.answerKeys.find(x => x.value === answerVal).label;
+            selectedPromptKeyText = config.promptKeys.find(x => x.value === promptVal).label;
+        }
+
+
+
+
+        //create the history entry if it doesn't exist for this card.
+        if(!viewedCards.some(e => e.id === currentCard.id)) {
+            console.log('Viewed cards does not have an entry for id: ' + currentCard.id);
+            console.log(viewedCards)
+            console.log('Creating history item for card');
+            console.log(currentCard);
+            createHistoryEntry(currentCard,viewedCards.length,currentCard[promptVal]);
+            viewedCards.push(currentCard);
+        }
+
+        ui.hideElements('answer-buttons');
+        if(currentCard.type == 'choice'){
+            console.log('current card is a choice type. Attempting to read current answer from options index!');
+
+            console.log('Current Card Info');
+            console.log(currentCard);
+            //get the text of the current correct answer for a choice question by using the correctAnswerValue property of the question definition to then read that object's label
+            //currentAnswer = currentCard.options.find(function(o){ return o.value===currentCard.correctAnswerValues}).label;
+
+
+            currentAnswer = 'Choice card logic needs fixing...'
+
+            ui.showElements('next-answer-button');
+            ui.hideElements('next-letter-button');
+
+            console.log('================ Prompt key');
+            console.log(ui.getElements('prompt-key'));
+            ui.getElements('prompt-key')[0].setAttribute('disabled',true);
+        }else{
+            console.log('current card is unknown type. Prompt text');
+            currentAnswer = promptVal == config.defaultPrompt ? currentCard[config.defaultAnswer] : currentCard[config.defaultPrompt];
+
+            ui.setAttribute('correct-icon-button','correctValue,',selectedAnswerKeyText);
+            ui.setAttribute('incorrect-icon-button','correctValue,',selectedAnswerKeyText);
+
+            ui.hideElements('next-answer-button');
+            ui.showElements('next-letter-button');
+
+            ui.showElements('answer-buttons');
+
+            ui.getElements('prompt-key')[0].setAttribute('disabled',false);
+        }
+
+        if(!currentAnswer || currentAnswer.length === 0){
+            alert('Unable to determine correct answer for this card. Please check card definition to ensure it has all properties set. See developer console for card info.');
+            console.warn('Incomplete card info');
+            console.log(currentCard);
+        }else{
+            console.log('Current correct answer is: ' + currentAnswer);
+        }
+        /*
+        
+        console.log('Prompt Key: ' + promptVal);
+        console.log('Answer Key: ' + answerVal);
+        
+        console.log('Answer Key Text: ' + selectedAnswerKeyText);
+        console.log('Answer Prompt Text: ' + selectedPromptKeyText);
+        
         console.log(currentCard);
-        //get the text of the current correct answer for a choice question by using the correctAnswerValue property of the question definition to then read that object's label
-        //currentAnswer = currentCard.options.find(function(o){ return o.value===currentCard.correctAnswerValues}).label;
+        console.log(config.promptKeys);
+        console.log(config.answerKeys);
+        */
+        document.getElementById("prompt").innerHTML= `${selectedPromptKeyText}<br/> <span class="prompt-text">${currentCard[promptVal]}</span>`; 
+        
+        if(currentCard.type == 'choice'){
+            document.getElementById("answer").innerHTML= document.getElementById("prompt").innerHTML;
+
+            console.log('\n\n\n---------- Generating card fro data');
+            console.log(currentCard.options);
+            console.log(currentCard.correctAnswerValues);
 
 
-        currentAnswer = 'Choice card logic needs fixing...'
+            document.getElementById("answer").appendChild(generateSelectListFromOptions(currentCard.options,currentCard.correctAnswerValues));
+        }else{
+            document.getElementById("answer").innerHTML= `${generateAnswerText(currentCard)}`;
+        }
+        
+        
+        document.getElementById("clue-text").innerHTML=currentCard[config.clueTextKey];
 
-        ui.showElements('next-answer-button');
-        ui.hideElements('next-letter-button');
+        //document.getElementById('answer').style.visibility='hidden';
+        document.getElementById('clue-text').style.visibility='hidden';
+        document.getElementById('hint-text').style.visibility='hidden';
 
-        console.log('================ Prompt key');
-        console.log(ui.getElements('prompt-key'));
-        ui.getElements('prompt-key')[0].setAttribute('disabled',true);
-    }else{
-        console.log('current card is unknown type. Prompt text');
-        currentAnswer = promptVal == config.defaultPrompt ? currentCard[config.defaultAnswer] : currentCard[config.defaultPrompt];
-
-        ui.setAttribute('correct-icon-button','correctValue,',selectedAnswerKeyText);
-        ui.setAttribute('incorrect-icon-button','correctValue,',selectedAnswerKeyText);
-
-        ui.hideElements('next-answer-button');
-        ui.showElements('next-letter-button');
-
-        ui.showElements('answer-buttons');
-
-        ui.getElements('prompt-key')[0].setAttribute('disabled',false);
+        document.getElementById("viewed-total").innerHTML = `${viewedCards.length} / ${cards.length}`;
+    }catch(ex){
+        handleError(ex);
     }
-
-    if(!currentAnswer || currentAnswer.length === 0){
-        alert('Unable to determine correct answer for this card. Please check card definition to ensure it has all properties set. See developer console for card info.');
-        console.warn('Incomplete card info');
-        console.log(currentCard);
-    }else{
-        console.log('Current correct answer is: ' + currentAnswer);
-    }
-    /*
-    
-    console.log('Prompt Key: ' + promptVal);
-    console.log('Answer Key: ' + answerVal);
-    
-    console.log('Answer Key Text: ' + selectedAnswerKeyText);
-    console.log('Answer Prompt Text: ' + selectedPromptKeyText);
-    
-    console.log(currentCard);
-    console.log(config.promptKeys);
-    console.log(config.answerKeys);
-    */
-    document.getElementById("prompt").innerHTML= `${selectedPromptKeyText}<br/> <span class="prompt-text">${currentCard[promptVal]}</span>`; 
-    
-    if(currentCard.type == 'choice'){
-        document.getElementById("answer").innerHTML= document.getElementById("prompt").innerHTML;
-
-        console.log('\n\n\n---------- Generating card fro data');
-        console.log(currentCard.options);
-        console.log(currentCard.correctAnswerValues);
-
-
-        document.getElementById("answer").appendChild(generateSelectListFromOptions(currentCard.options,currentCard.correctAnswerValues));
-    }else{
-        document.getElementById("answer").innerHTML= `${generateAnswerText(currentCard)}`;
-    }
-    
-    
-    document.getElementById("clue-text").innerHTML=currentCard[config.clueTextKey];
-
-    //document.getElementById('answer').style.visibility='hidden';
-    document.getElementById('clue-text').style.visibility='hidden';
-    document.getElementById('hint-text').style.visibility='hidden';
-
-    document.getElementById("viewed-total").innerHTML = `${viewedCards.length} / ${cards.length}`;
 		
 }
 
@@ -696,10 +706,12 @@ function setSelectedHistoryCard(cardId){
 
     console.log('Attempting to highlight card with index: ' + cardId);
     try{
-        document.querySelectorAll(`.history-item[data-card-id="${cardId}"]`)[0].classList.add("selected-history-item");
+        let matchingCards = document.querySelectorAll(`.history-item[data-card-id="${cardId}"]`);
+        if(matchingCards.length > 0){
+            ui.addClass(matchingCards, 'selected-history-item');
+        }
     }catch(ex){
-        console.log('Could not hightlight item');
-        console.log(ex);
+        handleError(ex);
     }
 }
 
@@ -915,7 +927,7 @@ function mascotSay(answerText,mascotType){
 
         setTimeout(function(elementId){
             document.getElementById(elementId).remove();
-        },2000,speechBubbleDiv.id);
+        },1800,speechBubbleDiv.id);
 
     },2000,speechBubbleDiv.id);
 }
@@ -955,50 +967,55 @@ function setNavigationButtonStates(cardIndex,stackLength){
 
 function loadNext(){
     console.log('---------------------------------- Loading next card. Card Index: ' + cardIndex);
-    console.log(viewedCards);
-    
-    //card object to load next
-    let cardToLoad;
+
+    try{
+        console.log(viewedCards);
+        
+        //card object to load next
+        let cardToLoad;
 
 
-    if(timer && timer.timerInterval && cardIndex == 0){
-        ui.hideElements('deck-loaded-image');
-        timer.startTimer();
-    }
+        if(timer && timer.timerInterval && cardIndex == 0){
+            ui.hideElements('deck-loaded-image');
+            timer.startTimer();
+        }
 
-    if(historyEntryToWrite != null){
-        document.getElementById('history-items').appendChild(historyEntryToWrite);
-        historyEntryToWrite = null;
-    }
+        if(historyEntryToWrite != null){
+            document.getElementById('history-items').appendChild(historyEntryToWrite);
+            historyEntryToWrite = null;
+        }
 
-    setHistoryItemStyles();
+        setHistoryItemStyles();
 
-    //if we are back in the stack, then instead just move up to the next card
-    if(viewedCards.length > cardIndex){
-        console.log('Exising card in stack. Loading card at index: ' + cardIndex);
-        cardIndex++;
-        loadCard(viewedCards[cardIndex].id);
-    }		
-    else {
-        if(!useRandom){
-            cardToLoad = cards[cardIndex];
-        }else{
-            
-            if(!preventDuplicates) cardToLoad = cards[Math.floor(Math.random()*cards.length)];	
-            else {
-                console.log('Loading random card, preventing dupes');
-                console.log(availableCards);
-                cardToLoad = availableCards[Math.floor(Math.random()*availableCards.length)];	
+        //if we are back in the stack, then instead just move up to the next card
+        if(viewedCards.length > cardIndex){
+            console.log('Exising card in stack. Loading card at index: ' + cardIndex);
+            cardIndex++;
+            loadCard(viewedCards[cardIndex].id);
+        }		
+        else {
+            if(!useRandom){
+                cardToLoad = cards[cardIndex];
+            }else{
+                
+                if(!preventDuplicates) cardToLoad = cards[Math.floor(Math.random()*cards.length)];	
+                else {
+                    console.log('Loading random card, preventing dupes');
+                    console.log(availableCards);
+                    cardToLoad = availableCards[Math.floor(Math.random()*availableCards.length)];	
+                }
             }
+            
+            cardIndex++;
+            //document.getElementById("history-items").scrollIntoView({ behavior: 'smooth', block: 'end' });
+            
+            loadCard(cardToLoad.id);
         }
         
-        cardIndex++;
-        //document.getElementById("history-items").scrollIntoView({ behavior: 'smooth', block: 'end' });
-        
-        loadCard(cardToLoad.id);
+        setNavigationButtonStates(cardIndex,cards.length);
+    }catch(ex){
+        handleError(ex);
     }
-	
-	setNavigationButtonStates(cardIndex,cards.length);
 }
 
 
@@ -1054,6 +1071,8 @@ function loadPrev(){
     
     let cardToLoad;
     
+    if(cardIndex == 0 || cardIndex == 1) mascotSay('There is some kind of bug with clicking previous on the first card. Don\'t do it....','sad')
+
     if(cardIndex > 0) {
         cardIndex--;
         console.log('Removed one from card index. Index is now ' + cardIndex);
@@ -1452,8 +1471,18 @@ function resetHistory(){
     }catch(ex){
         console.log('Error resetting history');
         console.error(ex);
+        handleError(ex);
     }
     
+}
+
+function handleError(e, customMessage){
+    let message = customMessage ? customMessage : e.message();
+
+    console.error('Error in application!')
+    console.log(e.message);
+    console.log(e);
+    mascotSay(message,'sad')
 }
 window.onload = function() {
 	init();

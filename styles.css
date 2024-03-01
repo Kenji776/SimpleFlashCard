@@ -732,7 +732,7 @@ input[type=button]:disabled,button[disabled],button:disabled{
      font-family: sans-serif;
      font-size: 1.125rem;
      line-height: 24px;
-     width: 300px;
+     min-width: 300px;
      background: #fff;
      border-radius: 30px;
      padding: 24px;
@@ -744,7 +744,7 @@ input[type=button]:disabled,button[disabled],button:disabled{
  .bubble-bottom-left:before {
      content: "";
      width: 0px;
-    # height: 0px;
+     height: 0px;
      position: absolute;
      border-left: 24px solid #fff;
      border-right: 12px solid transparent;

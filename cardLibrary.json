@@ -41,6 +41,11 @@
             "name": "Drugs Group C",
             "description": "Collection of drug generic names and brand names",
             "url": "https://pharmacy-flashcards-2027.lol/cards/IntroToPharmacy2/GroupC.cards"
+          },
+          "drugs_combines": {
+            "name": "All Combined",
+            "description": "Collection of drug generic names and brand names",
+            "url": "https://pharmacy-flashcards-2027.lol/cards/IntroToPharmacy2/Combined.cards"
           }
         }
       ],

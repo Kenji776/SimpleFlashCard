@@ -1,0 +1,1587 @@
+{
+  "config": {
+    "name": "All Intro To Pharmacy 2 Cards",
+    "promptKeys": [
+      {
+        "value": "genericName",
+        "label": "Generic Name"
+      },
+      {
+        "value": "brandName",
+        "label": "Brand Name"
+      }
+    ],
+    "answerKeys": [
+      {
+        "value": "genericName",
+        "label": "Generic Name"
+      },
+      {
+        "value": "brandName",
+        "label": "Brand Name"
+      }
+    ],
+    "defaultPrompt": "genericName",
+    "defaultAnswer": "brandName",
+    "clueTextKey": "drugClassName",
+    "labels": {
+      "genericName": "Generic Name",
+      "brandName": "Brand Name",
+      "drugClassName": "Drug Class Name",
+      "clueButtonName": "Drug Class Name"
+    },
+	"variants" : [{
+		"name": "Multiple Choice By Drug Class Name",
+		"shuffleType": "group-by",
+        "groupBy": "drugClassName",
+        "deckType": "multiple-choice",
+        "minRightAnswers": 1,
+        "minWrongAnswers": 1,
+        "maxAnswerOptions": 5,
+        "answerLabelProperty": "genericName",
+        "answerValueProperty": "genericName"
+	}]
+  },
+  "cards": [
+  {
+    "genericName": "Potassium Chloride (Oral)",
+    "brandName": "Klor-Con, K-Dur, Micro-K",
+    "drugClassName": "Electrolyte"
+  },
+  {
+    "genericName": "Calcitriol",
+    "brandName": "Rocaltrol",
+    "drugClassName": "Vitamin"
+  },
+  {
+    "genericName": "Folic Acid",
+    "brandName": "---",
+    "drugClassName": "Vitamin"
+  },
+  {
+    "genericName": "Vitamin D, Ergocalciferol",
+    "brandName": "Drisdol",
+    "drugClassName": "Vitamin"
+  },
+  {
+    "genericName": "Phentermine Hydrochloride",
+    "brandName": "Adipex-P, Ionamin",
+    "drugClassName": "Weight management"
+  },
+  {
+    "genericName": "Cyclosporine Emulsion",
+    "brandName": "Restasis",
+    "drugClassName": "Agent for dry eyes"
+  },
+  {
+    "genericName": "Ciprofloxacin Hydrochloride (Ophthalmic)",
+    "brandName": "Ciloxan",
+    "drugClassName": "Antibiotic / Ophthalmic"
+  },
+  {
+    "genericName": "Bimatoprost",
+    "brandName": "Lumigan",
+    "drugClassName": "Glaucoma agent"
+  },
+  {
+    "genericName": "Brimonidine Tartrate",
+    "brandName": "Alphagan P",
+    "drugClassName": "Glaucoma agent"
+  },
+  {
+    "genericName": "Dorzolamide Hydrochloride and Timolol Maleate",
+    "brandName": "Cosopt",
+    "drugClassName": "Glaucoma agent"
+  },
+  {
+    "genericName": "Latanoprost",
+    "brandName": "Xalatan",
+    "drugClassName": "Glaucoma agent"
+  },
+  {
+    "genericName": "Timolol Maleate (Ophthalmic)",
+    "brandName": "Timoptic, Timoptic XR",
+    "drugClassName": "Glaucoma agent"
+  },
+  {
+    "genericName": "Travoprost",
+    "brandName": "Travatan Z",
+    "drugClassName": "Glaucoma agent"
+  },
+  {
+    "genericName": "Trimethoprim Sulfate and Polymixin B Sulfate",
+    "brandName": "Polytrim",
+    "drugClassName": "Ophthalmic agent"
+  },
+  {
+    "genericName": "Olopatadine Hydrochloride",
+    "brandName": "Patanol, Pataday, Pazeo",
+    "drugClassName": "Ophthalmic anti-allergy"
+  },
+  {
+    "genericName": "Ofloxacin (ophthamlic)",
+    "brandName": "Ocuflox",
+    "drugClassName": "Ophthalmic Antibiotic"
+  },
+  {
+    "genericName": "Prednisolone Acetate (Ophthalmic)",
+    "brandName": "Pred Forte, Pred Mild, Omnipred",
+    "drugClassName": "Ophthalmic anti-inflammatory"
+  },
+  {
+    "genericName": "Ciprofloxacin with dexamethasone",
+    "brandName": "CiproDex",
+    "drugClassName": "Otic antibiotic / Anti-inflammatory"
+  },
+  {
+    "genericName": "Atorvastatin Calcium",
+    "brandName": "Lipitor",
+    "drugClassName": "Antihyperlipidemic"
+  },
+  {
+    "genericName": "Colestipol Hydrochloride",
+    "brandName": "Colestid",
+    "drugClassName": "Antihyperlipidemic"
+  },
+  {
+    "genericName": "Ezetimibe",
+    "brandName": "Zetia",
+    "drugClassName": "Antihyperlipidemic"
+  },
+  {
+    "genericName": "Fenofibrate",
+    "brandName": "Tricor, Lipofen",
+    "drugClassName": "Antihyperlipidemic"
+  },
+  {
+    "genericName": "Gemfibrozil",
+    "brandName": "Lopid",
+    "drugClassName": "Antihyperlipidemic"
+  },
+  {
+    "genericName": "Icosapent Ethyl",
+    "brandName": "Vascepa",
+    "drugClassName": "Antihyperlipidemic"
+  },
+  {
+    "genericName": "Lovastatin",
+    "brandName": "Mevacor",
+    "drugClassName": "Antihyperlipidemic"
+  },
+  {
+    "genericName": "Niacin (ER)",
+    "brandName": "Niaspan",
+    "drugClassName": "Antihyperlipidemic"
+  },
+  {
+    "genericName": "Omega-3-Acid Ethyl Esters",
+    "brandName": "Lovaza",
+    "drugClassName": "Antihyperlipidemic"
+  },
+  {
+    "genericName": "Pravastatin Sodium",
+    "brandName": "Pravachol",
+    "drugClassName": "Antihyperlipidemic"
+  },
+  {
+    "genericName": "Rosuvastatin Calcium",
+    "brandName": "Crestor",
+    "drugClassName": "Antihyperlipidemic"
+  },
+  {
+    "genericName": "Simvastatin",
+    "brandName": "Zocor",
+    "drugClassName": "Antihyperlipidemic"
+  },
+  {
+    "genericName": "Benazepril Hydrochloride",
+    "brandName": "Lotensin",
+    "drugClassName": "Antihypertensive"
+  },
+  {
+    "genericName": "Enalapril Maleate",
+    "brandName": "Vasotec, Epaned",
+    "drugClassName": "Antihypertensive"
+  },
+  {
+    "genericName": "Fosinopril sodium",
+    "brandName": "Monopril",
+    "drugClassName": "Antihypertensive"
+  },
+  {
+    "genericName": "Irbesartan",
+    "brandName": "Avapro",
+    "drugClassName": "Antihypertensive"
+  },
+  {
+    "genericName": "Lisinopril",
+    "brandName": "Prinivil, Zestril",
+    "drugClassName": "Antihypertensive"
+  },
+  {
+    "genericName": "Lisinopril with Hydrochlorothiazide",
+    "brandName": "Zestoretic, Prinzide",
+    "drugClassName": "Antihypertensive"
+  },
+  {
+    "genericName": "Losartan Potassium",
+    "brandName": "Cozaar",
+    "drugClassName": "Antihypertensive"
+  },
+  {
+    "genericName": "Losartan Potassium with Hydrochlorothiazide",
+    "brandName": "Hyzaar",
+    "drugClassName": "Antihypertensive"
+  },
+  {
+    "genericName": "Olmesartan Medoxomil",
+    "brandName": "Benicar",
+    "drugClassName": "Antihypertensive"
+  },
+  {
+    "genericName": "Ramipril",
+    "brandName": "Altace",
+    "drugClassName": "Antihypertensive"
+  },
+  {
+    "genericName": "Telmisartan",
+    "brandName": "Micardis",
+    "drugClassName": "Antihypertensive"
+  },
+  {
+    "genericName": "Valsartan",
+    "brandName": "Diovan",
+    "drugClassName": "Antihypertensive"
+  },
+  {
+    "genericName": "Valsartan with Hydrochlorothiazide",
+    "brandName": "Diovan-HCT",
+    "drugClassName": "Antihypertensive"
+  },
+  {
+    "genericName": "Diltiazem Hydrochloride",
+    "brandName": "Cardizem (CD), Cartia, Dilacor, Dilt-XR, Tiazac",
+    "drugClassName": "Antihypertensive / antianginal"
+  },
+  {
+    "genericName": "Nifedipine",
+    "brandName": "Procardia (XL), Nifedical XL, Adalat CC*",
+    "drugClassName": "Antihypertensive / Antianginal"
+  },
+  {
+    "genericName": "Verapamil Hydrochloride",
+    "brandName": "Isoptin, Calan, Verelan*",
+    "drugClassName": "Antihypertensive / Antianginal"
+  },
+  {
+    "genericName": "Enoxaparin Sodium",
+    "brandName": "Lovenox",
+    "drugClassName": "Anticoagulant"
+  },
+  {
+    "genericName": "Rivaroxaban",
+    "brandName": "Xarelto",
+    "drugClassName": "Anticoagulant"
+  },
+  {
+    "genericName": "Warfarin Sodium (Crystalline)",
+    "brandName": "Coumadin, Jantoven",
+    "drugClassName": "Anticoagulant"
+  },
+  {
+    "genericName": "Bumetanide",
+    "brandName": "Bumex",
+    "drugClassName": "Diuretic"
+  },
+  {
+    "genericName": "Chlorthalidone",
+    "brandName": "Hygroton",
+    "drugClassName": "Diuretic"
+  },
+  {
+    "genericName": "Furosemide",
+    "brandName": "Lasix",
+    "drugClassName": "Diuretic"
+  },
+  {
+    "genericName": "Hydrochlorothiazide",
+    "brandName": "Microzide",
+    "drugClassName": "Diuretic"
+  },
+  {
+    "genericName": "Metolazone",
+    "brandName": "Zaroxolyn",
+    "drugClassName": "Diuretic"
+  },
+  {
+    "genericName": "Spironolactone",
+    "brandName": "Aldactone",
+    "drugClassName": "Diuretic"
+  },
+  {
+    "genericName": "Torsemide",
+    "brandName": "Demadex",
+    "drugClassName": "Diuretic"
+  },
+  {
+    "genericName": "Triamterene with Hydrochlorothiazide",
+    "brandName": "Dyazide, Maxzide",
+    "drugClassName": "Diuretic"
+  },
+  {
+    "genericName": "Apixaban",
+    "brandName": "Eliquis",
+    "drugClassName": "Hematological agent"
+  },
+  {
+    "genericName": "Clopidogrel Bisulfate",
+    "brandName": "Plavix",
+    "drugClassName": "Hematological agent"
+  },
+  {
+    "genericName": "Cyanocobalamin (Vitamin B12)",
+    "brandName": "Nascobal",
+    "drugClassName": "Hematological agent"
+  },
+  {
+    "genericName": "Dabigatran Etexilate Mesylate",
+    "brandName": "Pradaxa",
+    "drugClassName": "Hematological agent"
+  },
+  {
+    "genericName": "Canagliflozin",
+    "brandName": "Invokana",
+    "drugClassName": "Antidiabetic"
+  },
+  {
+    "genericName": "Dapagliflozin",
+    "brandName": "Farxiga",
+    "drugClassName": "Antidiabetic"
+  },
+  {
+    "genericName": "Dulaglutide",
+    "brandName": "Trulicity",
+    "drugClassName": "Antidiabetic"
+  },
+  {
+    "genericName": "Empagliflozin",
+    "brandName": "Jardiance",
+    "drugClassName": "Antidiabetic"
+  },
+  {
+    "genericName": "Glimepiride",
+    "brandName": "Amaryl",
+    "drugClassName": "Antidiabetic"
+  },
+  {
+    "genericName": "Glipizide",
+    "brandName": "Glucotrol, Glucotrol XL",
+    "drugClassName": "Antidiabetic"
+  },
+  {
+    "genericName": "Glyburide",
+    "brandName": "Micronase, Diabeta",
+    "drugClassName": "Antidiabetic"
+  },
+  {
+    "genericName": "Insulin Aspart, rDNA Origin",
+    "brandName": "Novolog",
+    "drugClassName": "Antidiabetic"
+  },
+  {
+    "genericName": "Insulin Degludec",
+    "brandName": "Tresiba",
+    "drugClassName": "Antidiabetic"
+  },
+  {
+    "genericName": "Insulin Detemir",
+    "brandName": "Levemir",
+    "drugClassName": "Antidiabetic"
+  },
+  {
+    "genericName": "Insulin Glargine, rDNA Origin",
+    "brandName": "Lantus, Toujeo, Basaglar",
+    "drugClassName": "Antidiabetic"
+  },
+  {
+    "genericName": "Insulin Lispro, rDNA Origin",
+    "brandName": "Humalog",
+    "drugClassName": "Antidiabetic"
+  },
+  {
+    "genericName": "Linagliptin",
+    "brandName": "Tradjenta",
+    "drugClassName": "Antidiabetic"
+  },
+  {
+    "genericName": "Liraglutide (rDNA Origin)",
+    "brandName": "Victoza, Saxenda",
+    "drugClassName": "Antidiabetic"
+  },
+  {
+    "genericName": "Metformin Hydrochloride",
+    "brandName": "Glucophage (XR), Glumetza",
+    "drugClassName": "Antidiabetic"
+  },
+  {
+    "genericName": "Pioglitazone Hydrochloride",
+    "brandName": "Actos",
+    "drugClassName": "Antidiabetic"
+  },
+  {
+    "genericName": "Sitagliptin Phosphate",
+    "brandName": "Januvia",
+    "drugClassName": "Antidiabetic"
+  },
+  {
+    "genericName": "Sitagliptin Phosphate with Metformin Hydrochloride",
+    "brandName": "Janumet (XR)",
+    "drugClassName": "Antidiabetic"
+  },
+  {
+    "genericName": "Desmopressin Acetate",
+    "brandName": "DDAVP",
+    "drugClassName": "Hormone"
+  },
+  {
+    "genericName": "Testosterone Gel (Topical)",
+    "brandName": "Androgel, Fortesta, Testim",
+    "drugClassName": "Hormone"
+  },
+  {
+    "genericName": "Estradiol",
+    "brandName": "Divigel",
+    "drugClassName": "Hormone / Estrogen"
+  },
+  {
+    "genericName": "Estradiol (Cream)",
+    "brandName": "Estrace",
+    "drugClassName": "Hormone / Estrogen"
+  },
+  {
+    "genericName": "Estradiol (Suppository)",
+    "brandName": "Vagifem",
+    "drugClassName": "Hormone / Estrogen"
+  },
+  {
+    "genericName": "Estradiol (Tablet)",
+    "brandName": "Estrace",
+    "drugClassName": "Hormone / Estrogen"
+  },
+  {
+    "genericName": "Estradiol (Topical Patches)",
+    "brandName": "Vivelle-Dot, Alora, Climara",
+    "drugClassName": "Hormone / Estrogen"
+  },
+  {
+    "genericName": "Estradiol (Vaginal Insert)",
+    "brandName": "Femring, Estring",
+    "drugClassName": "Hormone / Estrogen"
+  },
+  {
+    "genericName": "Estrogen (Conjugated)",
+    "brandName": "Premarin",
+    "drugClassName": "Hormone / Estrogen"
+  },
+  {
+    "genericName": "Medroxyprogesterone Acetate (Oral)",
+    "brandName": "Provera",
+    "drugClassName": "Hormone / Progestin"
+  },
+  {
+    "genericName": "Levothyroxine Sodium",
+    "brandName": "Synthroid, Levoxyl, Levothroid",
+    "drugClassName": "Hormone / Thyroid"
+  },
+  {
+    "genericName": "Liothyronine Sodium",
+    "brandName": "Cytomel, Triostat",
+    "drugClassName": "Hormone / Thyroid"
+  },
+  {
+    "genericName": "Thyroid",
+    "brandName": "Armour Thyroid",
+    "drugClassName": "Hormone / Thyroid"
+  },
+  {
+    "genericName": "Progesterone (Oral)",
+    "brandName": "Prometrium",
+    "drugClassName": "Hormone replacement"
+  },
+  {
+    "genericName": "Drospirenone and Ethinyl Estradiol",
+    "brandName": "Yasmin, Ocella",
+    "drugClassName": "Oral contraceptive"
+  },
+  {
+    "genericName": "Norethindrone, Ethinyl Estradiol & Ferrous Fumarate",
+    "brandName": "Loestrin FE (24), Microgestin FE, Junel FE, Minastrin 24",
+    "drugClassName": "Oral contraceptive"
+  },
+  {
+    "genericName": "Norgestimate & Ethinyl Estradiol",
+    "brandName": "Ortho-Cyclen, Sprintec",
+    "drugClassName": "Oral contraceptive"
+  },
+  {
+    "genericName": "Norgestimate & Ethinyl Estradiol (Triphasic)",
+    "brandName": "Ortho Tri-Cyclen, TriSprintec, Trinessa",
+    "drugClassName": "Oral contraceptive"
+  },
+  {
+    "genericName": "Cilostazol",
+    "brandName": "Pletal",
+    "drugClassName": "Platelet inhibitor"
+  },
+  {
+    "genericName": "Lubiprostone",
+    "brandName": "Amitiza",
+    "drugClassName": "Agent for Irritable Bowel Syndrome"
+  },
+  {
+    "genericName": "Sucralfate",
+    "brandName": "Carafate",
+    "drugClassName": "Antiulcer agent"
+  },
+  {
+    "genericName": "Dexlansoprazole",
+    "brandName": "Dexilant",
+    "drugClassName": "Gastric antisecretory"
+  },
+  {
+    "genericName": "Esomeprazole Magnesium",
+    "brandName": "Nexium",
+    "drugClassName": "Gastric antisecretory"
+  },
+  {
+    "genericName": "Famotidine",
+    "brandName": "Pepcid",
+    "drugClassName": "Gastric antisecretory"
+  },
+  {
+    "genericName": "Lansoprazole",
+    "brandName": "Prevacid",
+    "drugClassName": "Gastric antisecretory"
+  },
+  {
+    "genericName": "Omeprazole",
+    "brandName": "Prilosec",
+    "drugClassName": "Gastric antisecretory"
+  },
+  {
+    "genericName": "Pantoprazole Sodium",
+    "brandName": "Protonix",
+    "drugClassName": "Gastric antisecretory"
+  },
+  {
+    "genericName": "Ranitidine Hydrochloride",
+    "brandName": "Zantac",
+    "drugClassName": "Gastric antisecretory"
+  },
+  {
+    "genericName": "Dicyclomine Hydrochloride",
+    "brandName": "Bentyl",
+    "drugClassName": "GI antispasmodic"
+  },
+  {
+    "genericName": "Hyoscyamine Sulfate",
+    "brandName": "Levsin, Levbid",
+    "drugClassName": "GI antispasmodic"
+  },
+    {
+    "genericName": "Potassium Chloride (Oral)",
+    "brandName": "Klor-Con, K-Dur, Micro-K",
+    "drugClassName": "Electrolyte"
+  },
+  {
+    "genericName": "Calcitriol",
+    "brandName": "Rocaltrol",
+    "drugClassName": "Vitamin"
+  },
+  {
+    "genericName": "Folic Acid",
+    "brandName": "---",
+    "drugClassName": "Vitamin"
+  },
+  {
+    "genericName": "Vitamin D, Ergocalciferol",
+    "brandName": "Drisdol",
+    "drugClassName": "Vitamin"
+  },
+  {
+    "genericName": "Phentermine Hydrochloride",
+    "brandName": "Adipex-P, Ionamin",
+    "drugClassName": "Weight management"
+  },
+  {
+    "genericName": "Cyclosporine Emulsion",
+    "brandName": "Restasis",
+    "drugClassName": "Agent for dry eyes"
+  },
+  {
+    "genericName": "Ciprofloxacin Hydrochloride (Ophthalmic)",
+    "brandName": "Ciloxan",
+    "drugClassName": "Antibiotic / Ophthalmic"
+  },
+  {
+    "genericName": "Bimatoprost",
+    "brandName": "Lumigan",
+    "drugClassName": "Glaucoma agent"
+  },
+  {
+    "genericName": "Brimonidine Tartrate",
+    "brandName": "Alphagan P",
+    "drugClassName": "Glaucoma agent"
+  },
+  {
+    "genericName": "Dorzolamide Hydrochloride and Timolol Maleate",
+    "brandName": "Cosopt",
+    "drugClassName": "Glaucoma agent"
+  },
+  {
+    "genericName": "Latanoprost",
+    "brandName": "Xalatan",
+    "drugClassName": "Glaucoma agent"
+  },
+  {
+    "genericName": "Timolol Maleate (Ophthalmic)",
+    "brandName": "Timoptic, Timoptic XR",
+    "drugClassName": "Glaucoma agent"
+  },
+  {
+    "genericName": "Travoprost",
+    "brandName": "Travatan Z",
+    "drugClassName": "Glaucoma agent"
+  },
+  {
+    "genericName": "Trimethoprim Sulfate and Polymixin B Sulfate",
+    "brandName": "Polytrim",
+    "drugClassName": "Ophthalmic agent"
+  },
+  {
+    "genericName": "Olopatadine Hydrochloride",
+    "brandName": "Patanol, Pataday, Pazeo",
+    "drugClassName": "Ophthalmic anti-allergy"
+  },
+  {
+    "genericName": "Ofloxacin (ophthamlic)",
+    "brandName": "Ocuflox",
+    "drugClassName": "Ophthalmic Antibiotic"
+  },
+  {
+    "genericName": "Prednisolone Acetate (Ophthalmic)",
+    "brandName": "Pred Forte, Pred Mild, Omnipred",
+    "drugClassName": "Ophthalmic anti-inflammatory"
+  },
+  {
+    "genericName": "Ciprofloxacin with dexamethasone",
+    "brandName": "CiproDex",
+    "drugClassName": "Otic antibiotic / Anti-inflammatory"
+  },
+  {
+    "genericName": "Atorvastatin Calcium",
+    "brandName": "Lipitor",
+    "drugClassName": "Antihyperlipidemic"
+  },
+  {
+    "genericName": "Colestipol Hydrochloride",
+    "brandName": "Colestid",
+    "drugClassName": "Antihyperlipidemic"
+  },
+  {
+    "genericName": "Ezetimibe",
+    "brandName": "Zetia",
+    "drugClassName": "Antihyperlipidemic"
+  },
+  {
+    "genericName": "Fenofibrate",
+    "brandName": "Tricor, Lipofen",
+    "drugClassName": "Antihyperlipidemic"
+  },
+  {
+    "genericName": "Gemfibrozil",
+    "brandName": "Lopid",
+    "drugClassName": "Antihyperlipidemic"
+  },
+  {
+    "genericName": "Icosapent Ethyl",
+    "brandName": "Vascepa",
+    "drugClassName": "Antihyperlipidemic"
+  },
+  {
+    "genericName": "Lovastatin",
+    "brandName": "Mevacor",
+    "drugClassName": "Antihyperlipidemic"
+  },
+  {
+    "genericName": "Niacin (ER)",
+    "brandName": "Niaspan",
+    "drugClassName": "Antihyperlipidemic"
+  },
+  {
+    "genericName": "Omega-3-Acid Ethyl Esters",
+    "brandName": "Lovaza",
+    "drugClassName": "Antihyperlipidemic"
+  },
+  {
+    "genericName": "Pravastatin Sodium",
+    "brandName": "Pravachol",
+    "drugClassName": "Antihyperlipidemic"
+  },
+  {
+    "genericName": "Rosuvastatin Calcium",
+    "brandName": "Crestor",
+    "drugClassName": "Antihyperlipidemic"
+  },
+  {
+    "genericName": "Simvastatin",
+    "brandName": "Zocor",
+    "drugClassName": "Antihyperlipidemic"
+  },
+  {
+    "genericName": "Benazepril Hydrochloride",
+    "brandName": "Lotensin",
+    "drugClassName": "Antihypertensive"
+  },
+  {
+    "genericName": "Enalapril Maleate",
+    "brandName": "Vasotec, Epaned",
+    "drugClassName": "Antihypertensive"
+  },
+  {
+    "genericName": "Fosinopril sodium",
+    "brandName": "Monopril",
+    "drugClassName": "Antihypertensive"
+  },
+  {
+    "genericName": "Irbesartan",
+    "brandName": "Avapro",
+    "drugClassName": "Antihypertensive"
+  },
+  {
+    "genericName": "Lisinopril",
+    "brandName": "Prinivil, Zestril",
+    "drugClassName": "Antihypertensive"
+  },
+  {
+    "genericName": "Lisinopril with Hydrochlorothiazide",
+    "brandName": "Zestoretic, Prinzide",
+    "drugClassName": "Antihypertensive"
+  },
+  {
+    "genericName": "Losartan Potassium",
+    "brandName": "Cozaar",
+    "drugClassName": "Antihypertensive"
+  },
+  {
+    "genericName": "Losartan Potassium with Hydrochlorothiazide",
+    "brandName": "Hyzaar",
+    "drugClassName": "Antihypertensive"
+  },
+  {
+    "genericName": "Olmesartan Medoxomil",
+    "brandName": "Benicar",
+    "drugClassName": "Antihypertensive"
+  },
+  {
+    "genericName": "Ramipril",
+    "brandName": "Altace",
+    "drugClassName": "Antihypertensive"
+  },
+  {
+    "genericName": "Telmisartan",
+    "brandName": "Micardis",
+    "drugClassName": "Antihypertensive"
+  },
+  {
+    "genericName": "Valsartan",
+    "brandName": "Diovan",
+    "drugClassName": "Antihypertensive"
+  },
+  {
+    "genericName": "Valsartan with Hydrochlorothiazide",
+    "brandName": "Diovan-HCT",
+    "drugClassName": "Antihypertensive"
+  },
+  {
+    "genericName": "Diltiazem Hydrochloride",
+    "brandName": "Cardizem (CD), Cartia, Dilacor, Dilt-XR, Tiazac",
+    "drugClassName": "Antihypertensive / antianginal"
+  },
+  {
+    "genericName": "Nifedipine",
+    "brandName": "Procardia (XL), Nifedical XL, Adalat CC*",
+    "drugClassName": "Antihypertensive / Antianginal"
+  },
+  {
+    "genericName": "Verapamil Hydrochloride",
+    "brandName": "Isoptin, Calan, Verelan*",
+    "drugClassName": "Antihypertensive / Antianginal"
+  },
+  {
+    "genericName": "Enoxaparin Sodium",
+    "brandName": "Lovenox",
+    "drugClassName": "Anticoagulant"
+  },
+  {
+    "genericName": "Rivaroxaban",
+    "brandName": "Xarelto",
+    "drugClassName": "Anticoagulant"
+  },
+  {
+    "genericName": "Warfarin Sodium (Crystalline)",
+    "brandName": "Coumadin, Jantoven",
+    "drugClassName": "Anticoagulant"
+  },
+  {
+    "genericName": "Bumetanide",
+    "brandName": "Bumex",
+    "drugClassName": "Diuretic"
+  },
+  {
+    "genericName": "Chlorthalidone",
+    "brandName": "Hygroton",
+    "drugClassName": "Diuretic"
+  },
+  {
+    "genericName": "Furosemide",
+    "brandName": "Lasix",
+    "drugClassName": "Diuretic"
+  },
+  {
+    "genericName": "Hydrochlorothiazide",
+    "brandName": "Microzide",
+    "drugClassName": "Diuretic"
+  },
+  {
+    "genericName": "Metolazone",
+    "brandName": "Zaroxolyn",
+    "drugClassName": "Diuretic"
+  },
+  {
+    "genericName": "Spironolactone",
+    "brandName": "Aldactone",
+    "drugClassName": "Diuretic"
+  },
+  {
+    "genericName": "Torsemide",
+    "brandName": "Demadex",
+    "drugClassName": "Diuretic"
+  },
+  {
+    "genericName": "Triamterene with Hydrochlorothiazide",
+    "brandName": "Dyazide, Maxzide",
+    "drugClassName": "Diuretic"
+  },
+  {
+    "genericName": "Apixaban",
+    "brandName": "Eliquis",
+    "drugClassName": "Hematological agent"
+  },
+  {
+    "genericName": "Clopidogrel Bisulfate",
+    "brandName": "Plavix",
+    "drugClassName": "Hematological agent"
+  },
+  {
+    "genericName": "Cyanocobalamin (Vitamin B12)",
+    "brandName": "Nascobal",
+    "drugClassName": "Hematological agent"
+  },
+  {
+    "genericName": "Dabigatran Etexilate Mesylate",
+    "brandName": "Pradaxa",
+    "drugClassName": "Hematological agent"
+  },
+  {
+    "genericName": "Canagliflozin",
+    "brandName": "Invokana",
+    "drugClassName": "Antidiabetic"
+  },
+  {
+    "genericName": "Dapagliflozin",
+    "brandName": "Farxiga",
+    "drugClassName": "Antidiabetic"
+  },
+  {
+    "genericName": "Dulaglutide",
+    "brandName": "Trulicity",
+    "drugClassName": "Antidiabetic"
+  },
+  {
+    "genericName": "Empagliflozin",
+    "brandName": "Jardiance",
+    "drugClassName": "Antidiabetic"
+  },
+  {
+    "genericName": "Glimepiride",
+    "brandName": "Amaryl",
+    "drugClassName": "Antidiabetic"
+  },
+  {
+    "genericName": "Glipizide",
+    "brandName": "Glucotrol, Glucotrol XL",
+    "drugClassName": "Antidiabetic"
+  },
+  {
+    "genericName": "Glyburide",
+    "brandName": "Micronase, Diabeta",
+    "drugClassName": "Antidiabetic"
+  },
+  {
+    "genericName": "Insulin Aspart, rDNA Origin",
+    "brandName": "Novolog",
+    "drugClassName": "Antidiabetic"
+  },
+  {
+    "genericName": "Insulin Degludec",
+    "brandName": "Tresiba",
+    "drugClassName": "Antidiabetic"
+  },
+  {
+    "genericName": "Insulin Detemir",
+    "brandName": "Levemir",
+    "drugClassName": "Antidiabetic"
+  },
+  {
+    "genericName": "Insulin Glargine, rDNA Origin",
+    "brandName": "Lantus, Toujeo, Basaglar",
+    "drugClassName": "Antidiabetic"
+  },
+  {
+    "genericName": "Insulin Lispro, rDNA Origin",
+    "brandName": "Humalog",
+    "drugClassName": "Antidiabetic"
+  },
+  {
+    "genericName": "Linagliptin",
+    "brandName": "Tradjenta",
+    "drugClassName": "Antidiabetic"
+  },
+  {
+    "genericName": "Liraglutide (rDNA Origin)",
+    "brandName": "Victoza, Saxenda",
+    "drugClassName": "Antidiabetic"
+  },
+  {
+    "genericName": "Metformin Hydrochloride",
+    "brandName": "Glucophage (XR), Glumetza",
+    "drugClassName": "Antidiabetic"
+  },
+  {
+    "genericName": "Pioglitazone Hydrochloride",
+    "brandName": "Actos",
+    "drugClassName": "Antidiabetic"
+  },
+  {
+    "genericName": "Sitagliptin Phosphate",
+    "brandName": "Januvia",
+    "drugClassName": "Antidiabetic"
+  },
+  {
+    "genericName": "Sitagliptin Phosphate with Metformin Hydrochloride",
+    "brandName": "Janumet (XR)",
+    "drugClassName": "Antidiabetic"
+  },
+  {
+    "genericName": "Desmopressin Acetate",
+    "brandName": "DDAVP",
+    "drugClassName": "Hormone"
+  },
+  {
+    "genericName": "Testosterone Gel (Topical)",
+    "brandName": "Androgel, Fortesta, Testim",
+    "drugClassName": "Hormone"
+  },
+  {
+    "genericName": "Estradiol",
+    "brandName": "Divigel",
+    "drugClassName": "Hormone / Estrogen"
+  },
+  {
+    "genericName": "Estradiol (Cream)",
+    "brandName": "Estrace",
+    "drugClassName": "Hormone / Estrogen"
+  },
+  {
+    "genericName": "Estradiol (Suppository)",
+    "brandName": "Vagifem",
+    "drugClassName": "Hormone / Estrogen"
+  },
+  {
+    "genericName": "Estradiol (Tablet)",
+    "brandName": "Estrace",
+    "drugClassName": "Hormone / Estrogen"
+  },
+  {
+    "genericName": "Estradiol (Topical Patches)",
+    "brandName": "Vivelle-Dot, Alora, Climara",
+    "drugClassName": "Hormone / Estrogen"
+  },
+  {
+    "genericName": "Estradiol (Vaginal Insert)",
+    "brandName": "Femring, Estring",
+    "drugClassName": "Hormone / Estrogen"
+  },
+  {
+    "genericName": "Estrogen (Conjugated)",
+    "brandName": "Premarin",
+    "drugClassName": "Hormone / Estrogen"
+  },
+  {
+    "genericName": "Medroxyprogesterone Acetate (Oral)",
+    "brandName": "Provera",
+    "drugClassName": "Hormone / Progestin"
+  },
+  {
+    "genericName": "Levothyroxine Sodium",
+    "brandName": "Synthroid, Levoxyl, Levothroid",
+    "drugClassName": "Hormone / Thyroid"
+  },
+  {
+    "genericName": "Liothyronine Sodium",
+    "brandName": "Cytomel, Triostat",
+    "drugClassName": "Hormone / Thyroid"
+  },
+  {
+    "genericName": "Thyroid",
+    "brandName": "Armour Thyroid",
+    "drugClassName": "Hormone / Thyroid"
+  },
+  {
+    "genericName": "Progesterone (Oral)",
+    "brandName": "Prometrium",
+    "drugClassName": "Hormone replacement"
+  },
+  {
+    "genericName": "Drospirenone and Ethinyl Estradiol",
+    "brandName": "Yasmin, Ocella",
+    "drugClassName": "Oral contraceptive"
+  },
+  {
+    "genericName": "Norethindrone, Ethinyl Estradiol & Ferrous Fumarate",
+    "brandName": "Loestrin FE (24), Microgestin FE, Junel FE, Minastrin 24",
+    "drugClassName": "Oral contraceptive"
+  },
+  {
+    "genericName": "Norgestimate & Ethinyl Estradiol",
+    "brandName": "Ortho-Cyclen, Sprintec",
+    "drugClassName": "Oral contraceptive"
+  },
+  {
+    "genericName": "Norgestimate & Ethinyl Estradiol (Triphasic)",
+    "brandName": "Ortho Tri-Cyclen, TriSprintec, Trinessa",
+    "drugClassName": "Oral contraceptive"
+  },
+  {
+    "genericName": "Cilostazol",
+    "brandName": "Pletal",
+    "drugClassName": "Platelet inhibitor"
+  },
+  {
+    "genericName": "Lubiprostone",
+    "brandName": "Amitiza",
+    "drugClassName": "Agent for Irritable Bowel Syndrome"
+  },
+  {
+    "genericName": "Sucralfate",
+    "brandName": "Carafate",
+    "drugClassName": "Antiulcer agent"
+  },
+  {
+    "genericName": "Dexlansoprazole",
+    "brandName": "Dexilant",
+    "drugClassName": "Gastric antisecretory"
+  },
+  {
+    "genericName": "Esomeprazole Magnesium",
+    "brandName": "Nexium",
+    "drugClassName": "Gastric antisecretory"
+  },
+  {
+    "genericName": "Famotidine",
+    "brandName": "Pepcid",
+    "drugClassName": "Gastric antisecretory"
+  },
+  {
+    "genericName": "Lansoprazole",
+    "brandName": "Prevacid",
+    "drugClassName": "Gastric antisecretory"
+  },
+  {
+    "genericName": "Omeprazole",
+    "brandName": "Prilosec",
+    "drugClassName": "Gastric antisecretory"
+  },
+  {
+    "genericName": "Pantoprazole Sodium",
+    "brandName": "Protonix",
+    "drugClassName": "Gastric antisecretory"
+  },
+  {
+    "genericName": "Ranitidine Hydrochloride",
+    "brandName": "Zantac",
+    "drugClassName": "Gastric antisecretory"
+  },
+  {
+    "genericName": "Dicyclomine Hydrochloride",
+    "brandName": "Bentyl",
+    "drugClassName": "GI antispasmodic"
+  },
+  {
+    "genericName": "Hyoscyamine Sulfate",
+    "brandName": "Levsin, Levbid",
+    "drugClassName": "GI antispasmodic"
+  },
+    {
+    "genericName": "Butalbital, Acetaminophen & Caffeine",
+    "brandName": "Fioricet",
+    "drugClass": "Analgesic"
+  },
+  {
+    "genericName": "Tramadol Hydrochloride",
+    "brandName": "Ultram, Ultram ER",
+    "drugClass": "Analgesic"
+  },
+  {
+    "genericName": "Alprazolam",
+    "brandName": "Xanax (XR)",
+    "drugClass": "Antianxiety agent"
+  },
+  {
+    "genericName": "Buspirone Hydrochloride",
+    "brandName": "BuSpar",
+    "drugClass": "Antianxiety agent"
+  },
+  {
+    "genericName": "Diazepam",
+    "brandName": "Valium",
+    "drugClass": "Antianxiety agent"
+  },
+  {
+    "genericName": "Lorazepam",
+    "brandName": "Ativan",
+    "drugClass": "Antianxiety agent"
+  },
+  {
+    "genericName": "Rizatriptan Benzoate",
+    "brandName": "Maxalt",
+    "drugClass": "Antimigrainous agent"
+  },
+  {
+    "genericName": "Sumatriptan Succinate",
+    "brandName": "Imitrex",
+    "drugClass": "Antimigrainous agent"
+  },
+  {
+    "genericName": "Baclofen",
+    "brandName": "Lioresal",
+    "drugClass": "Muscle relaxant"
+  },
+  {
+    "genericName": "Carisoprodol",
+    "brandName": "Soma",
+    "drugClass": "Muscle relaxant"
+  },
+  {
+    "genericName": "Cyclobenzaprine Hydrochloride",
+    "brandName": "Amrix, Flexeril, Fexmid",
+    "drugClass": "Muscle relaxant"
+  },
+  {
+    "genericName": "Methocarbamol",
+    "brandName": "Robaxin",
+    "drugClass": "Muscle relaxant"
+  },
+  {
+    "genericName": "Tizanidine Hydrochloride",
+    "brandName": "Zanaflex",
+    "drugClass": "Muscle relaxant"
+  },
+  {
+    "genericName": "Acetaminophen with Codeine Phosphate",
+    "brandName": "Tylenol (with Codeine)",
+    "drugClass": "Opioid analgesic"
+  },
+  {
+    "genericName": "Fentanyl (Transdermal)",
+    "brandName": "Duragesic",
+    "drugClass": "Opioid analgesic"
+  },
+  {
+    "genericName": "Hydrocodone Bitartrate with Acetaminophen",
+    "brandName": "Lortab, Vicodin, Norco",
+    "drugClass": "Opioid analgesic"
+  },
+  {
+    "genericName": "Hydromorphone Hydrochloride",
+    "brandName": "Dilaudid",
+    "drugClass": "Opioid analgesic"
+  },
+  {
+    "genericName": "Methadone Hydrochloride",
+    "brandName": "Methadose",
+    "drugClass": "Opioid analgesic"
+  },
+  {
+    "genericName": "Morphine Sulfate (Extended Release)",
+    "brandName": "MS Contin",
+    "drugClass": "Opioid analgesic"
+  },
+  {
+    "genericName": "Oxycodone Hydrochloride",
+    "brandName": "OxyContin, Roxicodone",
+    "drugClass": "Opioid analgesic"
+  },
+  {
+    "genericName": "Oxycodone with Acetaminophen",
+    "brandName": "Percocet, Roxicet, Endocet",
+    "drugClass": "Opioid analgesic"
+  },
+  {
+    "genericName": "Naltrexone Hydrochloride",
+    "brandName": "ReVia, Vivitrol",
+    "drugClass": "Opioid antagonist"
+  },
+  {
+    "genericName": "Buprenorphine with Naloxone",
+    "brandName": "Suboxone",
+    "drugClass": "Opioid dependence agent"
+  },
+  {
+    "genericName": "Eszopiclone",
+    "brandName": "Lunesta",
+    "drugClass": "Sedative"
+  },
+  {
+    "genericName": "Temazepam",
+    "brandName": "Restoril",
+    "drugClass": "Sedative"
+  },
+  {
+    "genericName": "Zaleplon",
+    "brandName": "Sonata",
+    "drugClass": "Sedative"
+  },
+  {
+    "genericName": "Zolpidem Tartrate",
+    "brandName": "Ambien (CR)",
+    "drugClass": "Sedative"
+  },
+  {
+    "genericName": "Nicotine",
+    "brandName": "Nicotrol",
+    "drugClass": "Smoking cessation aid"
+  },
+  {
+    "genericName": "Varenicline Tartrate",
+    "brandName": "Chantix",
+    "drugClass": "Smoking cessation aid"
+  },
+  {
+    "genericName": "Carbamazepine",
+    "brandName": "Tegretol, Tegretol XR, Carbatrol ER, Equetrol ER",
+    "drugClass": "Anticonvulsant"
+  },
+  {
+    "genericName": "Levetiracetam",
+    "brandName": "Keppra",
+    "drugClass": "Anticonvulsant"
+  },
+  {
+    "genericName": "Phenobarbital",
+    "brandName": "---",
+    "drugClass": "Anticonvulsant"
+  },
+  {
+    "genericName": "Pregabalin",
+    "brandName": "Lyrica",
+    "drugClass": "Anticonvulsant / Antineuralgic"
+  },
+  {
+    "genericName": "Divalproex Sodium",
+    "brandName": "Depakote, Depakote ER",
+    "drugClass": "Anticonvulsant / antipsychotic"
+  },
+  {
+    "genericName": "Gabapentin",
+    "brandName": "Neurontin",
+    "drugClass": "Anticonvulsant/antineuralgic"
+  },
+  {
+    "genericName": "Amitriptyline Hydrochloride",
+    "brandName": "Elavil",
+    "drugClass": "Antidepressant"
+  },
+  {
+    "genericName": "Bupropion Hydrochloride",
+    "brandName": "Wellbutrin, Zyban",
+    "drugClass": "Antidepressant"
+  },
+  {
+    "genericName": "Citalopram Hydrobromide",
+    "brandName": "Celexa",
+    "drugClass": "Antidepressant"
+  },
+  {
+    "genericName": "Desvenlafaxine",
+    "brandName": "Pristiq",
+    "drugClass": "Antidepressant"
+  },
+  {
+    "genericName": "Doxepin Hydrochloride",
+    "brandName": "Sinequan",
+    "drugClass": "Antidepressant"
+  },
+  {
+    "genericName": "Duloxetine Hydrochloride",
+    "brandName": "Cymbalta",
+    "drugClass": "Antidepressant"
+  },
+  {
+    "genericName": "Escitalopram Oxalate",
+    "brandName": "Lexapro",
+    "drugClass": "Antidepressant"
+  },
+  {
+    "genericName": "Fluoxetine Hydrochloride",
+    "brandName": "Prozac, Sarafem",
+    "drugClass": "Antidepressant"
+  },
+  {
+    "genericName": "Mirtazapine",
+    "brandName": "Remeron",
+    "drugClass": "Antidepressant"
+  },
+  {
+    "genericName": "Nortriptyline Hydrochloride",
+    "brandName": "Pamelor",
+    "drugClass": "Antidepressant"
+  },
+  {
+    "genericName": "Paroxetine Hydrochloride",
+    "brandName": "Paxil, Paxil XR, Pexeva",
+    "drugClass": "Antidepressant"
+  },
+  {
+    "genericName": "Sertraline hydrochloride",
+    "brandName": "Zoloft",
+    "drugClass": "Antidepressant"
+  },
+  {
+    "genericName": "Trazodone Hydrochloride",
+    "brandName": "Desyrel",
+    "drugClass": "Antidepressant"
+  },
+  {
+    "genericName": "Venlafaxine Hydrochloride",
+    "brandName": "Effexor, Effexor XR",
+    "drugClass": "Antidepressant"
+  },
+  {
+    "genericName": "Vilazodone Hydrochloride",
+    "brandName": "Viibryd",
+    "drugClass": "Antidepressant"
+  },
+  {
+    "genericName": "Vortioxetine",
+    "brandName": "Trintellix",
+    "drugClass": "Antidepressant"
+  },
+  {
+    "genericName": "Clonazepam",
+    "brandName": "Klonopin",
+    "drugClass": "Antiepileptic"
+  },
+  {
+    "genericName": "Lamotrigine",
+    "brandName": "Lamictal, Lamictal XR, Lamictal ODT",
+    "drugClass": "Antiepileptic"
+  },
+  {
+    "genericName": "Oxcarbazepine",
+    "brandName": "Trileptal, Oxtellar XR",
+    "drugClass": "Antiepileptic"
+  },
+  {
+    "genericName": "Phenytoin Sodium (Extended)",
+    "brandName": "Dilantin",
+    "drugClass": "Antiepileptic"
+  },
+  {
+    "genericName": "Primidone",
+    "brandName": "Mysoline",
+    "drugClass": "Antiepileptic"
+  },
+  {
+    "genericName": "Topiramate",
+    "brandName": "Topamax, Trokendi XR",
+    "drugClass": "Antiepileptic"
+  },
+  {
+    "genericName": "Aripiprazole",
+    "brandName": "Abilify",
+    "drugClass": "Antipsychotic"
+  },
+  {
+    "genericName": "Clozapine",
+    "brandName": "Clozaril",
+    "drugClass": "Antipsychotic"
+  },
+  {
+    "genericName": "Haloperidol",
+    "brandName": "Haldol",
+    "drugClass": "Antipsychotic"
+  },
+  {
+    "genericName": "Lithium Carbonate",
+    "brandName": "Lithonate, Lithotabs, Lithobid",
+    "drugClass": "Antipsychotic"
+  },
+  {
+    "genericName": "Lurasidone Hydrochloride",
+    "brandName": "Latuda",
+    "drugClass": "Antipsychotic"
+  },
+  {
+    "genericName": "Olanzapine",
+    "brandName": "Zyprexa",
+    "drugClass": "Antipsychotic"
+  },
+  {
+    "genericName": "Paliperidone",
+    "brandName": "Invega",
+    "drugClass": "Antipsychotic"
+  },
+  {
+    "genericName": "Quetiapine Fumarate",
+    "brandName": "Seroquel",
+    "drugClass": "Antipsychotic"
+  },
+  {
+    "genericName": "Risperidone",
+    "brandName": "Risperdal",
+    "drugClass": "Antipsychotic"
+  },
+  {
+    "genericName": "Ziprasidone Hydrochloride",
+    "brandName": "Geodon",
+    "drugClass": "Antipsychotic"
+  },
+  {
+    "genericName": "Fluvoxamine Maleate",
+    "brandName": "Luvox",
+    "drugClass": "CNS Agent for OCD"
+  },
+  {
+    "genericName": "Isosorbide Mononitrate",
+    "brandName": "Imdur",
+    "drugClass": "Antianginal"
+  },
+  {
+    "genericName": "Nitroglycerin (Sublingual and Injectable)",
+    "brandName": "Nitrostat, Nitroquick",
+    "drugClass": "Antianginal"
+  },
+  {
+    "genericName": "Ranolazine",
+    "brandName": "Ranexa",
+    "drugClass": "Antianginal"
+  },
+  {
+    "genericName": "Amlodipine Besylate",
+    "brandName": "Norvasc",
+    "drugClass": "Antihypertensive"
+  },
+  {
+    "genericName": "Amlodipine Besylate with Benazepril Hydrochloride",
+    "brandName": "Lotrel",
+    "drugClass": "Antihypertensive"
+  },
+  {
+    "genericName": "Atenolol",
+    "brandName": "Tenormin",
+    "drugClass": "Antihypertensive"
+  },
+  {
+    "genericName": "Bisoprolol Fumarate with Hydrochlorothiazide",
+    "brandName": "Ziac",
+    "drugClass": "Antihypertensive"
+  },
+  {
+    "genericName": "Carvedilol",
+    "brandName": "Coreg, Coreg CR",
+    "drugClass": "Antihypertensive"
+  },
+  {
+    "genericName": "Clonidine Hydrochloride",
+    "brandName": "Catapres, Nexiclon XR, Kapvay",
+    "drugClass": "Antihypertensive"
+  },
+  {
+    "genericName": "Hydralazine Hydrochloride",
+    "brandName": "Apresoline",
+    "drugClass": "Antihypertensive"
+  },
+  {
+    "genericName": "Labetalol Hydrochloride",
+    "brandName": "Normodyne, Trandate",
+    "drugClass": "Antihypertensive"
+  },
+  {
+    "genericName": "Metoprolol Succinate",
+    "brandName": "Toprol-XL",
+    "drugClass": "Antihypertensive"
+  },
+  {
+    "genericName": "Metoprolol Tartrate",
+    "brandName": "Lopressor",
+    "drugClass": "Antihypertensive"
+  },
+  {
+    "genericName": "Nebivolol Hydrochloride",
+    "brandName": "Bystolic",
+    "drugClass": "Antihypertensive"
+  },
+  {
+    "genericName": "Prazosin Hydrochloride",
+    "brandName": "Minipress",
+    "drugClass": "Antihypertensive"
+  },
+  {
+    "genericName": "Propranolol Hydrochloride",
+    "brandName": "Inderal (LA), Innopran XL",
+    "drugClass": "Antihypertensive"
+  },
+  {
+    "genericName": "Terazosin Hydrochloride",
+    "brandName": "Hytrin",
+    "drugClass": "Antihypertensive"
+  },
+  {
+    "genericName": "Guanfacine Hydrochloride",
+    "brandName": "Intuniv",
+    "drugClass": "Antihypertensive/antipsychotic"
+  },
+  {
+    "genericName": "Amiodarone",
+    "brandName": "Cordarone, Pacerone",
+    "drugClass": "Antiarrhythmic"
+  },
+  {
+    "genericName": "Sotalol Hydrochloride",
+    "brandName": "Betapace",
+    "drugClass": "Antiarrhythmic"
+  },
+  {
+    "genericName": "Digoxin",
+    "brandName": "Lanoxin, Digitek",
+    "drugClass": "Inotropic agent"
+  },
+  {
+    "genericName": "Modafinil",
+    "brandName": "Provigil",
+    "drugClass": "Pseudosympathomimetic"
+  }
+]
+}
