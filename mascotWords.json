@@ -1,0 +1,56 @@
+{
+    "correctAnswerResponses": [
+        "Nice Job!",
+        "Woo hoo!",
+        "Awesome",
+        "Sweet!",
+        "Your killing it!",
+        "Hell yeah!",
+        "Dope. Hella Dope",
+        "Fish",
+        "I'll drink to that!",
+        "That's what I'm talking about",
+        "Git er done!",
+        "Yeah, you got this!",
+        "Oh yeah!",
+        "Excellent!",
+        "Fantastic, nice work!",
+        "Now your getting it!"
+    ],
+
+    "incorrectAnswerResponses":[
+        "Boo!",
+        "I'm not angry. Just disappointed",
+        "Sigh...","WTF?! Seriously?",
+        "C'mon are you even trying?",
+        "Yeesh, don't quit your day job.",
+        "Uh yeah... no",
+        "Honestly, I'm embarassed for you",
+        "That's.... not quite right",
+        "You can do it! I beleive in you!",
+        "You'll get it next time",
+        "It's tough. I know. Your studying for a reason",
+        "If it was easy, everyone would do it",
+        "Don't stress. It happens.",
+        "Keep at it, you'll get it.",
+        "Nothing worth while is easy",
+        "I know you can do it. Just focus!",
+        "Beleive in the me that beleives in you!",
+        "This thing we call failure is not the falling down, but the staying down"
+    ],
+
+    "streak_1_responses": [
+        "Wow, that's amazing",
+        "You're really getting good at this",
+        "Holy cow, what a streak!",
+        "I'm legit impressed",
+        "Are you cheating? You're too good!"
+    ],
+
+    "streak_2_responses": [
+        "Yeah, I think your probably ready",
+        "Absolutely crushing it...",
+        "Your some kind of wonder!",
+        "Brings tear to my eye, so beautiful"
+    ]
+}

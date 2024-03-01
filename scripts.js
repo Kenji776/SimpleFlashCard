@@ -375,9 +375,9 @@ function generateDeckFromData(shuffleConfig=new ShuffleDeckConfig()){
                 let thisGroupCards = groups.hasOwnProperty(thisCard[shuffleConfig.options.groupBy]) ? groups[thisCard[shuffleConfig.options.groupBy]] : [];
                 
                 if(thisCard[shuffleConfig.options.groupBy] === undefined){
-                    console.log('------------------------- Card has undefined value for: ' + shuffleConfig.options.groupBy);
-                    console.log(thisCard);
+                    mascotSay('There is some bad data in the card set. This drug has an undefined group!','confused');
                 }
+
                 thisGroupCards.push(thisCard);
                 groups[thisCard[shuffleConfig.options.groupBy]] = thisGroupCards;
 
@@ -390,6 +390,8 @@ function generateDeckFromData(shuffleConfig=new ShuffleDeckConfig()){
                     let thisGroupCorrectAnswers = [];
                     //first generate list of correct options
                     for(let thisAnswer in groups[groupName]){
+
+                        if (thisGroupCorrectAnswers.some(e => e.value === groups[groupName][thisAnswer][answerValueProperty])) continue; //dont include duplicates
                         let thisOption = {
                             value: groups[groupName][thisAnswer][answerValueProperty],
                             label: groups[groupName][thisAnswer][answerLabelProperty]
