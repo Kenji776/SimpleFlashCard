@@ -1136,452 +1136,452 @@
     {
     "genericName": "Butalbital, Acetaminophen & Caffeine",
     "brandName": "Fioricet",
-    "drugClass": "Analgesic"
+    "drugClassName": "Analgesic"
   },
   {
     "genericName": "Tramadol Hydrochloride",
     "brandName": "Ultram, Ultram ER",
-    "drugClass": "Analgesic"
+    "drugClassName": "Analgesic"
   },
   {
     "genericName": "Alprazolam",
     "brandName": "Xanax (XR)",
-    "drugClass": "Antianxiety agent"
+    "drugClassName": "Antianxiety agent"
   },
   {
     "genericName": "Buspirone Hydrochloride",
     "brandName": "BuSpar",
-    "drugClass": "Antianxiety agent"
+    "drugClassName": "Antianxiety agent"
   },
   {
     "genericName": "Diazepam",
     "brandName": "Valium",
-    "drugClass": "Antianxiety agent"
+    "drugClassName": "Antianxiety agent"
   },
   {
     "genericName": "Lorazepam",
     "brandName": "Ativan",
-    "drugClass": "Antianxiety agent"
+    "drugClassName": "Antianxiety agent"
   },
   {
     "genericName": "Rizatriptan Benzoate",
     "brandName": "Maxalt",
-    "drugClass": "Antimigrainous agent"
+    "drugClassName": "Antimigrainous agent"
   },
   {
     "genericName": "Sumatriptan Succinate",
     "brandName": "Imitrex",
-    "drugClass": "Antimigrainous agent"
+    "drugClassName": "Antimigrainous agent"
   },
   {
     "genericName": "Baclofen",
     "brandName": "Lioresal",
-    "drugClass": "Muscle relaxant"
+    "drugClassName": "Muscle relaxant"
   },
   {
     "genericName": "Carisoprodol",
     "brandName": "Soma",
-    "drugClass": "Muscle relaxant"
+    "drugClassName": "Muscle relaxant"
   },
   {
     "genericName": "Cyclobenzaprine Hydrochloride",
     "brandName": "Amrix, Flexeril, Fexmid",
-    "drugClass": "Muscle relaxant"
+    "drugClassName": "Muscle relaxant"
   },
   {
     "genericName": "Methocarbamol",
     "brandName": "Robaxin",
-    "drugClass": "Muscle relaxant"
+    "drugClassName": "Muscle relaxant"
   },
   {
     "genericName": "Tizanidine Hydrochloride",
     "brandName": "Zanaflex",
-    "drugClass": "Muscle relaxant"
+    "drugClassName": "Muscle relaxant"
   },
   {
     "genericName": "Acetaminophen with Codeine Phosphate",
     "brandName": "Tylenol (with Codeine)",
-    "drugClass": "Opioid analgesic"
+    "drugClassName": "Opioid analgesic"
   },
   {
     "genericName": "Fentanyl (Transdermal)",
     "brandName": "Duragesic",
-    "drugClass": "Opioid analgesic"
+    "drugClassName": "Opioid analgesic"
   },
   {
     "genericName": "Hydrocodone Bitartrate with Acetaminophen",
     "brandName": "Lortab, Vicodin, Norco",
-    "drugClass": "Opioid analgesic"
+    "drugClassName": "Opioid analgesic"
   },
   {
     "genericName": "Hydromorphone Hydrochloride",
     "brandName": "Dilaudid",
-    "drugClass": "Opioid analgesic"
+    "drugClassName": "Opioid analgesic"
   },
   {
     "genericName": "Methadone Hydrochloride",
     "brandName": "Methadose",
-    "drugClass": "Opioid analgesic"
+    "drugClassName": "Opioid analgesic"
   },
   {
     "genericName": "Morphine Sulfate (Extended Release)",
     "brandName": "MS Contin",
-    "drugClass": "Opioid analgesic"
+    "drugClassName": "Opioid analgesic"
   },
   {
     "genericName": "Oxycodone Hydrochloride",
     "brandName": "OxyContin, Roxicodone",
-    "drugClass": "Opioid analgesic"
+    "drugClassName": "Opioid analgesic"
   },
   {
     "genericName": "Oxycodone with Acetaminophen",
     "brandName": "Percocet, Roxicet, Endocet",
-    "drugClass": "Opioid analgesic"
+    "drugClassName": "Opioid analgesic"
   },
   {
     "genericName": "Naltrexone Hydrochloride",
     "brandName": "ReVia, Vivitrol",
-    "drugClass": "Opioid antagonist"
+    "drugClassName": "Opioid antagonist"
   },
   {
     "genericName": "Buprenorphine with Naloxone",
     "brandName": "Suboxone",
-    "drugClass": "Opioid dependence agent"
+    "drugClassName": "Opioid dependence agent"
   },
   {
     "genericName": "Eszopiclone",
     "brandName": "Lunesta",
-    "drugClass": "Sedative"
+    "drugClassName": "Sedative"
   },
   {
     "genericName": "Temazepam",
     "brandName": "Restoril",
-    "drugClass": "Sedative"
+    "drugClassName": "Sedative"
   },
   {
     "genericName": "Zaleplon",
     "brandName": "Sonata",
-    "drugClass": "Sedative"
+    "drugClassName": "Sedative"
   },
   {
     "genericName": "Zolpidem Tartrate",
     "brandName": "Ambien (CR)",
-    "drugClass": "Sedative"
+    "drugClassName": "Sedative"
   },
   {
     "genericName": "Nicotine",
     "brandName": "Nicotrol",
-    "drugClass": "Smoking cessation aid"
+    "drugClassName": "Smoking cessation aid"
   },
   {
     "genericName": "Varenicline Tartrate",
     "brandName": "Chantix",
-    "drugClass": "Smoking cessation aid"
+    "drugClassName": "Smoking cessation aid"
   },
   {
     "genericName": "Carbamazepine",
     "brandName": "Tegretol, Tegretol XR, Carbatrol ER, Equetrol ER",
-    "drugClass": "Anticonvulsant"
+    "drugClassName": "Anticonvulsant"
   },
   {
     "genericName": "Levetiracetam",
     "brandName": "Keppra",
-    "drugClass": "Anticonvulsant"
+    "drugClassName": "Anticonvulsant"
   },
   {
     "genericName": "Phenobarbital",
     "brandName": "---",
-    "drugClass": "Anticonvulsant"
+    "drugClassName": "Anticonvulsant"
   },
   {
     "genericName": "Pregabalin",
     "brandName": "Lyrica",
-    "drugClass": "Anticonvulsant / Antineuralgic"
+    "drugClassName": "Anticonvulsant / Antineuralgic"
   },
   {
     "genericName": "Divalproex Sodium",
     "brandName": "Depakote, Depakote ER",
-    "drugClass": "Anticonvulsant / antipsychotic"
+    "drugClassName": "Anticonvulsant / antipsychotic"
   },
   {
     "genericName": "Gabapentin",
     "brandName": "Neurontin",
-    "drugClass": "Anticonvulsant/antineuralgic"
+    "drugClassName": "Anticonvulsant/antineuralgic"
   },
   {
     "genericName": "Amitriptyline Hydrochloride",
     "brandName": "Elavil",
-    "drugClass": "Antidepressant"
+    "drugClassName": "Antidepressant"
   },
   {
     "genericName": "Bupropion Hydrochloride",
     "brandName": "Wellbutrin, Zyban",
-    "drugClass": "Antidepressant"
+    "drugClassName": "Antidepressant"
   },
   {
     "genericName": "Citalopram Hydrobromide",
     "brandName": "Celexa",
-    "drugClass": "Antidepressant"
+    "drugClassName": "Antidepressant"
   },
   {
     "genericName": "Desvenlafaxine",
     "brandName": "Pristiq",
-    "drugClass": "Antidepressant"
+    "drugClassName": "Antidepressant"
   },
   {
     "genericName": "Doxepin Hydrochloride",
     "brandName": "Sinequan",
-    "drugClass": "Antidepressant"
+    "drugClassName": "Antidepressant"
   },
   {
     "genericName": "Duloxetine Hydrochloride",
     "brandName": "Cymbalta",
-    "drugClass": "Antidepressant"
+    "drugClassName": "Antidepressant"
   },
   {
     "genericName": "Escitalopram Oxalate",
     "brandName": "Lexapro",
-    "drugClass": "Antidepressant"
+    "drugClassName": "Antidepressant"
   },
   {
     "genericName": "Fluoxetine Hydrochloride",
     "brandName": "Prozac, Sarafem",
-    "drugClass": "Antidepressant"
+    "drugClassName": "Antidepressant"
   },
   {
     "genericName": "Mirtazapine",
     "brandName": "Remeron",
-    "drugClass": "Antidepressant"
+    "drugClassName": "Antidepressant"
   },
   {
     "genericName": "Nortriptyline Hydrochloride",
     "brandName": "Pamelor",
-    "drugClass": "Antidepressant"
+    "drugClassName": "Antidepressant"
   },
   {
     "genericName": "Paroxetine Hydrochloride",
     "brandName": "Paxil, Paxil XR, Pexeva",
-    "drugClass": "Antidepressant"
+    "drugClassName": "Antidepressant"
   },
   {
     "genericName": "Sertraline hydrochloride",
     "brandName": "Zoloft",
-    "drugClass": "Antidepressant"
+    "drugClassName": "Antidepressant"
   },
   {
     "genericName": "Trazodone Hydrochloride",
     "brandName": "Desyrel",
-    "drugClass": "Antidepressant"
+    "drugClassName": "Antidepressant"
   },
   {
     "genericName": "Venlafaxine Hydrochloride",
     "brandName": "Effexor, Effexor XR",
-    "drugClass": "Antidepressant"
+    "drugClassName": "Antidepressant"
   },
   {
     "genericName": "Vilazodone Hydrochloride",
     "brandName": "Viibryd",
-    "drugClass": "Antidepressant"
+    "drugClassName": "Antidepressant"
   },
   {
     "genericName": "Vortioxetine",
     "brandName": "Trintellix",
-    "drugClass": "Antidepressant"
+    "drugClassName": "Antidepressant"
   },
   {
     "genericName": "Clonazepam",
     "brandName": "Klonopin",
-    "drugClass": "Antiepileptic"
+    "drugClassName": "Antiepileptic"
   },
   {
     "genericName": "Lamotrigine",
     "brandName": "Lamictal, Lamictal XR, Lamictal ODT",
-    "drugClass": "Antiepileptic"
+    "drugClassName": "Antiepileptic"
   },
   {
     "genericName": "Oxcarbazepine",
     "brandName": "Trileptal, Oxtellar XR",
-    "drugClass": "Antiepileptic"
+    "drugClassName": "Antiepileptic"
   },
   {
     "genericName": "Phenytoin Sodium (Extended)",
     "brandName": "Dilantin",
-    "drugClass": "Antiepileptic"
+    "drugClassName": "Antiepileptic"
   },
   {
     "genericName": "Primidone",
     "brandName": "Mysoline",
-    "drugClass": "Antiepileptic"
+    "drugClassName": "Antiepileptic"
   },
   {
     "genericName": "Topiramate",
     "brandName": "Topamax, Trokendi XR",
-    "drugClass": "Antiepileptic"
+    "drugClassName": "Antiepileptic"
   },
   {
     "genericName": "Aripiprazole",
     "brandName": "Abilify",
-    "drugClass": "Antipsychotic"
+    "drugClassName": "Antipsychotic"
   },
   {
     "genericName": "Clozapine",
     "brandName": "Clozaril",
-    "drugClass": "Antipsychotic"
+    "drugClassName": "Antipsychotic"
   },
   {
     "genericName": "Haloperidol",
     "brandName": "Haldol",
-    "drugClass": "Antipsychotic"
+    "drugClassName": "Antipsychotic"
   },
   {
     "genericName": "Lithium Carbonate",
     "brandName": "Lithonate, Lithotabs, Lithobid",
-    "drugClass": "Antipsychotic"
+    "drugClassName": "Antipsychotic"
   },
   {
     "genericName": "Lurasidone Hydrochloride",
     "brandName": "Latuda",
-    "drugClass": "Antipsychotic"
+    "drugClassName": "Antipsychotic"
   },
   {
     "genericName": "Olanzapine",
     "brandName": "Zyprexa",
-    "drugClass": "Antipsychotic"
+    "drugClassName": "Antipsychotic"
   },
   {
     "genericName": "Paliperidone",
     "brandName": "Invega",
-    "drugClass": "Antipsychotic"
+    "drugClassName": "Antipsychotic"
   },
   {
     "genericName": "Quetiapine Fumarate",
     "brandName": "Seroquel",
-    "drugClass": "Antipsychotic"
+    "drugClassName": "Antipsychotic"
   },
   {
     "genericName": "Risperidone",
     "brandName": "Risperdal",
-    "drugClass": "Antipsychotic"
+    "drugClassName": "Antipsychotic"
   },
   {
     "genericName": "Ziprasidone Hydrochloride",
     "brandName": "Geodon",
-    "drugClass": "Antipsychotic"
+    "drugClassName": "Antipsychotic"
   },
   {
     "genericName": "Fluvoxamine Maleate",
     "brandName": "Luvox",
-    "drugClass": "CNS Agent for OCD"
+    "drugClassName": "CNS Agent for OCD"
   },
   {
     "genericName": "Isosorbide Mononitrate",
     "brandName": "Imdur",
-    "drugClass": "Antianginal"
+    "drugClassName": "Antianginal"
   },
   {
     "genericName": "Nitroglycerin (Sublingual and Injectable)",
     "brandName": "Nitrostat, Nitroquick",
-    "drugClass": "Antianginal"
+    "drugClassName": "Antianginal"
   },
   {
     "genericName": "Ranolazine",
     "brandName": "Ranexa",
-    "drugClass": "Antianginal"
+    "drugClassName": "Antianginal"
   },
   {
     "genericName": "Amlodipine Besylate",
     "brandName": "Norvasc",
-    "drugClass": "Antihypertensive"
+    "drugClassName": "Antihypertensive"
   },
   {
     "genericName": "Amlodipine Besylate with Benazepril Hydrochloride",
     "brandName": "Lotrel",
-    "drugClass": "Antihypertensive"
+    "drugClassName": "Antihypertensive"
   },
   {
     "genericName": "Atenolol",
     "brandName": "Tenormin",
-    "drugClass": "Antihypertensive"
+    "drugClassName": "Antihypertensive"
   },
   {
     "genericName": "Bisoprolol Fumarate with Hydrochlorothiazide",
     "brandName": "Ziac",
-    "drugClass": "Antihypertensive"
+    "drugClassName": "Antihypertensive"
   },
   {
     "genericName": "Carvedilol",
     "brandName": "Coreg, Coreg CR",
-    "drugClass": "Antihypertensive"
+    "drugClassName": "Antihypertensive"
   },
   {
     "genericName": "Clonidine Hydrochloride",
     "brandName": "Catapres, Nexiclon XR, Kapvay",
-    "drugClass": "Antihypertensive"
+    "drugClassName": "Antihypertensive"
   },
   {
     "genericName": "Hydralazine Hydrochloride",
     "brandName": "Apresoline",
-    "drugClass": "Antihypertensive"
+    "drugClassName": "Antihypertensive"
   },
   {
     "genericName": "Labetalol Hydrochloride",
     "brandName": "Normodyne, Trandate",
-    "drugClass": "Antihypertensive"
+    "drugClassName": "Antihypertensive"
   },
   {
     "genericName": "Metoprolol Succinate",
     "brandName": "Toprol-XL",
-    "drugClass": "Antihypertensive"
+    "drugClassName": "Antihypertensive"
   },
   {
     "genericName": "Metoprolol Tartrate",
     "brandName": "Lopressor",
-    "drugClass": "Antihypertensive"
+    "drugClassName": "Antihypertensive"
   },
   {
     "genericName": "Nebivolol Hydrochloride",
     "brandName": "Bystolic",
-    "drugClass": "Antihypertensive"
+    "drugClassName": "Antihypertensive"
   },
   {
     "genericName": "Prazosin Hydrochloride",
     "brandName": "Minipress",
-    "drugClass": "Antihypertensive"
+    "drugClassName": "Antihypertensive"
   },
   {
     "genericName": "Propranolol Hydrochloride",
     "brandName": "Inderal (LA), Innopran XL",
-    "drugClass": "Antihypertensive"
+    "drugClassName": "Antihypertensive"
   },
   {
     "genericName": "Terazosin Hydrochloride",
     "brandName": "Hytrin",
-    "drugClass": "Antihypertensive"
+    "drugClassName": "Antihypertensive"
   },
   {
     "genericName": "Guanfacine Hydrochloride",
     "brandName": "Intuniv",
-    "drugClass": "Antihypertensive/antipsychotic"
+    "drugClassName": "Antihypertensive/antipsychotic"
   },
   {
     "genericName": "Amiodarone",
     "brandName": "Cordarone, Pacerone",
-    "drugClass": "Antiarrhythmic"
+    "drugClassName": "Antiarrhythmic"
   },
   {
     "genericName": "Sotalol Hydrochloride",
     "brandName": "Betapace",
-    "drugClass": "Antiarrhythmic"
+    "drugClassName": "Antiarrhythmic"
   },
   {
     "genericName": "Digoxin",
     "brandName": "Lanoxin, Digitek",
-    "drugClass": "Inotropic agent"
+    "drugClassName": "Inotropic agent"
   },
   {
     "genericName": "Modafinil",
     "brandName": "Provigil",
-    "drugClass": "Pseudosympathomimetic"
+    "drugClassName": "Pseudosympathomimetic"
   }
 ]
 }

@@ -345,6 +345,7 @@ class Card {
         this.points = 1; //number of points this question is worth
         this.hint = '' //text hint string to present to user
         this.options = []; //array of option value objects. Each option should have a 'value' and a 'label' property.
+        this.allValidAnswers = [];
 
         if(typeof constructorData === 'object'){
             for (var k in this) if (constructorData[k] != undefined) this[k] = constructorData[k];
@@ -366,12 +367,17 @@ function generateDeckFromData(shuffleConfig=new ShuffleDeckConfig()){
 
             let answerLabelProperty = shuffleConfig.options.answerLabelProperty;
             let answerValueProperty = shuffleConfig.options.answerValueProperty;
-            console.log('Shuffling Deck. Grouping by: ' + shuffleConfig.groupBy);
+            console.log('Shuffling Deck. Grouping by: ' + shuffleConfig.options.groupBy);
 
             let groups = {};
             //group our cards by the desired key
             for(let thisCard of shuffleConfig.sourceDeckConfig.cards){
                 let thisGroupCards = groups.hasOwnProperty(thisCard[shuffleConfig.options.groupBy]) ? groups[thisCard[shuffleConfig.options.groupBy]] : [];
+                
+                if(thisCard[shuffleConfig.options.groupBy] === undefined){
+                    console.log('------------------------- Card has undefined value for: ' + shuffleConfig.options.groupBy);
+                    console.log(thisCard);
+                }
                 thisGroupCards.push(thisCard);
                 groups[thisCard[shuffleConfig.options.groupBy]] = thisGroupCards;
 
@@ -379,10 +385,7 @@ function generateDeckFromData(shuffleConfig=new ShuffleDeckConfig()){
 
             //if building a multiple choice deck...
             if(shuffleConfig.options.deckType = 'multiple-choice'){
-                
-                console.log('------------- Groups Data');
-                console.log(groups);
-                
+                                
                 for(let groupName in groups){
                     let thisGroupCorrectAnswers = [];
                     //first generate list of correct options
@@ -394,17 +397,16 @@ function generateDeckFromData(shuffleConfig=new ShuffleDeckConfig()){
                         thisGroupCorrectAnswers.push(thisOption);
                     }
 
-                    console.log('All Option Answers For: ' + groupName);
-                    console.log(thisGroupCorrectAnswers);
 
                     //construct our answer array
                     let allOptionsArray = [];
                     let correctAnswerIndexes = [];
+                    let allValidAnswers = JSON.parse(JSON.stringify(thisGroupCorrectAnswers));
 
                     while(true) {
                         //decide if we get a correct anwer by 'flipping a coin' and by ensuring there is a correct answer left to get from the source array.
                         let getCorrectAnswer = randomIntFromInterval(0,1) == 1 && thisGroupCorrectAnswers.length > 0 ? true : false;
-                        console.log('getCorrectAnswer: ' + getCorrectAnswer);
+                 
                         if(getCorrectAnswer){
                             //get the index of a random card in the correct answers stack
                             let index = randomIntFromInterval(0,thisGroupCorrectAnswers.length-1);
@@ -447,9 +449,6 @@ function generateDeckFromData(shuffleConfig=new ShuffleDeckConfig()){
                             
                         }
 
-                        console.log('Added options to select list');
-                        console.log(allOptionsArray[allOptionsArray.length-1]);
-                    
 
                         //check all conditions to see if we should stop adding answers
                         if(allOptionsArray.length >= shuffleConfig.options.maxAnswerOptions && correctAnswerIndexes.length > 0){
@@ -463,11 +462,9 @@ function generateDeckFromData(shuffleConfig=new ShuffleDeckConfig()){
                         points: 1,
                         hint: 'There are ' + correctAnswerIndexes.length + ' correct answers',
                         options: allOptionsArray,
-                        correctAnswerValues: correctAnswerIndexes
+                        correctAnswerValues: correctAnswerIndexes,
+                        allValidAnswers: allValidAnswers
                     });
-
-                    console.log('Pushing new card to array');
-                    console.log(newCard);
 
                     newCards.push(newCard);
                 }
@@ -1477,7 +1474,7 @@ function resetHistory(){
 }
 
 function handleError(e, customMessage){
-    let message = customMessage ? customMessage : e.message();
+    let message = customMessage ? customMessage : e.message;
 
     console.error('Error in application!')
     console.log(e.message);
