@@ -126,10 +126,18 @@ ui.setContent = function(elements,content){
 }
 
 ui.addClass = function(elements,className){
+
+    console.log('Add class called. Adding class ' + className + ' to elements');
+    console.log(elements);
+    
     let elementsList = [];
     if(typeof elements === 'string') elementsList = elementsList.concat(elements.split(','));
     else if(isArray(elements)) elementsList = elements;
     for(let element of elementsList){
+
+        console.log('Adding class to element');
+        console.log(element);
+
         thisElement = element;
         if(typeof element === 'string') thisElement = ui.getElements(element)[0];
         thisElement.classList.add(className);

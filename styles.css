@@ -630,7 +630,15 @@ input[type=button]:disabled,button[disabled],button:disabled{
      transform: translate(-50%, -50%);
      animation: appear 0.8s;
 }
- @keyframes appear {
+.question-container{
+    text-align:left;
+}
+
+.correct-answer{
+    color: #04AA6D;
+}
+
+@keyframes appear {
      0% {
          transform: translate(-50%, -50%) scale(0);
          background-color: #fff;
@@ -713,6 +721,9 @@ input[type=button]:disabled,button[disabled],button:disabled{
 }
  .incorrect-anwer-image{
      background-image: url("media/shibaSad.png");
+}
+.confused-image{
+    background-image: url("media/shibaConfused.png");
 }
  .bubble {
      position: absolute;

@@ -34,10 +34,10 @@
 				</div>
                 <div>
                     <label for="card-deck">Card Deck:</label><br/>
-                    <select name="card-deck" id="card-deck" onchange="loadDeck(this.value)">
+                    <select name="card-deck" id="card-deck" onchange="handleSetSelectedDeck(this.value)">
                         <option value="none" selected>Select A Card Deck</option>
                     </select>
-					<input type="button" onclick="loadDeck()" value="Load Deck" title="Load Deck"/>
+					<input type="button" onclick="handleLoadDeckSelect()" value="Load Deck" title="Load Deck"/>
                 </div>
 
 				<div id="deck-controls">
@@ -128,6 +128,23 @@
 							onchange="setPromptKey(this.value)">
 						</select>
 					</div>
+
+					<div class="spacer"></div>
+					
+					<div>
+						<label for="load-variant-select">Load Variant Deck</label>
+						<select 
+							onchange="handleSetSelectedVariant(this.value)" 
+							name="load-variant-select" 
+							id="load-variant-select"
+							data-option-key="deckOptions.load-variant-select"
+							data-persistent="true">
+
+							<option value="none" selected>Default</option>
+
+						</select>
+						<input type="button" onclick="loadVariantDeck()" value="Load Variant Deck" title="Load Variant Deck"/>
+					</div>				
                 
 					<!--
 						<br/>
@@ -300,7 +317,8 @@
 					<input type="button" class="big-button" id="prev-button" onclick="loadPrev()" data-default-value="&#8592; Previous" value="&#8592; Previous" ></input>
 					<input type="button" class="big-button" id="clue-button" onclick="showClue()" value="Hint (H)"></input>
 					<img src="media/flip.png" onclick="showAnswer()" id="flip-button" />
-					<input type="button" class="big-button" id="next-letter-button" onclick="showNextHintLetter()" data-default-value="Next Letter &#8595;" value="Next Letter &#8595;"></input>
+					<input type="button" class="big-button" id="next-letter-button" onclick="performHintAction()" data-default-value="Next Letter &#8595;" value="Next Letter &#8595;"></input>
+					<input type="button" class="big-button" id="next-answer-button" onclick="performHintAction()" data-default-value="Next Answer  &#8595;" value="Next Answer &#8595;"></input>
 					<input type="button" class="big-button" id="next-button" onclick="loadNext()"value="Next &#8594;"></input>
 					
 				</div>
