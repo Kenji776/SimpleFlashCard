@@ -84,9 +84,10 @@ const Mascot = class {
         this.registerMascotEventHandlers();
         this.preloadMascotImages();
         this.registerMascotRandomEventTimer();
+        this.registerMascotIdleTimer();
 
         this.setMood('happy');
-        this.say('Hello!');
+        this.sayRandom('greeting');
     }
 
 

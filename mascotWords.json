@@ -133,5 +133,12 @@
         "Stop touching me",
         "Ouch. What the fuck?",
         "Fuck off"
+    ],
+
+    "greeting":[
+        "Hello!",
+        "Hey There!",
+        "Welcome!",
+        "Lets get studying!"
     ]
 }
