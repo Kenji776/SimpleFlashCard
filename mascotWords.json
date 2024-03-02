@@ -140,5 +140,22 @@
         "Hey There!",
         "Welcome!",
         "Lets get studying!"
+    ],
+
+    "idle_start":[
+        "Are you there?",
+        "Hello, anyone there?",
+        "Where did you go?",
+        "Get back here and study!",
+        "Taking a break?"
+    ],
+
+    "idle_stop":[
+        "Welcome back!",
+        "There you are!",
+        "Lets get back to it",
+        "Glad you made it back"
     ]
+
+    
 }

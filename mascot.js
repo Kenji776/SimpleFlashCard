@@ -37,6 +37,8 @@ const Mascot = class {
     idleSeconds = 0;  //internal timer that keeps track of how long the user has been idle
     idleTimer;        //container for idle timer
     idleChatInterval; //how long user must be idle for chat message to appear
+    idleThesholdSeconds = 20;
+    userIsIdle = false;
 
     //random event loop variables
     randomEventLoop;
@@ -85,6 +87,7 @@ const Mascot = class {
         this.preloadMascotImages();
         this.registerMascotRandomEventTimer();
         this.registerMascotIdleTimer();
+        this.registerMascotIdleChat();
 
         this.setMood('happy');
         this.sayRandom('greeting');
@@ -101,22 +104,37 @@ const Mascot = class {
 
     registerMascotIdleTimer(){
         this.idleSeconds = 0;
-        window.onload = resetTimer;
+        window.onload = this.resetIdleTimer();
         // DOM Events
-        document.onload = resetTimer;
-        document.onmousemove = resetTimer;
-        document.onmousedown = resetTimer; // touchscreen presses
-        document.ontouchstart = resetTimer;
-        document.onclick = resetTimer;     // touchpad clicks
-        document.onkeydown = resetTimer;   // onkeypress is deprectaed
-    
-        function resetTimer() {
-            this.idleSeconds = 0;
-            clearTimeout(idleTimer);
-            this.idleTimer = setInterval(function(){
-                this.idleSeconds++;
-            }, 1000)
+        document.onload = this.resetIdleTimer();;
+        document.onmousemove = this.resetIdleTimer();;
+        document.onmousedown = this.resetIdleTimer();; // touchscreen presses
+        document.ontouchstart = this.resetIdleTimer();;
+        document.onclick = this.resetIdleTimer();;     // touchpad clicks
+        document.onkeydown = this.resetIdleTimer();;   // onkeypress is deprectaed
+
+        this.resetIdleTimer();
+    }
+
+    resetIdleTimer(){
+        console.log('Idle timer started')
+
+        if(this.userIsIdle){
+            this.sayRandom('idle_stop');
         }
+        this.idleSeconds = 0;
+        this.userIsIdle = false;
+        if(this.idleTimer) clearTimeout(this.idleTimer);
+        this.idleTimer = setInterval(function(scope){
+            scope.idleSeconds++;
+            console.log('Idle seconds is now: ' + scope.idleSeconds);
+
+            if(scope.idleSeconds > scope.idleThesholdSeconds) {
+                console.log('User is now idle');
+                scope.userIsIdle = true;
+                scope.sayRandom('idle_start');
+            }
+        }, 1000, this)
     }
 
     registerMascotRandomEventTimer(){
@@ -135,17 +153,22 @@ const Mascot = class {
 
     registerMascotIdleChat(){
         console.log('\n\n\n------------------- Registering Mascot Idle Chat Loop');
-        if(!mascotWords.hasOwnProperty('idle_chat')) {
+        if(!this.words.hasOwnProperty('idle_chat')) {
             console.log('No idle chat words in library. Aborting')
             return;
         }
     
         console.log('Registered idle chat loop');
-        idleChatInterval = setInterval(function(){
-            if(idleSeconds >= 10){
-                this.sayRandom('idle_chat');
+
+        this.idleChatInterval = setInterval(function(scope){
+            let randomChance = Math.floor(Math.random() * 101);
+
+            console.log('Idle chat loop checking idle times: ' + scope.idleSeconds + ' random chance value is: '+randomChance);
+            
+            if(scope.userIsIdle && randomChance > 10){          
+                scope.sayRandom('idle_chat');
             }
-        },10000);
+        },1000,this);
     }
 
     randomEvent(){
