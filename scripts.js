@@ -29,6 +29,7 @@ var answerResults = [];
 var autoLoadNextCardOnAnswer = true;
 var selectedVariantDeck = '';
 var mascotWords = {};
+var mascotLeaveLimit = 15;
 
 //final score tally objects
 var scoreTally = {
@@ -466,7 +467,7 @@ function generateDeckFromData(shuffleConfig=new ShuffleDeckConfig()){
 
 
                         //check all conditions to see if we should stop adding answers
-                        if(allOptionsArray.length >= shuffleConfig.options.maxAnswerOptions && correctAnswerIndexes.length > 0){
+                        if( allOptionsArray.length >= shuffleConfig.options.maxAnswerOptions){
                             break;
                         }
                     }
@@ -768,7 +769,7 @@ function recordQuestionResponse(card,givenAnswers,correctAnswers,awardedPoints){
         performance.streak = 0;
         incorrectAnswerAlert();
 
-        if(performance.missStreak >= 10){
+        if(performance.missStreak >= mascotLeaveLimit){
             setTimeout(function(){
                 console.log('Mascot is leaving!')
                 ui.hideElements('mascot-response-container')
@@ -915,7 +916,7 @@ function getIncorrectAnswerText(){
 
     console.log('------------------------------------------------- Getting saying for performance missStreak: ' + performance.missStreak);
 
-    if(performance.missStreak >= 10){
+    if(performance.missStreak >= mascotLeaveLimit){
         wordsToUse = 'leave'
     }
     else if(performance.missStreak >= 10){
