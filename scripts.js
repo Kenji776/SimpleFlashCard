@@ -767,6 +767,13 @@ function recordQuestionResponse(card,givenAnswers,correctAnswers,awardedPoints){
         performance.missStreak++;
         performance.streak = 0;
         incorrectAnswerAlert();
+
+        if(performance.missStreak >= 10){
+            setTimeout(function(){
+                console.log('Mascot is leaving!')
+                ui.hideElements('mascot-response-container')
+            },2000);
+        }
         
     }
     if(autoLoadNextCardOnAnswer) loadNext();
@@ -909,6 +916,9 @@ function getIncorrectAnswerText(){
     console.log('------------------------------------------------- Getting saying for performance missStreak: ' + performance.missStreak);
 
     if(performance.missStreak >= 10){
+        wordsToUse = 'leave'
+    }
+    else if(performance.missStreak >= 10){
         wordsToUse = 'fail_streak_2_responses';
     }else if(performance.missStreak >= 5){
         wordsToUse = 'fail_streak_1_responses';
