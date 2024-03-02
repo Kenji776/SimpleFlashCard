@@ -37,7 +37,7 @@ const Mascot = class {
     idleSeconds = 0;  //internal timer that keeps track of how long the user has been idle
     idleTimer;        //container for idle timer
     idleChatInterval; //how long user must be idle for chat message to appear
-    idleThesholdSeconds = 5; //how long with no user interation before we consider them idle
+    idleThesholdSeconds =20; //how long with no user interation before we consider them idle
     idleChatCooldownSeconds = 5; //minimum amount of time between idle chat messages
     idleChatRandomChance = 10; //odds of random chat being sent (out of 100) if cooldown is met
     lastIdleChatSent = 0 //when was the idle last chat sent?
@@ -92,6 +92,7 @@ const Mascot = class {
         this.registerMascotRandomEventTimer();
         this.registerMascotIdleTimer();
         this.registerMascotIdleChat();
+        this.registerMascotHotkeys();
 
         this.setMood('happy');
         this.sayRandom('greeting');
@@ -101,8 +102,6 @@ const Mascot = class {
     async loadMascotWords(){
         let mascotWordsData = await fetch(`${this.urls.wordsLibrary}?cache-invalidate=${Date.now()}`, {cache: "no-store"});
         let words =  await mascotWordsData.json();
-        console.log('Loaded mascot words');
-        console.log(words);
         return words;
     }
 
@@ -114,6 +113,7 @@ const Mascot = class {
                 this.resetIdleTimer();
             }.bind(this));
         }
+        this.resetIdleTimer();
     }
 
     resetIdleTimer(){
@@ -146,10 +146,22 @@ const Mascot = class {
     }
 
     registerMascotEventHandlers(){
-
         this.mascotDiv.addEventListener('click', function() {
             this.setMood('angry')
             this.sayRandom('clicked');
+        }.bind(this));
+    }
+
+    registerMascotHotkeys(){
+        document.addEventListener('keydown', function(e) {
+            e = e || window.event;
+            // use e.keyCode
+            console.log(e.keyCode);
+            
+            if (e.keyCode == '70') {
+                this.fart();
+                e.preventDefault();
+            }
         }.bind(this));
     }
 
@@ -174,7 +186,6 @@ const Mascot = class {
 
     randomEvent(){
         let eventId = Math.floor(Math.random() * 101);
-        console.log('Calling random event Id: ' + eventId);
 
         if(eventId > 50){
             this.fart();
@@ -221,6 +232,7 @@ const Mascot = class {
         if(resetToStatusAfterFart === 'fart') return;
 
         this.setMood('fart');
+        this.sayRandom('fart');
         this.playSound('fart');
 
         let fartDiv = document.createElement("div");
