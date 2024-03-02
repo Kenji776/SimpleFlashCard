@@ -30,6 +30,7 @@ var autoLoadNextCardOnAnswer = true;
 var selectedVariantDeck = '';
 var mascotWords = {};
 var mascotLeaveLimit = 15;
+var idleChatInterval;
 
 //final score tally objects
 var scoreTally = {
@@ -87,6 +88,8 @@ async function init(){
 	
     loadMascotWords();
 
+    
+
 	settingsCookie = new Cookie(settingsCookieName);
 	console.log('Settings Cookie Data');
 	console.log(settingsCookie);
@@ -117,8 +120,20 @@ async function loadCardLibrary(){
     setDeckCategories(cardLibrary);
 
     if(selectedDeckCategory) setDeckOptions(cardLibrary);
+
+    registerMascotIdleChat();
 }
-				
+		
+function registerMascotIdleChat(){
+    if(!mascotWords.hasOwnProperty('idle_chat')) return;
+    
+    console.log('Registered idle chat loop');
+    idleChatInterval = setInterval(function(){
+        console.log('Mascot performing idle chat');
+        mascotSay(mascotWords.idle_chat[Math.floor(Math.random() * mascotWords.idle_chat.length),'confused']);
+    },2000);
+}
+
 function registerKeyboardShortcuts(){
 	
 	console.log('Registering shortcut keys!');
