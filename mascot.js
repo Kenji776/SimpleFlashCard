@@ -38,8 +38,10 @@ const Mascot = class {
     idleTimer;        //container for idle timer
     idleChatInterval; //how long user must be idle for chat message to appear
     idleThesholdSeconds = 5;
-    userIsIdle = false;
+    idleChatCooldownSeconds = 5;
     idleChatRandomChance = 10;
+    lastIdleChatSent = 0
+    userIsIdle = false;
 
     //random event loop variables
     randomEventLoop;
@@ -53,7 +55,8 @@ const Mascot = class {
             confusion: 0,
             happiness: 50
         },
-        value: ''
+        value: '',
+        lastIdleChatSent: null
     }
 
 
@@ -114,7 +117,6 @@ const Mascot = class {
     }
 
     resetIdleTimer(){
-    
         if(this.userIsIdle){
             this.setMood('happy');
             this.sayRandom('idle_stop');
@@ -161,10 +163,12 @@ const Mascot = class {
             let randomChance = Math.floor(Math.random() * 101);
 
             //console.log('Idle chat loop checking idle times: ' + scope.idleSeconds + ' random chance value is: '+randomChance);
-            
-            if(scope.userIsIdle && randomChance < scope.idleChatRandomChance){          
+            let rightNow = new Date().getTime();
+
+            if(scope.userIsIdle && randomChance < scope.idleChatRandomChance && ( (rightNow-scope.lastIdleChatSent) / 1000 > scope.idleChatCooldownSeconds)){          
                 scope.setMood('happy');
                 scope.sayRandom('idle_chat');
+                scope.lastIdleChatSent = new Date().getTime(); 
             }
         },1000,this);
     }
