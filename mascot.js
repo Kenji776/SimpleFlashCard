@@ -37,8 +37,9 @@ const Mascot = class {
     idleSeconds = 0;  //internal timer that keeps track of how long the user has been idle
     idleTimer;        //container for idle timer
     idleChatInterval; //how long user must be idle for chat message to appear
-    idleThesholdSeconds = 20;
+    idleThesholdSeconds = 5;
     userIsIdle = false;
+    idleChatRandomChance = 10;
 
     //random event loop variables
     randomEventLoop;
@@ -103,36 +104,35 @@ const Mascot = class {
     }
 
     registerMascotIdleTimer(){
-        this.idleSeconds = 0;
-        window.onload = this.resetIdleTimer();
-        // DOM Events
-        document.onload = this.resetIdleTimer();;
-        document.onmousemove = this.resetIdleTimer();;
-        document.onmousedown = this.resetIdleTimer();; // touchscreen presses
-        document.ontouchstart = this.resetIdleTimer();;
-        document.onclick = this.resetIdleTimer();;     // touchpad clicks
-        document.onkeydown = this.resetIdleTimer();;   // onkeypress is deprectaed
+        let activityEvents = ['load','mousemove','mousedown','click','touchstart','keydown'];
 
-        this.resetIdleTimer();
+        for(let thisEvent of activityEvents){
+            document.addEventListener(thisEvent, function() {
+                this.resetIdleTimer();
+            }.bind(this));
+        }
     }
 
     resetIdleTimer(){
-        console.log('Idle timer started')
-
+    
         if(this.userIsIdle){
+            this.setMood('happy');
             this.sayRandom('idle_stop');
         }
+
         this.idleSeconds = 0;
         this.userIsIdle = false;
         if(this.idleTimer) clearTimeout(this.idleTimer);
         this.idleTimer = setInterval(function(scope){
             scope.idleSeconds++;
-            console.log('Idle seconds is now: ' + scope.idleSeconds);
-
+ 
             if(scope.idleSeconds > scope.idleThesholdSeconds) {
-                console.log('User is now idle');
+                if(!scope.userIsIdle){
+                    console.log('User Went Idle!');
+                    scope.setMood('confused');
+                    scope.sayRandom('idle_start');
+                }
                 scope.userIsIdle = true;
-                scope.sayRandom('idle_start');
             }
         }, 1000, this)
     }
@@ -152,20 +152,18 @@ const Mascot = class {
     }
 
     registerMascotIdleChat(){
-        console.log('\n\n\n------------------- Registering Mascot Idle Chat Loop');
         if(!this.words.hasOwnProperty('idle_chat')) {
             console.log('No idle chat words in library. Aborting')
             return;
         }
     
-        console.log('Registered idle chat loop');
-
         this.idleChatInterval = setInterval(function(scope){
             let randomChance = Math.floor(Math.random() * 101);
 
-            console.log('Idle chat loop checking idle times: ' + scope.idleSeconds + ' random chance value is: '+randomChance);
+            //console.log('Idle chat loop checking idle times: ' + scope.idleSeconds + ' random chance value is: '+randomChance);
             
-            if(scope.userIsIdle && randomChance > 10){          
+            if(scope.userIsIdle && randomChance < scope.idleChatRandomChance){          
+                scope.setMood('happy');
                 scope.sayRandom('idle_chat');
             }
         },1000,this);
@@ -181,7 +179,9 @@ const Mascot = class {
     }
 
     sayRandom(speechCategory){
-        if(this.words.hasOwnProperty(speechCategory));
+        if(!this.words.hasOwnProperty(speechCategory)){
+            console.error(`Could not find speech category ${speechCategory}. Not reading text`)
+        }
         let randomWords = this.words[speechCategory][Math.floor(Math.random() *  this.words[speechCategory].length)];
         this.say(randomWords);
     }
@@ -217,8 +217,6 @@ const Mascot = class {
         
         if(resetToStatusAfterFart === 'fart') return;
 
-        console.log('Farting...');
-
         this.setMood('fart');
         this.playSound('fart');
 
@@ -248,7 +246,6 @@ const Mascot = class {
         }
 
         let imageURL = `${this.imageBaseFolderURL}${this.moodImages[moodName]}`;
-        console.log(`Setting mascot image to: ${imageURL}`)
         this.currentStatus.value = moodName;
         this.setMascotImage(imageURL);
     }
@@ -278,9 +275,11 @@ const Mascot = class {
         }else{
             thisSound = this.audio[soundName];
         }
-        console.log('Playing sound: ' + soundName)
-        console.log(thisSound);
-        thisSound.play();
+        try{
+            thisSound.play();
+        }catch(exception){
+            console.error('Unable to play sound: ' + exception.message)
+        }
     }
 
     hide(){
