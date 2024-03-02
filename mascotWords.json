@@ -59,6 +59,12 @@
         "I uh, I think I should go."
     ],
 
+    "leave":[
+        "Yeah, I'm gonna bounce outta here. Later",
+        "I... I gotta go. You're on your own",
+        "I can't watch this anymore. I'm gonna go get drunk"
+    ],
+
     "streak_1_responses": [
         "Wow, that's amazing",
         "You're really getting good at this",
