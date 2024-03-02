@@ -140,7 +140,7 @@ ui.addClass = function(elements,className){
 
         thisElement = element;
         if(typeof element === 'string') thisElement = ui.getElements(element)[0];
-        thisElement.classList.add(className);
+        if(thisElement != null) thisElement.classList.add(className);
     }
 }
 

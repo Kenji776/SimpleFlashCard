@@ -31,6 +31,8 @@ var selectedVariantDeck = '';
 var mascotWords = {};
 var mascotLeaveLimit = 15;
 var idleChatInterval;
+var idleSeconds = 0;
+var idleTimer;
 
 //final score tally objects
 var scoreTally = {
@@ -71,6 +73,27 @@ var options = {
 	}
 }
 
+function registerInactivityTimer(){
+    idleSeconds = 0;
+    window.onload = resetTimer;
+    // DOM Events
+    document.onload = resetTimer;
+    document.onmousemove = resetTimer;
+    document.onmousedown = resetTimer; // touchscreen presses
+    document.ontouchstart = resetTimer;
+    document.onclick = resetTimer;     // touchpad clicks
+    document.onkeydown = resetTimer;   // onkeypress is deprectaed
+
+    function resetTimer() {
+        idleSeconds = 0;
+        console.log('Reset timer called');
+        clearTimeout(idleTimer);
+        idleTimer = setInterval(function(){
+            console.log('Increasing idle seconds: ' + idleSeconds);
+            idleSeconds++;
+        }, 1000)
+    }
+};
 
 
 async function init(){
@@ -88,8 +111,6 @@ async function init(){
 	
     loadMascotWords();
 
-    
-
 	settingsCookie = new Cookie(settingsCookieName);
 	console.log('Settings Cookie Data');
 	console.log(settingsCookie);
@@ -99,8 +120,7 @@ async function init(){
 	console.log('Scores Cookie Data');
 	console.log(scoresCookie);
 
-
-		
+    registerInactivityTimer();	
 }
 
 async function loadMascotWords(){
@@ -108,6 +128,9 @@ async function loadMascotWords(){
     mascotWords = await mascotWordsData.json();
     console.log('Loaded mascot words');
     console.log(mascotWords);
+
+    registerMascotIdleChat()
+
     return mascotWords;
 }
 
@@ -120,18 +143,21 @@ async function loadCardLibrary(){
     setDeckCategories(cardLibrary);
 
     if(selectedDeckCategory) setDeckOptions(cardLibrary);
-
-    registerMascotIdleChat();
 }
 		
 function registerMascotIdleChat(){
-    if(!mascotWords.hasOwnProperty('idle_chat')) return;
-    
+    console.log('\n\n\n------------------- Registering Mascot Idle Chat Loop');
+    if(!mascotWords.hasOwnProperty('idle_chat')) {
+        console.log('No idle chat words in library. Aborting')
+        return;
+    }
+
     console.log('Registered idle chat loop');
     idleChatInterval = setInterval(function(){
-        console.log('Mascot performing idle chat');
-        mascotSay(mascotWords.idle_chat[Math.floor(Math.random() * mascotWords.idle_chat.length),'confused']);
-    },2000);
+        if(idleSeconds >= 10){
+            mascotSay(mascotWords.idle_chat[Math.floor(Math.random() * mascotWords.idle_chat.length)],'confused');
+        }
+    },10000);
 }
 
 function registerKeyboardShortcuts(){
