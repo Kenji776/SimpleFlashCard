@@ -37,11 +37,11 @@ const Mascot = class {
     idleSeconds = 0;  //internal timer that keeps track of how long the user has been idle
     idleTimer;        //container for idle timer
     idleChatInterval; //how long user must be idle for chat message to appear
-    idleThesholdSeconds = 5;
-    idleChatCooldownSeconds = 5;
-    idleChatRandomChance = 10;
-    lastIdleChatSent = 0
-    userIsIdle = false;
+    idleThesholdSeconds = 5; //how long with no user interation before we consider them idle
+    idleChatCooldownSeconds = 5; //minimum amount of time between idle chat messages
+    idleChatRandomChance = 10; //odds of random chat being sent (out of 100) if cooldown is met
+    lastIdleChatSent = 0 //when was the idle last chat sent?
+    userIsIdle = false; //tracks if user is currently idle
 
     //random event loop variables
     randomEventLoop;
@@ -162,7 +162,6 @@ const Mascot = class {
         this.idleChatInterval = setInterval(function(scope){
             let randomChance = Math.floor(Math.random() * 101);
 
-            //console.log('Idle chat loop checking idle times: ' + scope.idleSeconds + ' random chance value is: '+randomChance);
             let rightNow = new Date().getTime();
 
             if(scope.userIsIdle && randomChance < scope.idleChatRandomChance && ( (rightNow-scope.lastIdleChatSent) / 1000 > scope.idleChatCooldownSeconds)){          
