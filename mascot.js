@@ -160,7 +160,7 @@ const Mascot = class {
 
             setTimeout(function(scope){
                 ui.removeClass([scope.mascotDiv],'hit-impact');
-            },500,this);
+            },100,this);
             
             //ui.removeClass([this.mascotDiv],'hit-impact');
             this.currentStatus.clickedTimes++;
