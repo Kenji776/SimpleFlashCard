@@ -395,9 +395,8 @@
 }
 
 .slide-in-out-left {
-  animation: slide-in-out-left 3s ease;
+  animation: slide-in-out-left 3s linear;
   animation-iteration-count: 1;
-  animation-timing-function: linear;
 }
 @keyframes slide-in-out-left {
   0% {

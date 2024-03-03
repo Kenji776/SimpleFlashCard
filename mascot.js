@@ -11,8 +11,8 @@ const Mascot = class {
     urls = {
         wordsLibrary: 'https://pharmacy-flashcards-2027.lol/mascotWords.json',
         sounds: {
-            farts: ['fart1.wav','fart2.wav','fart3.wav','fart4.wav','fart5.wav'],
-            barks: ['bark1.wav']
+            fart: ['fart1.wav','fart2.wav','fart3.wav','fart4.wav','fart5.wav'],
+            bark: ['bark1.wav']
         }
     }
     audio = []
@@ -58,7 +58,10 @@ const Mascot = class {
             happiness: 50
         },
         value: '',
-        lastIdleChatSent: null
+        lastIdleChatSent: null,
+        isActive: true,
+        clickedTimes: 0,
+        clickLimit: 10
     }
 
 
@@ -150,8 +153,19 @@ const Mascot = class {
     registerMascotEventHandlers(){
         this.mascotDiv.addEventListener('click', function() {
             this.setMood('angry')
-            this.sayRandom('clicked');
-            this.this.playRandomSound('bark');
+            
+            this.playRandomSound('bark');
+
+            this.currentStatus.clickedTimes++;
+            if(this.currentStatus.clickedTimes+1 == this.currentStatus.clickLimit){
+                this.sayRandom('click_leave_warning')
+            }
+            else if(this.currentStatus.clickedTimes == this.currentStatus.clickLimit){
+                this.sayRandom('leave');
+                this.rageQuit();
+            }else{
+                this.sayRandom('clicked');
+            }
         }.bind(this));
     }
 
@@ -239,7 +253,7 @@ const Mascot = class {
         this.setMood('fart');
         this.sayRandom('fart');
 
-        this.playRandomSound('farts');
+        this.playRandomSound('fart');
 
         let fartDiv = document.createElement("div");
         fartDiv.className = 'slide-in-out-left mascot-fart-cloud';
@@ -283,6 +297,14 @@ const Mascot = class {
         this.mascotDiv.style.backgroundImage=`url(${imageURL})`; // specify the image path here
     }
 
+    addMascotAnimationEffect(animationName){
+        ui.addClass([this.mascotDiv],animationName)
+    }
+
+    removeMascotAnimationEffect(animationName){
+        ui.removeClass([this.mascotDiv],animationName)
+    }
+
     playRandomSound(category){
         if(!this.urls.sounds.hasOwnProperty(category)){
             console.error(`No sound category ${category} could be found in sound library. Valid sounds are: ${Object.keys(this.urls.sounds)}`);
@@ -324,13 +346,30 @@ const Mascot = class {
         }
     }
 
-    hide(){
-        ui.addClass([document.getElementById(elementId)], 'fade-out');
-    
-        setTimeout(function(elementId){
-            ui.hideElements(elementId);
-        },1800,this.containerName);
+    rageQuit(){
+        
+        this.sayRandom('leave');
+        this.setMood('angry');
+        this.addMascotAnimationEffect('leave-right');
+        setTimeout(function(scope){
+            scope.deactivate();
+        },5000,this)
     }
+
+    deactivate(){
+        this.currentStatus.isActive = false;
+        ui.hideElements([this.container]);
+        if(this.idleTimer) clearTimeout(this.idleTimer);
+        if(this.randomEventLoop) clearTimeout(this.randomEventLoop);
+    }
+
+    activate(){
+        this.currentStatus.isActive = true;
+        ui.showElements([this.container]);   
+        this.registerMascotIdleTimer();
+        this.registerMascotIdleChat();     
+    }
+
 
     async preloadMascotImages(){
         for(let imageKey in this.moodImages){
