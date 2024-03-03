@@ -5,6 +5,7 @@ const Mascot = class {
     defaultMascotClass = 'happy';
 	words = {};
     mute = false;
+    isActive = true;
     mood = 50;
     imageBaseFolderURL = 'https://pharmacy-flashcards-2027.lol/media/';
     soundsFolder = 'https://pharmacy-flashcards-2027.lol/media/sounds/'
@@ -59,7 +60,6 @@ const Mascot = class {
         },
         value: '',
         lastIdleChatSent: null,
-        isActive: true,
         clickedTimes: 0,
         clickLimit: 10
     }
@@ -364,9 +364,24 @@ const Mascot = class {
         },5000,this)
     }
 
-    deactivate(){
+    neutralLeave(){     
         this.sayRandom('leave_neutral');
+        this.setMood('confused');
+        this.addMascotAnimationEffect('leave-right');
+        setTimeout(function(scope){
+            scope.removeMascotAnimationEffect('leave-right');
+            scope.deactivate();
+        },5000,this)
+    }
 
+    mascotReturn(){
+        this.activate();
+        this.addMascotAnimationEffect('fade-in');
+        this.sayRandom('return');
+        this.setMood('happy');
+    }
+
+    deactivate(){
         this.currentStatus.isActive = false;
         if(this.idleTimer) clearTimeout(this.idleTimer);
         if(this.randomEventLoop) clearTimeout(this.randomEventLoop);
@@ -378,8 +393,6 @@ const Mascot = class {
         this.registerMascotIdleTimer();
         this.registerMascotIdleChat();
         ui.showElements([this.container]);        
-
-        this.sayRandom('return');
     }
 
 

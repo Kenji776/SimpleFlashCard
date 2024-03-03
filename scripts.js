@@ -1365,10 +1365,11 @@ function setSelectOptions(selectId, optionsArray, defaultValue, includeRandom, c
 }
 
 function toggleMascot(){
+    console.log('Toggling mascot. Active Status: ' + mascot.isActive);
     mascot.isActive = !mascot.isActive;
 
-    if(!mascot.isActive) mascot.deactivate();
-    else mascot.activate();
+    if(!mascot.isActive) mascot.neutralLeave();
+    else mascot.mascotReturn();
 }
 function setPromptKey(value){
     doLog('Setting prompt key: ' + value);
