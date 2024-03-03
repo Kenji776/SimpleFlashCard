@@ -285,17 +285,27 @@ const Mascot = class {
     }
 
     playSound(category, soundName){
+
+        console.log('Category: '+ category);
+        console.log('Sound name: ' + soundName);
+        console.log('Registered sounds');
+        console.log(this.urls.sounds);
         
-        if(!this.urls.sounds[category].hasOwnProperty(soundName)){
-            console.error(`No sound named ${soundName} could be found in sound library. Valid sounds are: ${Object.keys(this.urls.sounds)}`);
+        if(!this.urls.sounds.hasOwnProperty(category)){
+            console.error(`No sound category ${category} could be found in sound library. Valid sounds are: ${Object.keys(this.urls.sounds)}`);
+            return;
+        }
+        if(this.urls.sounds[category].indexOf(soundName) === -1){
+            console.error(`No sound named ${soundName} could be found in sound library. Valid sounds are: ${this.urls.sounds[category]}`);
             return;
         }
         
 
         let thisSound;
+        if(!this.audio[category]) this.audio[category] = {};
+
         if(!this.audio[category].hasOwnProperty(soundName)){
-            console.log(`Loading sound from url: ${this.soundsFolder}${this.urls.sounds[soundName]}` )
-            thisSound = new Audio(`${this.soundsFolder}${this.urls.sounds[category][soundName]}`);
+            thisSound = new Audio(`${this.soundsFolder}${soundName}`);
             this.audio[category][soundName] = thisSound;
         }else{
             thisSound = this.audio[category][soundName];
