@@ -156,13 +156,20 @@ const Mascot = class {
             
             this.playRandomSound('bark');
 
+            ui.addClass([this.mascotDiv],'hit-impact');
+
+            setTimeout(function(scope){
+                ui.removeClass([scope.mascotDiv],'hit-impact');
+            },500,this);
+            
+            //ui.removeClass([this.mascotDiv],'hit-impact');
             this.currentStatus.clickedTimes++;
             if(this.currentStatus.clickedTimes+1 == this.currentStatus.clickLimit){
                 this.sayRandom('click_leave_warning')
             }
             else if(this.currentStatus.clickedTimes == this.currentStatus.clickLimit){
                 this.sayRandom('leave');
-                this.rageQuit();
+                this.rageQuit('rage_leave');
             }else{
                 this.sayRandom('clicked');
             }
@@ -346,9 +353,9 @@ const Mascot = class {
         }
     }
 
-    rageQuit(){
+    rageQuit(textType){
         
-        this.sayRandom('rage_leave');
+        this.sayRandom(textType);
         this.setMood('angry');
         this.addMascotAnimationEffect('leave-right');
         setTimeout(function(scope){

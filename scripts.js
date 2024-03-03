@@ -765,7 +765,7 @@ function recordQuestionResponse(card,givenAnswers,correctAnswers,awardedPoints){
         incorrectAnswerAlert();
 
         if(performance.missStreak >= mascotLeaveLimit){
-            mascot.rageQuit();
+            mascot.rageQuit('sad_leave');
         }
         
     }

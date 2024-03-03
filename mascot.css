@@ -92,3 +92,24 @@
       transform: translateX(100%) translateY(-300%) rotate(120deg);
     }
 }
+
+.hit-impact {
+    animation: hit-impact 0.05s linear 1;
+  }
+  @keyframes hit-impact {
+    0% {
+        opacity: 1;
+    }
+    50% {
+        transform:translateY(-15%);
+        transform: scale(.80);
+    }
+      100% { transform:translateY(0); }
+  }
+
+  @keyframes idle-dance {
+    from, to { transform: scale(1, 1); }
+    25% { transform: scale(0.9, 1.1); }
+    50% { transform: scale(1.1, 0.9); }
+    75% { transform: scale(0.95, 1.05); }
+}
