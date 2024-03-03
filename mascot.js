@@ -7,10 +7,11 @@ const Mascot = class {
   
     mood = 50;
     imageBaseFolderURL = 'https://pharmacy-flashcards-2027.lol/media/';
+    soundsFolder = 'https://pharmacy-flashcards-2027.lol/media/sounds/'
     urls = {
         wordsLibrary: 'https://pharmacy-flashcards-2027.lol/mascotWords.json',
         sounds: {
-            fart: 'https://assets.mixkit.co/sfx/download/mixkit-cartoon-fart-sound-2891.wav'
+            farts: ['fart1.wav','fart2.wav','fart3.wav','fart4.wav','fart5.wav']
         }
     }
     audio = []
@@ -194,7 +195,9 @@ const Mascot = class {
 
     sayRandom(speechCategory){
         if(!this.words.hasOwnProperty(speechCategory)){
-            console.error(`Could not find speech category ${speechCategory}. Not reading text`)
+            console.error(`Could not find speech category ${speechCategory}. Not reading text`);
+            this.say('I don\'t know what to say!')
+            return;
         }
         let randomWords = this.words[speechCategory][Math.floor(Math.random() *  this.words[speechCategory].length)];
         this.say(randomWords);
@@ -233,7 +236,11 @@ const Mascot = class {
 
         this.setMood('fart');
         this.sayRandom('fart');
-        this.playSound('fart');
+
+        let fartSound =  this.urls.sounds.farts[Math.floor(Math.random() *  this.urls.sounds.farts.length)];
+
+        console.log('Got fart sound: ' + fartSound);
+        this.playSound('farts',fartSound);
 
         let fartDiv = document.createElement("div");
         fartDiv.className = 'slide-in-out-left mascot-fart-cloud';
@@ -277,18 +284,21 @@ const Mascot = class {
         this.mascotDiv.style.backgroundImage=`url(${imageURL})`; // specify the image path here
     }
 
-    playSound(soundName){
-        if(!this.urls.sounds.hasOwnProperty(soundName)){
+    playSound(category, soundName){
+        
+        if(!this.urls.sounds[category].hasOwnProperty(soundName)){
             console.error(`No sound named ${soundName} could be found in sound library. Valid sounds are: ${Object.keys(this.urls.sounds)}`);
             return;
         }
+        
 
         let thisSound;
-        if(!this.audio.hasOwnProperty(soundName)){
-            thisSound = new Audio(this.urls.sounds[soundName]);
-            this.audio[soundName] = thisSound;
+        if(!this.audio[category].hasOwnProperty(soundName)){
+            console.log(`Loading sound from url: ${this.soundsFolder}${this.urls.sounds[soundName]}` )
+            thisSound = new Audio(`${this.soundsFolder}${this.urls.sounds[category][soundName]}`);
+            this.audio[category][soundName] = thisSound;
         }else{
-            thisSound = this.audio[soundName];
+            thisSound = this.audio[category][soundName];
         }
         try{
             thisSound.play();
