@@ -1364,6 +1364,12 @@ function setSelectOptions(selectId, optionsArray, defaultValue, includeRandom, c
     
 }
 
+function toggleMascot(){
+    mascot.isActive = !mascot.isActive;
+
+    if(!mascot.isActive) mascot.deactivate();
+    else mascot.activate();
+}
 function setPromptKey(value){
     doLog('Setting prompt key: ' + value);
     promptKey = value;

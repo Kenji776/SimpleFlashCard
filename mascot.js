@@ -4,7 +4,7 @@ const Mascot = class {
     containerName = 'mascot-container';
     defaultMascotClass = 'happy';
 	words = {};
-  
+    mute = false;
     mood = 50;
     imageBaseFolderURL = 'https://pharmacy-flashcards-2027.lol/media/';
     soundsFolder = 'https://pharmacy-flashcards-2027.lol/media/sounds/'
@@ -322,10 +322,11 @@ const Mascot = class {
     }
     playSound(category, soundName){
 
-        console.log('Category: '+ category);
-        console.log('Sound name: ' + soundName);
-        console.log('Registered sounds');
-        console.log(this.urls.sounds);
+
+        if(this.mute){
+            console.error(`Sounds disabled. Not playing sounds`);
+            return;
+        }
         
         if(!this.urls.sounds.hasOwnProperty(category)){
             console.error(`No sound category ${category} could be found in sound library. Valid sounds are: ${Object.keys(this.urls.sounds)}`);
@@ -364,6 +365,8 @@ const Mascot = class {
     }
 
     deactivate(){
+        this.sayRandom('leave_neutral');
+
         this.currentStatus.isActive = false;
         if(this.idleTimer) clearTimeout(this.idleTimer);
         if(this.randomEventLoop) clearTimeout(this.randomEventLoop);
@@ -375,6 +378,8 @@ const Mascot = class {
         this.registerMascotIdleTimer();
         this.registerMascotIdleChat();
         ui.showElements([this.container]);        
+
+        this.sayRandom('return');
     }
 
 

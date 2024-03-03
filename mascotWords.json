@@ -72,6 +72,19 @@
         "You just couldn't help yourself could you? And now I'm leaving"
     ],
 
+    "leave_neutral":[
+        "Alright, see ya!",
+        "Catch ya later",
+        "I'll be back!",
+        "But why?!"
+    ],
+
+    "return":[
+        "Good to be back",
+        "Hey there, glad to be back",
+        "Sticks like foot in here"
+    ],
+
     "click_leave_warning":[
         "Do that one more time and I'm out of here.",
         "Try it again, see what happens"
