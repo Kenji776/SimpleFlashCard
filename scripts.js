@@ -1371,6 +1371,10 @@ function toggleMascot(){
     if(!mascot.isActive) mascot.neutralLeave();
     else mascot.mascotReturn();
 }
+
+function toggleMuteMascot(){
+    mascot.mute = !mascot.mute;
+}
 function setPromptKey(value){
     doLog('Setting prompt key: ' + value);
     promptKey = value;
