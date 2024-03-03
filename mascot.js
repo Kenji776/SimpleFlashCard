@@ -11,7 +11,8 @@ const Mascot = class {
     urls = {
         wordsLibrary: 'https://pharmacy-flashcards-2027.lol/mascotWords.json',
         sounds: {
-            farts: ['fart1.wav','fart2.wav','fart3.wav','fart4.wav','fart5.wav']
+            farts: ['fart1.wav','fart2.wav','fart3.wav','fart4.wav','fart5.wav'],
+            barks: ['bark1.wav']
         }
     }
     audio = []
@@ -150,6 +151,7 @@ const Mascot = class {
         this.mascotDiv.addEventListener('click', function() {
             this.setMood('angry')
             this.sayRandom('clicked');
+            this.this.playRandomSound('bark');
         }.bind(this));
     }
 
@@ -237,10 +239,7 @@ const Mascot = class {
         this.setMood('fart');
         this.sayRandom('fart');
 
-        let fartSound =  this.urls.sounds.farts[Math.floor(Math.random() *  this.urls.sounds.farts.length)];
-
-        console.log('Got fart sound: ' + fartSound);
-        this.playSound('farts',fartSound);
+        this.playRandomSound('farts');
 
         let fartDiv = document.createElement("div");
         fartDiv.className = 'slide-in-out-left mascot-fart-cloud';
@@ -284,6 +283,14 @@ const Mascot = class {
         this.mascotDiv.style.backgroundImage=`url(${imageURL})`; // specify the image path here
     }
 
+    playRandomSound(category){
+        if(!this.urls.sounds.hasOwnProperty(category)){
+            console.error(`No sound category ${category} could be found in sound library. Valid sounds are: ${Object.keys(this.urls.sounds)}`);
+            return;
+        }
+        let thisSound =  this.urls.sounds[category][Math.floor(Math.random() *  this.urls.sounds[category].length)];
+        this.playSound(category,thisSound);
+    }
     playSound(category, soundName){
 
         console.log('Category: '+ category);
