@@ -11,6 +11,7 @@
     width:150px;
     height:150px;
     z-index:1001;
+    cursor:grabbing;
 }
 
 .mascot-container .mascot-fart-cloud{

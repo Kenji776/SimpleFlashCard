@@ -348,7 +348,7 @@ const Mascot = class {
 
     rageQuit(){
         
-        this.sayRandom('leave');
+        this.sayRandom('rage_leave');
         this.setMood('angry');
         this.addMascotAnimationEffect('leave-right');
         setTimeout(function(scope){
@@ -358,16 +358,16 @@ const Mascot = class {
 
     deactivate(){
         this.currentStatus.isActive = false;
-        ui.hideElements([this.container]);
         if(this.idleTimer) clearTimeout(this.idleTimer);
         if(this.randomEventLoop) clearTimeout(this.randomEventLoop);
+        ui.hideElements([this.container]);
     }
 
     activate(){
         this.currentStatus.isActive = true;
-        ui.showElements([this.container]);   
         this.registerMascotIdleTimer();
-        this.registerMascotIdleChat();     
+        this.registerMascotIdleChat();
+        ui.showElements([this.container]);        
     }
 
 

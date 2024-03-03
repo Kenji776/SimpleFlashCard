@@ -65,6 +65,13 @@
         "I can't watch this anymore. I'm gonna go get drunk"
     ],
 
+    "rage_leave":[
+        "Fuck this I'm outta here",
+        "I don't have to take this, I'm leaving",
+        "Have fun studying by yourself.",
+        "You just couldn't help yourself could you? And now I'm leaving"
+    ],
+
     "click_leave_warning":[
         "Do that one more time and I'm out of here.",
         "Try it again, see what happens"

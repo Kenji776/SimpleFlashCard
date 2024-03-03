@@ -185,7 +185,7 @@ ui.setElementVisibility = function(elements,visible,displayType){
         if(typeof element === 'object' ) {     
             //elm.height='0px';
             element.style.visibility=visiblityWord;
-            elm.style.display=displayWord;
+            element.style.display=displayWord;
         }
         if(typeof element === 'string') {
             for(let elm of ui.getElements(element)){  
