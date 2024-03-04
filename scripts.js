@@ -4,11 +4,13 @@ const scoresName = 'SimpleFlashCardHighScores';
 const databaseUrl = 'https://daj000002wi3eeas-dev-ed.develop.my.salesforce-sites.com/services/apexrest/flashCard';
 
 //class objects
-var resultsModal; //instance of Modal
+var resultsModal = new Modal(); //instance of Modal
+var highScoresModal = new Modal();
 var mascot; //instance of Mascot
-var storedSettings; //instance of LS (local storage) object
-var storedScores; //instance of LS (local storage) object
-var database;
+var storedSettings = new LS(settingsName); //instance of LS (local storage) object
+var storedScores = new LS(scoresName); //instance of LS (local storage) object
+var database = new Database(databaseUrl);
+var utils = new Utils();
 
 var showLogs = false;
 var deckUrl;
@@ -68,22 +70,18 @@ async function init(){
 	
 	registerKeyboardShortcuts();
 	
-	resultsModal = new Modal();
-	
 	resultsModal.registerModal('results-modal');
 	
 	resultsModal.registerModalCloseHandler(function(scope){
 		ui.hideElements('confetti_outer');
 	});		
+
+    highScoresModal.registerModal('high-scores-modal');
 	
-    mascot = new Mascot();
-    storedSettings = new LS(settingsName);
     loadSettings();
     registerPersistantDataStorage();
 
-    storedScores = new LS(scoresName);
-
-    database = new Database(databaseUrl);
+    mascot = new Mascot()
 }
 
 async function loadCardLibrary(){
@@ -105,8 +103,9 @@ async function sendScore(){
         'action':'log_score',
         'player':userName,
         'score':performance.runningTotalScore,
-        'deck': performance.deckId, 
-        'recordId': performance.performanceRecordId});
+        'deck': utils.formatId(performance.deckId), 
+        'recordId': performance.performanceRecordId
+    });
 
     console.log('Result of high score create');
     console.log(createResult);
@@ -353,6 +352,8 @@ async function loadDeck(deckData){
 
     performance = new PerformanceRecord({'deckId':selectedDeckCategory+'-'+deckData.config.name});
 
+    setHighScoresFrame(performance.deckId);
+
     if(!deckData) {
         doLog('Deck data not provided. Aborting Load');
         alert('Deck data not provided. Aborting Load');
@@ -390,6 +391,15 @@ async function loadDeck(deckData){
 	
     document.getElementById("prompt").innerHTML= `${config.name} Loaded. Press Next To Begin`;
 
+}
+
+function setHighScoresFrame(deckId){
+    document.getElementById('scores-frame').src = `scores.html?deck=${utils.formatId(deckId)}`;
+}
+
+function handleShowHighScores(){
+    console.log('Showing scores modal!');
+    highScoresModal.showModal();
 }
 
 function generateDeckFromData(shuffleConfig=new ShuffleDeckConfig()){

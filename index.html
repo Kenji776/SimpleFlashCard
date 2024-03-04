@@ -12,13 +12,15 @@
 <link rel="icon" type="image/png" href="media/favicon-16x16.png" sizes="16x16" />
 
 <script type="text/javascript" language="javascript" src="objects.js"></script>
-<script type="text/javascript" language="javascript" src="scripts.js"></script> 
 <script type="text/javascript" language="javascript" src="ui.js"></script> 
 <script type="text/javascript" language="javascript" src="timer.js"></script> 
 <script type="text/javascript" language="javascript" src="modal.js"></script> 
 <script type="text/javascript" language="javascript" src="localStorage.js"></script>
 <script type="text/javascript" language="javascript" src="mascot.js"></script>
 <script type="text/javascript" language="javascript" src="database.js"></script>
+<script type="text/javascript" language="javascript" src="utils.js"></script>
+<script type="text/javascript" language="javascript" src="scripts.js"></script> 
+
 <body>
     <div class="container">
 		<!---->
@@ -34,6 +36,7 @@
 				id="username" 
 				data-option-key="config.username"
 				onkeyup="setUsername(this.value)"
+				value="Your Name Here"
 				data-persistent="true">
 			</input>
 			<div class="spacer"></div>
@@ -53,6 +56,7 @@
                         <option value="none" selected>Select A Card Deck</option>
                     </select>
 					<input type="button" onclick="handleLoadDeckSelect()" value="Load Deck" title="Load Deck"/>
+					<input type="button" onclick="handleShowHighScores()" value="High Scores" title="High Scores"/>
                 </div>
 
 				<div id="deck-controls">
@@ -365,6 +369,27 @@
     </div>
 	
 	<!-- MODAL WINDOW -->
+	
+	<div id="high-scores-modal" class="modal">
+		  <!-- Modal content -->
+		  <div class="modal-content">
+			<div class="modal-header">
+				<span class="close-modal-button modal-close">&times;</span>
+				<center><h2 class="inline pulse sub-header-text-2" id="new-high-score-alert">High Scores</h2></center>
+			</div>
+			
+			<div class="modal-body">
+				<div style="display: flex; justify-content: space-between;">
+				
+					<iframe src="scores.html" id="scores-frame" width="100%" height="500px"></iframe>
+				</div>
+			</div>
+			
+			<div class="modal-footer">
+				<h3></h3>
+			</div>
+		</div>		
+	</div>
 	<!-- The Modal -->
 	<div id="results-modal" class="modal">
 		  <!-- Modal content -->

@@ -1,0 +1,12 @@
+.high-score-table{
+    width:100%;
+    table-layout: fixed;
+    overflow-wrap: break-word;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.high-score-table td{
+    text-align: center; 
+    vertical-align: middle;
+}

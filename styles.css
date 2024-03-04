@@ -2,7 +2,7 @@
      font-family: 'Rocher';
      src: url('media/font/RocherColorGX.woff2');
 }
- @font-face {
+@font-face {
      font-family: 'Digital7';
      src: url('media/font/digital-7 (mono).ttf');
 }
@@ -30,7 +30,7 @@
  a:hover {
      background-size: 0 2px, 100% 3px;
 }
- .container {
+.container {
      display: grid;
      grid-template-columns: 0.5fr 2.2fr 0.3fr;
      grid-template-rows: 0.3fr 2.5fr 0.2fr;
@@ -42,10 +42,10 @@
  #center-view{
      overflow:hidden;
 }
- .spacer{
+.spacer{
      margin:10px;
 }
- .no-background{
+.no-background{
      background-color: transparent !important;
      box-shadow: none !important;
      border-style: none !important;
@@ -53,7 +53,7 @@
      margin: 0px !important;
      padding: 0px !important;
 }
- .header {
+.header {
      grid-area: header;
      height:6vh;
      font-size:1.875px;
@@ -63,58 +63,58 @@
      margin-right:auto;
      min-height:65px;
 }
- .score{
+.score{
      height:15vh;
      min-height:115px;
 	 white-space: nowrap;
 }
- .timer{
+.timer{
      height:10vh;
      min-height:100px;
 	 white-space: nowrap;
 }
- .timer-output{
+.timer-output{
      min-width:185px;
      display:inline-block;
      margin-left:0px !important;
      margin-right:0px !important;
 }
- .timer-group{
+.timer-group{
      display: inline-block;
      min-width: 36px;
 }
  #timer-control-buttons{
      white-space: nowrap;
 }
- .settings {
+.settings {
      grid-area: settings;
      width:15vw;
      min-height:300px;
 }
- .history {
+.history {
      grid-area: history;
      height: 50vh;
      overflow-y:auto;
      width:18vw;
      grid-auto-rows: 1fr;
 }
- .footer {
+.footer {
      grid-area: footer;
      width: 100%;
      font-size: 0.8rem;
 }
- .content {
+.content {
      grid-area: content;
      width:60vw;
      position:relative;
 }
- .center {
+.center {
      margin:auto;
      text-align:center;
      margin-left: auto;
      margin-right: auto;
 }
- .hidden {
+.hidden {
      visibility: hidden;
 }
  #prompt{
@@ -219,7 +219,7 @@ input[type=button]:disabled,button[disabled],button:disabled{
      animation: none;
 }
 
- .sub-header{
+.sub-header{
      font-size:1.4rem;
 }
  #button-container {
@@ -231,7 +231,7 @@ input[type=button]:disabled,button[disabled],button:disabled{
  #controls{
      visibility:hidden;
 }
- .panel{
+.panel{
      -webkit-box-shadow:0px 5px 10px #1c1c1c;
      -moz-box-shadow:0px 5px 10px #1c1c1c;
      box-shadow:0px 5px 10px #1c1c1c;
@@ -243,7 +243,7 @@ input[type=button]:disabled,button[disabled],button:disabled{
      padding:15px;
      margin-bottom:10px;
 }
- .flip-card {
+.flip-card {
      background-color: transparent;
      height: 70%;
      perspective: 1000px;
@@ -255,7 +255,7 @@ input[type=button]:disabled,button[disabled],button:disabled{
      text-transform: uppercase;
 }
 /* This container is needed to position the front and back side */
- .flip-card-inner {
+.flip-card-inner {
      position: relative;
      width: 100%;
      height: 100%;
@@ -270,11 +270,11 @@ input[type=button]:disabled,button[disabled],button:disabled{
      border-color: #04AA6D;
 }
 /* Do an horizontal flip when you move the mouse over the flip box container */
- .flip-card-flipped .flip-card-inner {
+.flip-card-flipped.flip-card-inner {
      transform: rotateY(180deg);
 }
 /* Position the front and back side */
- .flip-card-front, .flip-card-back {
+.flip-card-front,.flip-card-back {
      position: absolute;
      width: 100%;
      height: 100%;
@@ -283,10 +283,10 @@ input[type=button]:disabled,button[disabled],button:disabled{
      backface-visibility: hidden;
 }
 /* Style the front side (fallback if image is missing) */
- .flip-card-front {
+.flip-card-front {
 }
 /* Style the back side */
- .flip-card-back {
+.flip-card-back {
      transform: rotateY(180deg);
      border-radius:10px;
 }
@@ -300,7 +300,7 @@ input[type=button]:disabled,button[disabled],button:disabled{
      backface-visibility: visible !important;
      animation: spin 1s infinite linear;
 }
- .center-content{
+.center-content{
      margin:auto;
      margin-top:15px;
      margin-bottom:15px;
@@ -316,24 +316,24 @@ input[type=button]:disabled,button[disabled],button:disabled{
      font-weight:bold;
      margin:auto;
 }
- .history-item{
+.history-item{
      margin-bottom:5px;
      cursor:pointer;
      border-radius:5px;
      padding:3px;
 }
- .history-item:hover{
+.history-item:hover{
      background-color: #04AA6D!important;
      color: #ffffff!important;
 }
- .history-item.correct-answer{
+.history-item.correct-answer{
      color:#04AA6D;
 }
- .history-item.incorrect-answer{
+.history-item.incorrect-answer{
      color:red;
      text-decoration: line-through;
 }
- .selected-history-item{
+.selected-history-item{
      background-color: #04AA6D!important;
      color: #ffffff!important;
      font-weight:bold;
@@ -348,12 +348,12 @@ input[type=button]:disabled,button[disabled],button:disabled{
      background-color: #CBCBCB;
      outline: 2px solid #FFF;
      outline-offset: -2px;
-     border: .1px solid #B7B7B7;
+     border:.1px solid #B7B7B7;
 }
  ::-webkit-scrollbar-thumb:hover{
      background-color: #909090;
 }
- .inline{
+.inline{
      display: inline-block;
 }
  th, td {
@@ -362,68 +362,68 @@ input[type=button]:disabled,button[disabled],button:disabled{
      padding-left: 30px;
      padding-right: 40px;
 }
- .grade-output{
+.grade-output{
      font-family: 'Rocher';
      text-align: center;
      margin-left: 10px;
      font-size:1.8rem;
 }
- .animated-heading{
+.animated-heading{
      font-family: 'Rocher';
      text-align: center;
      margin-left: 15px;
      font-size:1.8rem;
      font-palette: --Orange;
 }
- @font-palette-values --Green {
+@font-palette-values --Green {
      font-family: Rocher;
      base-palette: 2;
 }
- @font-palette-values --Blue {
+@font-palette-values --Blue {
      font-family: Rocher;
      base-palette: 4;
 }
- @font-palette-values --Yellow {
+@font-palette-values --Yellow {
      font-family: Rocher;
      base-palette: 5;
 }
- @font-palette-values --Orange {
+@font-palette-values --Orange {
      font-family: Rocher;
      base-palette: 8;
 }
- @font-palette-values --Red {
+@font-palette-values --Red {
      font-family: Rocher;
      base-palette: 1;
 }
- @font-palette-values --Special {
+@font-palette-values --Special {
      font-family: Rocher;
      base-palette: 3;
 }
- .grade-output[data-grade="s"] {
+.grade-output[data-grade="s"] {
      font-palette: --Special;
 }
- .grade-output[data-grade="a"] {
+.grade-output[data-grade="a"] {
      font-palette: --Green;
 }
- .grade-output[data-grade="b"] {
+.grade-output[data-grade="b"] {
      font-palette: --Blue;
 }
- .grade-output[data-grade="c"] {
+.grade-output[data-grade="c"] {
      font-palette: --Yellow;
 }
- .grade-output[data-grade="d"] {
+.grade-output[data-grade="d"] {
      font-palette: --Orange;
 }
- .grade-output[data-grade="f"] {
+.grade-output[data-grade="f"] {
      font-palette: --Red;
 }
- .header-text{
+.header-text{
      font-family: 'Rocher';
      text-align: center;
      font-size:4rem;
      font-palette: --Green;
 }
- .sub-header-text{
+.sub-header-text{
      font-family: 'Rocher';
      text-align: center;
      font-size:1.6rem;
@@ -431,14 +431,14 @@ input[type=button]:disabled,button[disabled],button:disabled{
      margin-right: 15px;
      vertical-align: top;
 }
- .sub-header-text-2{
+.sub-header-text-2{
      font-family: 'Rocher';
      font-size:1.6rem;
      font-palette: --Yellow;
      margin-right: 15px;
      vertical-align: top;
 }
- .prompt-text{
+.prompt-text{
      font-weight: 900;
      color: #04AA6D;
     /*text-shadow: black 0.1em 0.1em 0.2em*/
@@ -466,7 +466,7 @@ input[type=button]:disabled,button[disabled],button:disabled{
  svg#one {
      position: absolute;
 }
- .group {
+.group {
      -webkit-transform: translate(25px,25px);
      -moz-transform: translate(25px,25px);
      transform: translate(25px,25px);
@@ -476,19 +476,19 @@ input[type=button]:disabled,button[disabled],button:disabled{
      -moz-transform: translate(-42.50px,-42.50px);
      transform: translate(-42.50px,-42.50px);
 }
- .large {
+.large {
      -webkit-animation: large 2.5s infinite;
      -moz-animation: large 2.5s infinite;
 }
- .large-2 {
+.large-2 {
      -webkit-animation: large-2 2.5s infinite;
      -moz-animation: large-2 2.5s infinite;
 }
- .small {
+.small {
      -webkit-animation: small 2.5s infinite;
      -moz-animation: small 2.5s infinite;
 }
- @-webkit-keyframes large {
+@-webkit-keyframes large {
      0% {
          opacity: 0;
          -webkit-transform: rotate(0deg) scale(0);
@@ -503,7 +503,7 @@ input[type=button]:disabled,button[disabled],button:disabled{
          transform: rotate(360deg) scale(1.5);
     }
 }
- @-moz-keyframes large {
+@-moz-keyframes large {
      0% {
          opacity: 0;
          transform: rotate(0deg) scale(0);
@@ -516,7 +516,7 @@ input[type=button]:disabled,button[disabled],button:disabled{
          transform: rotate(360deg) scale(1.5);
     }
 }
- @-webkit-keyframes large-2 {
+@-webkit-keyframes large-2 {
      0% {
          opacity: 0;
          -webkit-transform: rotate(45deg) scale(0);
@@ -531,7 +531,7 @@ input[type=button]:disabled,button[disabled],button:disabled{
          transform: rotate(405deg) scale(1.1);
     }
 }
- @-moz-keyframes large-2 {
+@-moz-keyframes large-2 {
      0% {
          opacity: 0;
          transform: rotate(45deg) scale(0);
@@ -544,7 +544,7 @@ input[type=button]:disabled,button[disabled],button:disabled{
          transform: rotate(405deg) scale(1.1);
     }
 }
- @-webkit-keyframes small {
+@-webkit-keyframes small {
      0% {
          opacity: 0;
          -webkit-transform: rotate(0deg) scale(0);
@@ -559,7 +559,7 @@ input[type=button]:disabled,button[disabled],button:disabled{
          transform: rotate(-360deg) scale(1.5);
     }
 }
- @-moz-keyframes small {
+@-moz-keyframes small {
      0% {
          opacity: 0;
          transform: rotate(0deg) scale(0);
@@ -572,20 +572,20 @@ input[type=button]:disabled,button[disabled],button:disabled{
          transform: rotate(-360deg) scale(1.5);
     }
 }
- .deck-intro-image{
+.deck-intro-image{
      position:absolute;
      bottom:0px;
      left:15px;
      width: 314px;
      height: 395px;
 }
- .deck-bottom-image{
+.deck-bottom-image{
      position:absolute;
      bottom:-40px;
      right: 50%;
      transform: translateX(50%);
 }
- fieldset {
+fieldset {
      margin: 50px;
      padding: 20px;
      border-radius: 20px;
@@ -594,7 +594,7 @@ input[type=button]:disabled,button[disabled],button:disabled{
      display: inline-block;
      border: none;
 }
- legend {
+legend {
      font-size: 1.5rem;
      font-weight: bold;
      background: rgba(255, 255, 255, 0.1);
@@ -607,7 +607,7 @@ input[type=button]:disabled,button[disabled],button:disabled{
 .hidden{
     display:none;
 }
- input[type="radio"] {
+input[type="radio"] {
      appearance: none;
      -webkit-appearance: none;
      width: 20px;
@@ -620,7 +620,7 @@ input[type=button]:disabled,button[disabled],button:disabled{
      top: 6px;
      cursor:hand;
 }
- input[type="radio"]:checked::before {
+input[type="radio"]:checked::before {
      content: "";
      display: block;
      width: 12px;
@@ -686,7 +686,7 @@ input[type=button]:disabled,button[disabled],button:disabled{
      transform: translate(-50%, -50%);
      animation: appear 0.8s;
 }
- @keyframes appear {
+@keyframes appear {
      0% {
          transform: translate(-50%, -50%) scale(0);
          background-color: #fff;
@@ -714,33 +714,33 @@ input[type=button]:disabled,button[disabled],button:disabled{
 .results-fact{
 	display:inline-block !important;
 }
- @media (max-width: 1000px) {
+@media (max-width: 1000px) {
      body{
          font-size:.8rem;
     }
-     .header{
+    .header{
          min-height: 28px;
          height: 2vh;
     }
-     .header-text{
+    .header-text{
          font-size:2rem;
     }
-     .sub-header-text{
+    .sub-header-text{
          font-size:1.3rem;
     }
-     .sub-header-text-2{
+    .sub-header-text-2{
          font-size:1.3rem;
     }
-     .flip-card{
+    .flip-card{
          height: 40%;
          min-height:360px;
     }
-     .deck-intro-image{
+    .deck-intro-image{
          width: 156px;
          height: 195px;
          left:-10px;
     }
-     .deck-bottom-image{
+    .deck-bottom-image{
          width:170px;
          bottom: -20px;
     }
@@ -748,7 +748,7 @@ input[type=button]:disabled,button[disabled],button:disabled{
          margin-top: 5px;
          margin-bottom: 5px;
     }
-     .grade-output{
+    .grade-output{
          font-size: 1.8rem;
          margin-left:5px;
     }
