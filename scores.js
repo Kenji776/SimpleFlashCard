@@ -47,7 +47,7 @@ async function buildGlobalHighScoresTable(deckId, targetContainer){
     table = document.createElement('table'),
     table.setAttribute('class', 'high-score-table');
     tr = document.createElement('tr');
-    tr.setAttribute('class', 'header-text pulse-slow');
+    tr.setAttribute('class', 'header-text');
 
     let headers = ['Player','Score','Date']
     table.appendChild(tr);

@@ -66,6 +66,8 @@ var options = {
 }
 
 async function init(){
+    mascot = new Mascot();
+
 	loadCardLibrary();
 	
 	registerKeyboardShortcuts();
@@ -78,10 +80,15 @@ async function init(){
 
     highScoresModal.registerModal('high-scores-modal');
 	
-    loadSettings();
+    let settings = loadSettings();
+
+    console.log('SEttings');
+    console.log(settings);
     registerPersistantDataStorage();
 
-    mascot = new Mascot()
+    if(settings && settings?.config?.username) setUsername(settings.config.username);
+
+    
 }
 
 async function loadCardLibrary(){
@@ -193,6 +200,8 @@ function loadSettings(){
             }
         }
     }
+
+    return savedSettings;
 }
 
 function getPastPerformanceData(){
