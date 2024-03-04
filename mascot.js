@@ -6,6 +6,7 @@ const Mascot = class {
 	words = {};
     mute = false;
     isActive = true;
+    canReactivate = true;
     mood = 50;
     imageBaseFolderURL = 'https://pharmacy-flashcards-2027.lol/media/';
     soundsFolder = 'https://pharmacy-flashcards-2027.lol/media/sounds/'
@@ -168,7 +169,6 @@ const Mascot = class {
                 this.sayRandom('click_leave_warning')
             }
             else if(this.currentStatus.clickedTimes == this.currentStatus.clickLimit){
-                this.sayRandom('leave');
                 this.rageQuit('rage_leave');
             }else{
                 this.sayRandom('clicked');
@@ -358,7 +358,9 @@ const Mascot = class {
         
         this.sayRandom(textType);
         this.setMood('angry');
+        this.fart();
         this.addMascotAnimationEffect('leave-right');
+        this.canReactivate = false;
         setTimeout(function(scope){
             scope.deactivate();
         },5000,this)
@@ -375,6 +377,10 @@ const Mascot = class {
     }
 
     mascotReturn(){
+        if(!this.canReactivate) {
+            console.warn('Mascot was requested to reactivate but canReactivate is set to false. Not reactivating');
+            return;
+        }
         this.activate();
         this.addMascotAnimationEffect('fade-in');
         this.sayRandom('return');
@@ -389,6 +395,10 @@ const Mascot = class {
     }
 
     activate(){
+        if(!this.canReactivate) {
+            console.warn('Mascot was requested to reactivate but canReactivate is set to false. Not reactivating');
+            return;
+        }
         this.currentStatus.isActive = true;
         this.registerMascotIdleTimer();
         this.registerMascotIdleChat();

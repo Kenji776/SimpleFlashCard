@@ -1,68 +1,33 @@
-const Cookie = class {
+const LS = class {
 
-	cookieId = '';
-	cookie = {};
-	
-	constructor(thisCookieName) {
-		this.cookieId = thisCookieName;
-		this.cookie = this.loadCookie(thisCookieName);
+	name;
+
+	get value(){
+		return JSON.parse(localStorage.getItem(this.name));
 	}
 	
-	setCookie(value,days=30) {
-		if(!this.cookieId) console.error('Cookie Not Constucted.')
-		var expires = "";
-		if (days) {
-			var date = new Date();
-			date.setTime(date.getTime() + (days*24*60*60*1000));
-			expires = "; expires=" + date.toUTCString();
-		}
-		document.cookie = this.cookieId + "=" + (value || "")  + expires + "; path=/";
-		this.cookie = value;
-	}
-	
-	loadCookie() {
-		var nameEQ = this.cookieId + "=";
-		var ca = document.cookie.split(';');
-		for(var i=0;i < ca.length;i++) {
-			var c = ca[i];
-			while (c.charAt(0)==' ') c = c.substring(1,c.length);
-			if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length,c.length);
-		}
-		return null;
+	set value(value){
+		localStorage.setItem(this.name, JSON.stringify(value));
 	}
 
-	getCookieValue(){
-		return this.cookie;
+	constructor(name) {
+		this.name = name;
 	}
 	
 	getPersistentValuesFromUI(){
 		let nodeList = document.querySelectorAll('input[data-persistent=true]');
-		let cookieValues = {};
+		let values = {};
 		
 		for(let thisNode of nodeList){
 			//let thisNode = nodeList[thisNodeIndex];
 			try{	
-
-				console.log('Reading persistant data value from');
-				console.log(thisNode);
-
 				let objectValuePath = thisNode.getAttribute('data-option-key');
 				
 				let obj = {};
-				
-				console.log('Node Value is: ' + thisNode.value);
-
 				if(thisNode.type == 'checkbox') obj[objectValuePath] = thisNode.checked;
-				else obj[objectValuePath] = thisNode.value;
-
-				console.log('Resolved value is: ' + obj[objectValuePath]);
-				
-				let fieldData = this.expandDotString(obj);		
-				
-				console.log('Field Data is:');
-				console.log(fieldData);
-
-				cookieValues = this.mergeDeep(cookieValues,fieldData);
+				else obj[objectValuePath] = thisNode.value;				
+				let fieldData = this.expandDotString(obj);						
+				values = this.mergeDeep(values,fieldData);
 
 			}catch(ex){
 				console.error('Error getting data option from node');
@@ -72,51 +37,44 @@ const Cookie = class {
 			}
 		}
 		
-		console.log('Completed Cookie');
-		console.log(cookieValues);
+		console.log('Completed Local Storage Item: ' + this.name);
+		console.log(values);
 		
-		return cookieValues;
+		return values;
 	}
 
-	setPersistantValuesInUI(target,path=''){
+	setPersistantValuesInUI(target,path='',nodes=[]){
 
 		if (this.isObject(target) ) {
-			console.log('Provided value is an object. Iterating its keys')
 			for(let key in target){
 				const newPath = path.length > 0 ? path + '.' + key : key;
 				//first we have to figure out if this value is an object, if so we need to dig into it recursivly until we get to actual values
 				if (this.isObject(target[key]) ) {
-					this.setPersistantValuesInUI(target[key],newPath);
+					this.setPersistantValuesInUI(target[key],newPath,nodes);
 				}else{
-					this.setFormElement(newPath,target[key]);
+					nodes.push(this.setFormElement(newPath,target[key],nodes));
 				}
 
 			}
 		}else{
-			console.log('Hit secondary if')
-			this.setFormElement(path,target);
+			nodes.push(this.setFormElement(path,target,nodes));
 		}
+		return nodes;
 	}
 
 	setFormElement(key,value){
-		console.log('Finding element with path: ' + key);
-		const nodeList = document.querySelectorAll(`input[data-persistent=true][data-option-key="${key}"]`);
+		const thisNode = document.querySelector(`input[data-persistent=true][data-option-key="${key}"]`);
 
-		for(let thisNode of nodeList){
+		if(thisNode){
 			
 			if(thisNode.type == 'checkbox') {
-				console.log('Setting '+key+' checked to: ' + value)
 				thisNode.checked = value;
 			}
 			else{
-				console.log('Setting  '+key+' value to: ' + value)
 				thisNode.value = value;
 			}
 		}
-	}
-	
-	setOptionValues(cookieObject){
-		
+		return thisNode;
 	}
 	
 	mergeDeep(target, ...sources) {
@@ -167,7 +125,7 @@ const Cookie = class {
         return obj;
     }
 	
-	eraseCookie(name) {   
-		document.cookie = name +'=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+	delete() {   
+		localStorage.removeItem(this.name);
 	}
 }

@@ -1,10 +1,14 @@
-const settingsCookieName = 'SimpleFlashCardSettings';
-const scoresCookieName = 'SimpleFlashCardHighScores';
+
+const settingsName = 'SimpleFlashCardSettings';
+const scoresName = 'SimpleFlashCardHighScores';
+const databaseUrl = 'https://daj000002wi3eeas-dev-ed.develop.my.salesforce-sites.com/services/apexrest/flashCard';
+
 //class objects
 var resultsModal; //instance of Modal
-var settingsCookie; //instance of Cookie
-var scoresCookie; //instance of Cookie
 var mascot; //instance of Mascot
+var storedSettings; //instance of LS (local storage) object
+var storedScores; //instance of LS (local storage) object
+var database;
 
 var showLogs = false;
 var deckUrl;
@@ -27,9 +31,9 @@ var showHistory = true;
 var selectedDeckCategory;
 var showUi = false;
 var categories = [];
-var answerResults = [];
 var autoLoadNextCardOnAnswer = true;
 var selectedVariantDeck = '';
+var userName = 'Test User';
 
 var mascotLeaveLimit = 15;
 
@@ -43,23 +47,9 @@ var scoreTally = {
 	tallyIntervalMS: 1 //how often to incriment the display
 }
 
-//overall score/performance data
-var performance = {
-	currentPoints: 0, 
-	possiblePoints : 0, 
-	numberCorrect: 0, 
-	numberOfQuestions:0, 
-	numberIncorrect : 0,
-	numberUnanswered : 0,
-	pointsScorePercent: 0,
-	correctPercent: 0,
-	pointsGrade : '-',
-	numberCorrectGrade: '-',
-	streak: 0,
-	longestStreak: 0,
-	runningTotalScore: 0,
-    missStreak: 0
-}
+//overall score/performance data. Created when deck is loaded
+var performance;
+
 //options
 var options = {
 	deckControls: {
@@ -72,9 +62,6 @@ var options = {
 		promptKey: ''
 	}
 }
-
-
-
 
 async function init(){
 	loadCardLibrary();
@@ -89,18 +76,14 @@ async function init(){
 		ui.hideElements('confetti_outer');
 	});		
 	
-
     mascot = new Mascot();
+    storedSettings = new LS(settingsName);
+    loadSettings();
+    registerPersistantDataStorage();
 
+    storedScores = new LS(scoresName);
 
-	settingsCookie = new Cookie(settingsCookieName);
-	doLog('Settings Cookie Data');
-	doLog(settingsCookie);
-	settingsCookie.getPersistentValuesFromUI();
-	
-	scoresCookie = new Cookie(scoresCookieName);
-	doLog('Scores Cookie Data');
-	doLog(scoresCookie);
+    database = new Database(databaseUrl);
 }
 
 async function loadCardLibrary(){
@@ -113,53 +96,139 @@ async function loadCardLibrary(){
 
     if(selectedDeckCategory) setDeckOptions(cardLibrary);
 }
-		
+
+async function sendScore(){
+
+    console.log('Sending Score!');
+
+    let createResult = await database.sendRequest({
+        'action':'log_score',
+        'player':userName,
+        'score':performance.runningTotalScore,
+        'deck': performance.deckId, 
+        'recordId': performance.performanceRecordId});
+
+    console.log('Result of high score create');
+    console.log(createResult);
+}
+
 function registerKeyboardShortcuts(){
 	
 	doLog('Registering shortcut keys!');
 	document.onkeydown = function (e) {
 		e = e || window.event;
 		// use e.keyCode
-		doLog(e.keyCode);
+		console.log(e.keyCode);
 		
-		if (e.keyCode == '38') {
-			//up arrow
-			showAnswer();
-			e.preventDefault();
-		}
-		else if (e.keyCode == '40') {
-			// down arrow
-			performHintAction();
-			e.preventDefault();
-		}
-		else if (e.keyCode == '37') {
-		   // left arrow
-		   loadPrev();
-		   e.preventDefault();
-		}
-		else if (e.keyCode == '39') {
-			//right arrow
-		   loadNext();
-		   e.preventDefault();
-		}
-		else if(e.keyCode == '72'){
-			showClue();
-			e.preventDefault();
-		}
-		else if(e.keyCode == '49'){
-			answerCorrect();
-			e.preventDefault();
-		}
-		else if(e.keyCode == '50'){
-			answerIncorrect();
-			e.preventDefault();
-		}
-		else if(e.keyCode == '35'){
-			deckCompleteEvents();
-			e.preventDefault();
-		}
+        //up arrow
+		if (e.keyCode == '38') showAnswer();
+        //down arrow
+		else if (e.keyCode == '40') performHintAction();
+        // left arrow
+		else if (e.keyCode == '37') loadPrev();
+        //right arrow
+		else if (e.keyCode == '39') loadNext();
+        //"h"	   
+		else if(e.keyCode == '72') showClue();
+        //1
+		else if(e.keyCode == '49') answerCorrect();
+        //2
+		else if(e.keyCode == '50') answerIncorrect();
+        //"s"
+        else if(e.keyCode == '83') saveSettings();
+        //"l"
+        else if(e.keyCode == '76') loadSettings();
+        //"r"
+        else if(e.keyCode == '82') savePerformance();
+        //"p"
+        else if(e.keyCode == '80') getPastPerformanceData();
+        
+        //e.preventDefault();
 	};
 }
+
+function savePerformance(){
+    if(!performance || !performance.hasOwnProperty('deckId') || !performance.deckId.length === 0) {
+        console.warn('No current performance information to save! Aborting.')
+        return;
+    }
+    let performanceHistory = storedScores.value;
+
+    if(performanceHistory == null) performanceHistory = [];
+    
+    let existingRecordPosition = performanceHistory.find(obj => {
+        return obj.performanceRecordId === performance.performanceRecordId;
+    });
+
+    if(existingRecordPosition){
+        performanceHistory[existingRecordPosition] = performance;
+    }else{
+        performanceHistory.push(performance);
+    }
+
+    storedScores.value = performanceHistory;
+
+    console.log('Saved Performance Data!');
+    console.log(storedScores.value);
+}
+
+function saveSettings(){
+    let currentSettings = storedSettings.getPersistentValuesFromUI();
+    storedSettings.value =currentSettings;
+}
+
+function loadSettings(){
+    let savedSettings = storedSettings.value;
+    let affectedElements = storedSettings.setPersistantValuesInUI(savedSettings);
+
+    //this is a really stupid way to do this, but instead of manually calling each function an input would set I just iterate over them and call
+    //their onclick function. This will only really work for like buttons and checkboxes and such. 
+    for(let thisNode of affectedElements){
+
+        if((thisNode.type == 'checkbox' && thisNode.checked) || (thisNode.type != 'checkbox') ){
+            if(thisNode.getAttribute('onclick')){
+                eval(thisNode.getAttribute('onclick'));
+            }
+            if(thisNode.getAttribute('onchange')){
+                eval(thisNode.getAttribute('onchange'));
+            }
+        }
+    }
+}
+
+function getPastPerformanceData(){
+    let pastPerformances = performance.getPreviousResults(storedScores.value);
+
+    console.log('All Previous Results for this deck');
+    console.log(pastPerformances);
+
+    deckCompleteEvents();
+}
+
+function setUsername(value){
+    userName = value;
+}
+
+/**
+* @description Adds event handlers to all inputs that are marked as data-persistent=true so that any time they are changed by the user (clicked, change, keyup) the 
+* values are saved to local storage. It's not terrible efficient but it works well enough for now
+*/
+function registerPersistantDataStorage(){
+    let nodeList = document.querySelectorAll('input[data-persistent=true]');
+    let values = {};
+    let activityEvents = ['click','change','keyup',];
+
+    
+    for(let thisNode of nodeList){
+        for(let thisEvent of activityEvents){
+            thisNode.addEventListener(thisEvent, function() {           
+                saveSettings();
+            });
+        }
+    }
+    
+}
+
 
 /**
  * @description sets all of the potential deck category options from the card library
@@ -280,7 +349,9 @@ async function fetchRemoteDeck(deckUrl){
 async function loadDeck(deckData){
     
     doLog('loadDeck Loading deck with data');
-    doLog(deckData);
+    console.log(deckData);
+
+    performance = new PerformanceRecord({'deckId':selectedDeckCategory+'-'+deckData.config.name});
 
     if(!deckData) {
         doLog('Deck data not provided. Aborting Load');
@@ -319,47 +390,6 @@ async function loadDeck(deckData){
 	
     document.getElementById("prompt").innerHTML= `${config.name} Loaded. Press Next To Begin`;
 
-}
-
-class ShuffleDeckConfig {
-    constructor(sourceDeckConfig, options={}) {
-        this.sourceDeckConfig = sourceDeckConfig;
-        this.shuffleType;
-        this.groupBy;
-
-        //default options
-        //TODO: Set better defaults
-        this.options = {
-            shuffleType: 'group-by',
-            groupBy: 'drugClassName',
-            deckType: 'multiple-choice',
-            minRightAnswers: 1,
-            minWrongAnswers: 1,
-            maxAnswerOptions: 5,
-            answerLabelProperty: 'genericName',
-            answerValueProperty: 'genericName'
-        }
-
-        for(let propName in options){
-            if(options[propName] && options[propName] != undefined ) this[propName] = options[propName];
-        }
-    }
-}
-
-class Card {
-    constructor(constructorData){
-        this.type = ''; //type of card. May be 'choice' or 'flashcard;
-        this.questionText = ''; //text of the question
-        this.correctAnswerValues = []; //index numbers of the option values in the options array that are correct
-        this.points = 1; //number of points this question is worth
-        this.hint = '' //text hint string to present to user
-        this.options = []; //array of option value objects. Each option should have a 'value' and a 'label' property.
-        this.allValidAnswers = [];
-
-        if(typeof constructorData === 'object'){
-            for (var k in this) if (constructorData[k] != undefined) this[k] = constructorData[k];
-        } 
-    }
 }
 
 function generateDeckFromData(shuffleConfig=new ShuffleDeckConfig()){
@@ -618,10 +648,6 @@ function loadCard(cardId, forceIndex){
 
         ui.hideElements('answer-buttons');
         if(currentCard.type == 'choice'){
-            doLog('current card is a choice type. Attempting to read current answer from options index!');
-
-            doLog('Current Card Info');
-            doLog(currentCard);
             //get the text of the current correct answer for a choice question by using the correctAnswerValue property of the question definition to then read that object's label
             //currentAnswer = currentCard.options.find(function(o){ return o.value===currentCard.correctAnswerValues}).label;
 
@@ -630,16 +656,13 @@ function loadCard(cardId, forceIndex){
 
             ui.showElements('next-answer-button');
             ui.hideElements('next-letter-button');
-
-            doLog('================ Prompt key');
-            doLog(ui.getElements('prompt-key'));
             ui.getElements('prompt-key')[0].setAttribute('disabled',true);
         }else{
             doLog('current card is unknown type. Prompt text');
             currentAnswer = promptVal == config.defaultPrompt ? currentCard[config.defaultAnswer] : currentCard[config.defaultPrompt];
 
-            ui.setAttribute('correct-icon-button','correctValue,',selectedAnswerKeyText);
-            ui.setAttribute('incorrect-icon-button','correctValue,',selectedAnswerKeyText);
+            //ui.setAttribute('correct-icon-button','correctValue,',selectedAnswerKeyText);
+            //ui.setAttribute('incorrect-icon-button','correctValue,',selectedAnswerKeyText);
 
             ui.hideElements('next-answer-button');
             ui.showElements('next-letter-button');
@@ -656,27 +679,11 @@ function loadCard(cardId, forceIndex){
         }else{
             doLog('Current correct answer is: ' + currentAnswer);
         }
-        /*
-        
-        doLog('Prompt Key: ' + promptVal);
-        doLog('Answer Key: ' + answerVal);
-        
-        doLog('Answer Key Text: ' + selectedAnswerKeyText);
-        doLog('Answer Prompt Text: ' + selectedPromptKeyText);
-        
-        doLog(currentCard);
-        doLog(config.promptKeys);
-        doLog(config.answerKeys);
-        */
+
         document.getElementById("prompt").innerHTML= `${selectedPromptKeyText}<br/> <span class="prompt-text">${currentCard[promptVal]}</span>`; 
         
         if(currentCard.type == 'choice'){
             document.getElementById("answer").innerHTML= document.getElementById("prompt").innerHTML;
-
-            doLog('\n\n\n---------- Generating card fro data');
-            doLog(currentCard.options);
-            doLog(currentCard.correctAnswerValues);
-
 
             document.getElementById("answer").appendChild(generateSelectListFromOptions(currentCard.options,currentCard.correctAnswerValues));
         }else{
@@ -698,10 +705,7 @@ function loadCard(cardId, forceIndex){
 }
 
 function removeCardFromAvailable(cardId){
-    doLog('Removing card from stack with Id' + cardId);
     availableCards = availableCards.filter(item => item.id !== cardId);
-    doLog('Available cards is now: ');
-    doLog(availableCards);
 }
 
 function setSelectedHistoryCard(cardId){
@@ -736,107 +740,52 @@ function generateAnswerText(card){
 function recordQuestionResponse(card,givenAnswers,correctAnswers,awardedPoints){
     if(!isArray(givenAnswers)) givenAnswers = [givenAnswers];
     if(!isArray(correctAnswers)) correctAnswers = [correctAnswers];
-    answerResults.push({
+
+    const thisAnswer = new Answer({
         "card": card,
         "givenAnswers": givenAnswers,
         "correctAnswers": correctAnswers,
         "awardedPoints": awardedPoints,
         "possiblePoints" : card.points ? card.points : 1,
-        "wasCorrect": JSON.stringify(givenAnswers.sort()) === JSON.stringify(correctAnswers.sort()) ? true : false
+        "correct": JSON.stringify(givenAnswers.sort()) === JSON.stringify(correctAnswers.sort()) ? true : false,
+        "question": card
     });
 
-    if(answerResults[answerResults.length-1].wasCorrect) {
-        if(!performance.streak) performance.streak = 0;
-        performance.streak++;
-        performance.missStreak=0;
+    performance.recordAnswer(thisAnswer);
+
+    if(thisAnswer.correct) {
         correctAnswerAlert()
-        
-		
-		let newPoints = performance.streak * (awardedPoints * 10);
-		doLog(`Adding ${newPoints} to total  ${performance.runningTotalScore}.  ${performance.streak} * (${awardedPoints} * 10)`);
-		
-		performance.runningTotalScore += newPoints;
-		if(performance.streak > performance.longestStreak) performance.longestStreak = performance.streak;
     }
     else {
-        if(!performance.missStreak) performance.missStreak = 0;
-        performance.missStreak++;
-        performance.streak = 0;
         incorrectAnswerAlert();
 
         if(performance.missStreak >= mascotLeaveLimit){
             mascot.rageQuit('sad_leave');
         }
-        
     }
     if(autoLoadNextCardOnAnswer) loadNext();
 }
 
-function calculateScore(){
+function updateUIWithPerformanceData(performanceData){
 
-	//copy our performance objects so we don't lose anything that was set on it that we arn't calculating here
-	returnObj = performance;
-	
-    returnObj.numberOfQuestions = cards.length;
-	returnObj.currentPoints = 0;
-	returnObj.possiblePoints = 0
-	returnObj.numberCorrect = 0;
-	returnObj.numberIncorrect = 0;
-	returnObj.numberUnanswered = 0;
+    console.log('Updating UI With Performance Data');
+    console.log(performanceData);
 
-    let finalAnswers = {};
-	
-    for(let answer of answerResults){
-        returnObj.currentPoints += answer.awardedPoints;
-        returnObj.possiblePoints += answer.possiblePoints;
-        finalAnswers[answer.card.id] = answer;
-    }
-
-    doLog('Final Answers object');
-    doLog(finalAnswers);
-
-    for(let thisCard of cards){
-        if(finalAnswers.hasOwnProperty(thisCard.id)){
-            if(finalAnswers[thisCard.id].wasCorrect){
-                returnObj.numberCorrect++;
-            }else{
-                returnObj.numberIncorrect++;
-            }
-        }else{
-            returnObj.numberUnanswered++;
-        }
-    }
-
-	
-    returnObj.pointsScorePercent = Math.round( (returnObj.currentPoints / (returnObj.possiblePoints)) * 100);
-    returnObj.correctPercent = Math.round( (returnObj.numberCorrect / (returnObj.numberOfQuestions-returnObj.numberUnanswered)) * 100);
-
-    returnObj.pointsGrade = getLetterGrade(returnObj.pointsScorePercent);
-    returnObj.numberCorrectGrade = getLetterGrade(returnObj.correctPercent);
-
-    document.getElementById('score-total').innerHTML =`${returnObj.numberCorrect} / ${returnObj.numberOfQuestions-returnObj.numberUnanswered}`;
-    document.getElementById('points-total').innerHTML =`${returnObj.currentPoints} / ${returnObj.possiblePoints}`;
-    document.getElementById('streak-total').innerHTML = returnObj.streak;
+    document.getElementById('score-total').innerHTML =`${performanceData.numberCorrect} / ${performanceData.numberOfQuestions-performanceData.numberUnanswered}`;
+    document.getElementById('points-total').innerHTML =`${performanceData.currentPoints} / ${performanceData.possiblePoints}`;
+    document.getElementById('streak-total').innerHTML = performanceData.streak;
     
 
-	if(returnObj.numberOfQuestions-returnObj.numberUnanswered >= 1){
-		document.getElementById('score-grade').innerHTML =`${returnObj.numberCorrectGrade}`;
-		document.getElementById('score-grade').setAttribute('data-grade',returnObj.numberCorrectGrade.slice(0,1).toLowerCase());
+	if(performanceData.numberOfQuestions-performanceData.numberUnanswered >= 1){
+		document.getElementById('score-grade').innerHTML =`${performanceData.numberCorrectGrade}`;
+		document.getElementById('score-grade').setAttribute('data-grade',performanceData.numberCorrectGrade.slice(0,1).toLowerCase());
 	}else{
 		document.getElementById('score-grade').innerHTML = '';
 	}
 	
-	if(returnObj.numberOfQuestions-returnObj.numberUnanswered >= 1){
-		//document.getElementById('points-grade').innerHTML =`${returnObj.pointsGrade}`;
-		//document.getElementById('points-grade').setAttribute('data-grade',returnObj.pointsGrade.slice(0,1).toLowerCase());
-	}else{
-		//document.getElementById('points-grade').innerHTML = '';
-	}
-    document.getElementById('streak-total').setAttribute('data-grade',returnObj.numberCorrectGrade.slice(0,1).toLowerCase());
+    document.getElementById('streak-total').setAttribute('data-grade',performanceData.numberCorrectGrade.slice(0,1).toLowerCase());
     
-
-    /*
-    if(returnObj.pointsScorePercent === 100) {
+    if(performanceData.pointsScorePercent === 100) {
         ui.showElements('point-sparkles');
         ui.addClass('points-total-animations','pulse');
     }
@@ -844,10 +793,9 @@ function calculateScore(){
         ui.hideElements('point-sparkles');
         ui.removeClass('points-total-animations','pulse');
     }
-    */
-
     
-    if(returnObj.correctPercent === 100 && returnObj.numberOfQuestions > 0) {
+    
+    if(performanceData.correctPercent === 100 && performanceData.numberOfQuestions > 0) {
         ui.showElements('score-sparkles','inline');
         ui.addClass('score-total-animations','pulse');
     }
@@ -855,36 +803,6 @@ function calculateScore(){
         ui.hideElements('score-sparkles');
         ui.removeClass('score-total-animations','pulse');
     }
-    
-
-    return returnObj;
-
-}
-
-function getLetterGrade(numberGrade) {
-    let letter;
-    if (numberGrade == 100){
-        letter = 'S';
-    }else if (numberGrade >= 97) {
-      letter = 'A+';
-    }else if (numberGrade >= 94) {
-        letter = 'A';
-    }else if (numberGrade >= 90) {
-        letter = 'A-';
-    } else if (numberGrade >= 87) {
-      letter = 'B+';
-    } else if (numberGrade >= 84) {
-        letter = 'B';
-    } else if (numberGrade >= 80) {
-        letter = 'B-';
-    } else if (numberGrade >= 77) {
-      letter = 'C+';
-    } else if (numberGrade >= 70) {
-        letter = 'C';
-    } else {
-      letter = 'F';
-    }
-    return letter;
 }
 
 function getCorrectAnswerText(){
@@ -898,7 +816,7 @@ function getCorrectAnswerText(){
     } else if(performance.streak >= 5){
         wordsToUse='streak_1_responses';
     }     
-    return returnString = mascotWords[wordsToUse][Math.floor(Math.random()*mascotWords[wordsToUse].length)];;
+    return wordsToUse;
 
 }
 
@@ -916,18 +834,15 @@ function getIncorrectAnswerText(){
     }else if(performance.missStreak >= 5){
         wordsToUse = 'fail_streak_1_responses';
     }
-
-	returnString = mascotWords[wordsToUse][Math.floor(Math.random()*mascotWords[wordsToUse].length)];
-
-    return returnString;
+    return wordsToUse;
 }
 
 function correctAnswerAlert(){
-    mascot.say(getCorrectAnswerText(),'happy')
+    mascot.sayRandom(getCorrectAnswerText(),'happy')
 }
 
 function incorrectAnswerAlert(){
-    mascot.say(getIncorrectAnswerText(),'sad')
+    mascot.sayRandom(getIncorrectAnswerText(),'sad')
 }
 
 
@@ -1020,7 +935,6 @@ function loadNext(){
 function createHistoryEntry(cardData,navigationPosition,entryLabel){
     var div = document.createElement('div');
 
-    //TODO - Replace this with whatever 
     div.innerHTML = `${entryLabel}`;
     div.setAttribute('class', 'history-item');
     div.setAttribute('onClick', `loadCard('${cardData.id}',${navigationPosition})`);
@@ -1030,32 +944,25 @@ function createHistoryEntry(cardData,navigationPosition,entryLabel){
 }
 
 function setHistoryItemStyles(){
-    let answerMap = {};
-    for(let answerindex in answerResults){
-        answerMap[answerResults[answerindex].card.id] = answerResults[answerindex].wasCorrect;
-    }
 
     let historyItems = document.querySelectorAll('.history-item');
 
     for(let thisItem of historyItems){
-
-        let isCorrect = answerMap.hasOwnProperty(thisItem.getAttribute('data-card-id')) ? answerMap[thisItem.getAttribute('data-card-id')] : false;
-
-        if(answerMap.hasOwnProperty(thisItem.getAttribute('data-card-id'))){
-            if(isCorrect){
+        const cardId = thisItem.getAttribute('data-card-id');
+        const answer = performance.getAnswer(cardId);
+        //answer will be null in the case this question has not been answered. In which case we don't appy any styling
+        if(answer != null){
+            if(answer.correct){
                 thisItem.classList.remove("incorrect-answer");
                 thisItem.classList.add("correct-answer");
             }
-
-            if(!isCorrect){
+            else{
                 thisItem.classList.remove("correct-answer");
                 thisItem.classList.add("incorrect-answer");
             }
         }else{
             doLog('Question does not seem to have been answered. Does not exist in answer object. Skipping')
-        }
-
-        
+        }  
     }
 }
 /**
@@ -1086,6 +993,7 @@ function loadPrev(){
 }
 
 function showAnswer(){
+    
     document.getElementById('answer').style.visibility='visible';
     let card = document.getElementById('answer-card').classList.toggle("flip-card-flipped")
 }
@@ -1096,17 +1004,18 @@ function setRandom(){
 
 function showClue() {
     document.getElementById('clue-text').style.visibility='visible';
-
     mascot.say(document.getElementById('clue-text').innerHTML,'happy');
     
 }
 
 function performHintAction(){
+    
     if(currentCard.type == 'choice')  showNextAnswer();
     else showNextHintLetter();
 }
 
 function showNextHintLetter(){
+    performance.lettersShown++;
     hintIndex++;
     var hintText = currentAnswer.substring(0, hintIndex);
     document.getElementById("hint-text").innerHTML=hintText;
@@ -1116,6 +1025,7 @@ function showNextHintLetter(){
 }
 
 function showNextAnswer(){
+    performance.answersRevelaed++;
     if(!hintIndex) hintIndex = 0;
     //var hintText = currentAnswer.substring(0, hintIndex);
 
@@ -1150,7 +1060,7 @@ function answerCorrect(event){
     doLog(currentCard);
     let pointsMod = currentCard.points ? currentCard.points : 1;
     recordQuestionResponse(currentCard,currentCard.genericName,currentCard.genericName,pointsMod);
-    performance = calculateScore();
+    updateUIWithPerformanceData(performance);
 
     doLog('Current score info');
     doLog(performance);
@@ -1161,7 +1071,7 @@ function answerCorrect(event){
 function answerIncorrect(event){
     doLog(currentCard);
     recordQuestionResponse(currentCard,currentCard.genericName,'miss',0);
-    performance = calculateScore();
+    updateUIWithPerformanceData(performance);
 
     doLog('Current score info');
     doLog(performance);
@@ -1171,7 +1081,7 @@ function answerIncorrect(event){
 
 
 function deckCompleteEvents(){
-	ui.showElements('confetti_outer');
+	
 	ui.hideElements('.results-fact');
 	resultsModal.showModal();
 	
@@ -1185,9 +1095,36 @@ function deckCompleteEvents(){
 	ui.setContent('final-score-incorrect-answers',`${performance.numberIncorrect } / ${performance.numberOfQuestions}`);
 	ui.setContent('final-score-grade',`${performance.pointsGrade}`);
 	ui.setContent('final-score-longest-streak',`${performance.longestStreak}`);
-	
+
+    let bestPreviousScore = performance.previousHighScore(storedScores.value);
+
+    console.log('Best Previous Score...');
+    console.log(bestPreviousScore);
+
+    if(bestPreviousScore && bestPreviousScore.hasOwnProperty('currentPoints')){
+        ui.setContent('best-previous-score', bestPreviousScore.runningTotalScore);
+
+        ui.hideElements('deck-complete-header');
+        ui.showElements('confetti_outer');
+        ui.showElements('best-previous-score-container');
+    }else{
+        ui.hideElements('best-previous-score-container');
+        
+    }
+    
 	scoreTally.resultFacts = document.getElementsByClassName('results-fact');
 	scoreTally.resultFactIndex = 0;
+
+    //change the header if this is the new highest score
+    if(performance.isBestScore(storedScores.value)){
+        console.log('New High Score Detected!');
+        ui.showElements('new-high-score-alert');
+        ui.hideElements('deck-complete-header');
+    }else{
+        console.log('Score is not high score');
+        ui.hideElements('new-high-score-alert');
+        ui.showElements('deck-complete-header');
+    }
 	
 	scoreTally.resultFactInterval = setInterval(function(scope){
 		scoreTally.resultFacts[scoreTally.resultFactIndex].classList.add('bounce-in-right');
@@ -1204,7 +1141,9 @@ function deckCompleteEvents(){
 		
 	},1000,this);
 	
+    savePerformance();
 
+    sendScore();
 }
 
 function animateScoreTally(score){
@@ -1212,22 +1151,33 @@ function animateScoreTally(score){
 	scoreTally.totalScore = score;
 	
 	doLog(scoreTally);
+
+    let incriment = 10;
+    if(score > 100000) incriment = 1000;
+    else if(score > 50000) incriment = 500;
+    else if(score > 10000) incriment = 50;
 	
 	scoreTally.tallyAnimationInterval  = setInterval(function(scope){
 
-		scoreTally.currentTally = scoreTally.currentTally + 10;
+		scoreTally.currentTally = scoreTally.currentTally + incriment;
 		
 		if(scoreTally.currentTally >= scoreTally.totalScore) {
 			clearInterval(scoreTally.tallyAnimationInterval);
 			scoreTally.currentTally = scoreTally.totalScore;
 			scoreTally.targetNode.classList.add('bounce');
 		}
-		
 		scoreTally.targetNode.innerHTML = scoreTally.currentTally;
-		
 	}, scoreTally.tallyIntervalMS, this);
 }
 
+function showPerformanceData(){
+
+    console.log('Current Performance Info');
+    console.log(performance);
+    alert(JSON.stringify(performance));
+    console.log('Existing Performance Info');
+
+}
 function generateSelectListFromOptions(optionsArray,correctValues){
 
     if(!isArray(correctValues)) correctValues = [correctValues];
@@ -1248,7 +1198,7 @@ function generateSelectListFromOptions(optionsArray,correctValues){
     answerBtn.id = `answer-btn`;
     answerBtn.name = `answer-btn`;
     answerBtn.className = 'button';
-    answerBtn.setAttribute('data-correct-value',correctValues);
+    //answerBtn.setAttribute('data-correct-value',correctValues);
     answerBtn.onclick = function(event){
         let correctAnswersIndexes = event.target.getAttribute('data-correct-value').split(',');
 
@@ -1277,7 +1227,7 @@ function generateSelectListFromOptions(optionsArray,correctValues){
 
         recordQuestionResponse(currentCard,selectedOptionIndexes,correctAnswersIndexes,pointsMod);
 
-        performance = calculateScore();
+        performance = updateUIWithPerformanceData();
 
         setHistoryItemStyles();
     }
@@ -1417,7 +1367,6 @@ function resetHistory(){
         availableCards = [];
         cards = [];
         cardIndex = 0;
-        answerResults = [];
 		cardLibrary = {};
 	    currentCard = {};
 		config = {};
@@ -1434,21 +1383,7 @@ function resetHistory(){
 			tallyIntervalMS: 1 //how often to incriment the display
 		}
 
-		performance = {
-			currentPoints: 0, 
-			possiblePoints : 0, 
-			numberCorrect: 0, 
-			numberOfQuestions:0, 
-			numberIncorrect : 0,
-			numberUnanswered : 0,
-			pointsScorePercent: 0,
-			correctPercent: 0,
-			pointsGrade : '-',
-			numberCorrectGrade: '-',
-			streak: 0,
-			longestStreak: 0,
-			runningTotalScore: 0
-		}
+		
 		
         document.getElementById("hint-text").innerHTML = '';
         document.getElementById("clue-text").innerHTML = '';
@@ -1459,7 +1394,7 @@ function resetHistory(){
 		timer.seconds =0;
 		timer.tens = 0;
 		timer.mins = 0;
-		calculateScore();
+		updateUIWithPerformanceData(performance);
     }catch(ex){
         doLog('Error resetting history');
         console.error(ex);

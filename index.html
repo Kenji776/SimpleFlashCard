@@ -11,12 +11,14 @@
 <link rel="icon" type="image/png" href="media/favicon-32x32.png" sizes="32x32" />
 <link rel="icon" type="image/png" href="media/favicon-16x16.png" sizes="16x16" />
 
+<script type="text/javascript" language="javascript" src="objects.js"></script>
 <script type="text/javascript" language="javascript" src="scripts.js"></script> 
 <script type="text/javascript" language="javascript" src="ui.js"></script> 
 <script type="text/javascript" language="javascript" src="timer.js"></script> 
 <script type="text/javascript" language="javascript" src="modal.js"></script> 
-<script type="text/javascript" language="javascript" src="cookie.js"></script>
+<script type="text/javascript" language="javascript" src="localStorage.js"></script>
 <script type="text/javascript" language="javascript" src="mascot.js"></script>
+<script type="text/javascript" language="javascript" src="database.js"></script>
 <body>
     <div class="container">
 		<!---->
@@ -25,6 +27,17 @@
         </div>    
 
         <div class="settings panel">
+			<label for="username">Leaderboard Alias</label>
+			<input 
+				type="text" 
+				name="username" 
+				id="username" 
+				data-option-key="config.username"
+				onkeyup="setUsername(this.value)"
+				data-persistent="true">
+			</input>
+			<div class="spacer"></div>
+
             <span class="sub-header-text">Select Deck</span>
                 
             <div>
@@ -164,6 +177,9 @@
 						<label for="answerKey">Answer:</label>
 						<select name="answerKey" id="answerKey" onchange="setAnswerKey(this.value)"></select>
 					-->
+
+
+					
 				</div>
             </div>
 			
@@ -355,7 +371,8 @@
 		<div class="modal-content">
 			<div class="modal-header">
 				<span class="close-modal-button modal-close">&times;</span>
-				<h2>Deck Complete!</h2>
+				<center><h2 class="inline pulse sub-header-text-2" id="deck-complete-header">Deck Complete!</h2></center>
+				<center><h2 class="inline pulse sub-header-text-2" id="new-high-score-alert">NEW HIGH SCORE!</h2></center>
 			</div>
 			
 			<div class="modal-body">
@@ -376,6 +393,9 @@
 						</p>
 						<p>
 							<span class="sub-header-text big-text">Final Grade: </span><span class="sub-header-text-2 results-fact big-text" id="final-score-grade"></span>
+						</p>
+						<p id="best-previous-score-container">
+							<span class="sub-header-text big-text">Best Previous Score: </span><span class="sub-header-text-2 results-fact big-text" id="best-previous-score"></span>
 						</p>
 					</div>
 					
