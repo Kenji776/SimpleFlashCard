@@ -270,7 +270,7 @@ input[type=button]:disabled,button[disabled],button:disabled{
      border-color: #04AA6D;
 }
 /* Do an horizontal flip when you move the mouse over the flip box container */
-.flip-card-flipped.flip-card-inner {
+.flip-card-flipped .flip-card-inner {
      transform: rotateY(180deg);
 }
 /* Position the front and back side */
