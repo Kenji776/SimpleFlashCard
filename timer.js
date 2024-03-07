@@ -28,9 +28,9 @@ let timer = {
         this.tens = 0;
         this.seconds = 0;
         this.minutes = 0;
-        this.appendTens.innerHTML = "00";
-        this.appendSeconds.innerHTML = "00";
-        this.appendMins.innerHTML = "00";
+        if(this.appendTens) this.appendTens.innerHTML = "00";
+        if(this.appendSeconds) this.appendSeconds.innerHTML = "00";
+        if(this.appendMins) this.appendMins.innerHTML = "00";
     },
     
     runTimer: function(scope){
