@@ -183,7 +183,10 @@ const Mascot = class {
             console.log(e.keyCode);
             
             if (e.keyCode == '70') {
+                let prevSetting = this.mute;
+                this.mute = false;
                 this.fart();
+                this.mute = prevSetting;
                 e.preventDefault();
             }
         }.bind(this));
