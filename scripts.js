@@ -1219,21 +1219,27 @@ function generateSelectListFromOptions(optionsArray,correctValues){
     answerBtn.className = 'button';
     //answerBtn.setAttribute('data-correct-value',correctValues);
     answerBtn.onclick = function(event){
-        let correctAnswersIndexes = event.target.getAttribute('data-correct-value').split(',');
+    
+        console.log('Correct values are');
+        console.log(correctValues);
 
-        let options = ui.getElements('.question-option');;
+        let options = ui.getElements('.question-option');
         let selectedOptionIndexes = [];
         let selectedOptionValues = [];
 
 
         for(let i = 0; i < options.length; i++){
             if(options[i].checked){
-                selectedOptionIndexes.push(i.toString()); //the values in the array this will compare to are strings, so convert this to a string as well
+                selectedOptionIndexes.push(i); //the values in the array this will compare to are strings, so convert this to a string as well
                 selectedOptionValues.push(options[i].value);
             }
         }
 
-        const isCorrect = JSON.stringify(selectedOptionIndexes.sort()) == JSON.stringify(correctAnswersIndexes.sort()) ? true : false;
+        correctValues = correctValues.sort();
+        console.log(JSON.stringify(selectedOptionIndexes.sort()) + ' VS ' + JSON.stringify(correctValues));
+        const isCorrect = JSON.stringify(selectedOptionIndexes.sort()) == JSON.stringify(correctValues) ? true : false;
+
+        console.log('Is correct?: ' + isCorrect)
 
         let pointsMod = currentCard.points ? currentCard.points : 1;
 
@@ -1244,9 +1250,9 @@ function generateSelectListFromOptions(optionsArray,correctValues){
             pointsMod = 0;
         }
 
-        recordQuestionResponse(currentCard,selectedOptionIndexes,correctAnswersIndexes,pointsMod);
+        recordQuestionResponse(currentCard,selectedOptionIndexes,correctValues,pointsMod);
 
-        performance = updateUIWithPerformanceData();
+        updateUIWithPerformanceData(performance);
 
         setHistoryItemStyles();
     }
