@@ -3,6 +3,7 @@ const Mascot = class {
 	name = 'Default Mascot'
     containerName = 'mascot-container';
     defaultMascotClass = 'happy';
+    speechBubbleFadeDelay = 1;
 	words = {};
     mute = false;
     isActive = true;
@@ -20,7 +21,6 @@ const Mascot = class {
     audio = []
     
     speechBubbleDiv;
-    speechBubbleLifeMS = 3000;
     moodImages = {
         angry: 'shibaAngry.png',
         confused: 'shibaConfused.png',
@@ -239,6 +239,11 @@ const Mascot = class {
         
         this.container.appendChild(speechBubbleDiv);     
 
+        let numWords = speechText.split(' ').length;
+        let speechDelay = 2.5 * numWords * 1000 * this.speechBubbleFadeDelay;
+        speechDelay = speechDelay > 1500 && speechDelay < 10000 ? speechDelay : 3000;
+        console.log('there are ' + numWords + ' about to be said. Average reading speed is 150 WPM, so .0025 per MS or 2.5 per second. ');
+        console.log('Delay is: ' + speechDelay)
     
         setTimeout(function(elementId){
             ui.addClass([document.getElementById(elementId)], 'fade-out');
@@ -246,9 +251,9 @@ const Mascot = class {
             setTimeout(function(elementId){
                 const bubbleDiv = document.getElementById(elementId);
                 if(bubbleDiv) bubbleDiv.remove();
-            },1800,speechBubbleDiv.id);
+            },1900,speechBubbleDiv.id);
     
-        },this.speechBubbleLifeMS,speechBubbleDiv.id);
+        },speechDelay,speechBubbleDiv.id);
     }
 
     fart(){
