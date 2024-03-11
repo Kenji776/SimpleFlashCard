@@ -1,3 +1,9 @@
+/**
+ * @description allows connection to a remote database via fetch requests. The remote source must support allowing CORS. All requests currently made through req requests.
+ * If connecting to a Salesforce Apex Rest service, enable CORS in Setup->CORS->Add your origin.
+ * @param {string} endPointURL The endpoint URL of your service. Salesforce Salesforce Apex Rest Services, create your Apex REST class, host it on a public site, then the format is 
+ * https:/[Your Site URL Here]/services/apexrest/ [Apex Rest Class URL here]
+ */
 const Database = class {
 
     endpoint = '';
@@ -18,18 +24,47 @@ const Database = class {
 		}
 	}
 
-    async sendRequest(params){
-        let authTokenString = `?authToken=${this.getAuthToken()}`;
+    async sendRequest(params,method='GET'){
+        let authToken = this.getAuthToken();
+        
+        if(method=='GET'){
+            return await this.doGet(params,authToken)
+        }else if(method=='POST'){
+            return await this.doPost(params,authToken)
+        }
+    }
+
+    async doGet(params={},authToken=''){
+        let authTokenString = `?authToken=${authToken}`;
         let queryString = '&'+this.serializeObjectToQueryString(params);
 
         let requestUrl = `${this.endpoint}${authTokenString}${queryString}`;
         console.log('Sending request to URL');
         console.log(requestUrl);
 
-        const response = await fetch(requestUrl);
+        const response = await fetch(requestUrl,{
+            method: 'GET'
+        });
+        
         const data = await response.json();
         return data;
     }
+    async doPost(params={},authToken=''){
+        params.authToken = authToken;
+        let requestUrl = `${this.endpoint}`;
+        console.log('Sending request to URL');
+        console.log(requestUrl);
+        console.log('Post Body');
+        console.log(JSON.stringify(params));
+
+        const response = await fetch(requestUrl,{
+            method: 'POST',
+            body: JSON.stringify(params)
+        });
+        
+        const data = await response.json();
+        return data;
+    }    
 
     serializeObjectToQueryString(obj){
         var str = [];

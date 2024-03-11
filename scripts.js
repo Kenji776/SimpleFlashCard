@@ -195,7 +195,7 @@ function loadSettings(){
     //their onclick function. This will only really work for like buttons and checkboxes and such. 
     for(let thisNode of affectedElements){
 
-        if(!thisNode || !this.thisNode.type) continue;
+        if(!thisNode || !thisNode.type) continue;
         if((thisNode.type == 'checkbox' && thisNode.checked) || (thisNode.type != 'checkbox') ){
             if(thisNode.getAttribute('onclick')){
                 eval(thisNode.getAttribute('onclick'));
