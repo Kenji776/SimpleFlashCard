@@ -134,7 +134,7 @@ class PerformanceRecord {
         return null;
     }
 
-    getPreviousResults(pastPerformances){
+    getPreviousResults(pastPerformances={}){
         let previousResults = [];
         for(let thisPerf of pastPerformances){
             if(thisPerf.deckId === this.deckId && thisPerf.performanceRecordId != this.performanceRecordId) previousResults.push(thisPerf);

@@ -104,18 +104,22 @@ async function loadCardLibrary(){
 
 async function sendScore(){
 
-    console.log('Sending Score!');
+    if(userName.length > 0 && userName != 'Your Name Here'){
+        console.log('Sending Score!');
 
-    let createResult = await database.sendRequest({
-        'action':'log_score',
-        'player':userName,
-        'score':performance.runningTotalScore,
-        'deck': utils.formatId(performance.deckId), 
-        'recordId': performance.performanceRecordId
-    });
+        let createResult = await database.sendRequest({
+            'action':'log_score',
+            'player':userName,
+            'score':performance.runningTotalScore,
+            'deck': utils.formatId(performance.deckId), 
+            'recordId': performance.performanceRecordId
+        });
 
-    console.log('Result of high score create');
-    console.log(createResult);
+        console.log('Result of high score create');
+        console.log(createResult);
+    }else{
+        console.log('No username set. Not sending score.');
+    }
 }
 
 function registerKeyboardShortcuts(){
