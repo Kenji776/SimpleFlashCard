@@ -82,13 +82,9 @@ async function init(){
 	
     let settings = loadSettings();
 
-    console.log('SEttings');
-    console.log(settings);
     registerPersistantDataStorage();
 
     if(settings && settings?.config?.username) setUsername(settings.config.username);
-
-    
 }
 
 async function loadCardLibrary(){
@@ -124,11 +120,12 @@ async function sendScore(){
 
 function registerKeyboardShortcuts(){
 	
+ 
 	doLog('Registering shortcut keys!');
 	document.onkeydown = function (e) {
 		e = e || window.event;
 		// use e.keyCode
-		console.log(e.keyCode);
+		console.log(e.keyCode + ' or key: ' + e.key);
 		
         //up arrow
 		if (e.keyCode == '38') showAnswer();
@@ -139,19 +136,22 @@ function registerKeyboardShortcuts(){
         //right arrow
 		else if (e.keyCode == '39') loadNext();
         //"h"	   
-		else if(e.keyCode == '72') showClue();
+		else if(e.key == 'h') showClue();
         //1
-		else if(e.keyCode == '49') answerCorrect();
+		else if(e.key == '1') answerCorrect();
         //2
-		else if(e.keyCode == '50') answerIncorrect();
+		else if(e.key == '2') answerIncorrect();
         //"s"
-        else if(e.keyCode == '83') saveSettings();
+        else if(e.key == 's') saveSettings();
         //"l"
-        else if(e.keyCode == '76') loadSettings();
+        else if(e.key == 'l') loadSettings();
         //"r"
-        else if(e.keyCode == '82') savePerformance();
+        else if(e.key == 'r') savePerformance();
         //"p"
-        else if(e.keyCode == '80') getPastPerformanceData();
+        else if(e.key == 'p') getPastPerformanceData();
+
+        else if(e.key == 'm') generateMnemonic();
+
         
         //e.preventDefault();
 	};
@@ -869,6 +869,14 @@ function incorrectAnswerAlert(){
     mascot.sayRandom(getIncorrectAnswerText(),'sad')
 }
 
+function generateMnemonic(){
+    console.log('Calling Chat GPT!');
+    console.log(currentCard);
+    let question = 'Please give me a Mnemonic Device to remember the pharmacy drug brand name ' + currentCard.brandName + ' that has a generic name of ' + currentCard.genericName + ' that is of the class ' + currentCard.drugClassName;
+    mascot.askQuestion(question);
+
+
+}
 
 function setNavigationButtonStates(cardIndex,stackLength){
 	
@@ -878,7 +886,7 @@ function setNavigationButtonStates(cardIndex,stackLength){
 	//if we are the beginning of the deck
 	if(cardIndex == 0){
 		doLog('If block 1');
-		ui.disable(['prev-button','clue-button','next-letter-button','next-answer-button']);
+		ui.disable(['prev-button','clue-button','next-letter-button','next-answer-button', 'mnemonic-button']);
 		
 	}
 	
@@ -890,7 +898,7 @@ function setNavigationButtonStates(cardIndex,stackLength){
 	//if we are somewhere in middle of the stack
 	else if(cardIndex < cards.length){
 		doLog('If block 3');
-		ui.enable(['next-button','prev-button','clue-button','next-letter-button','next-answer-button']);
+		ui.enable(['next-button','prev-button','clue-button','next-letter-button','next-answer-button','mnemonic-button']);
 		ui.getElements('next-button')[0].value = 'Next';
 	}
 	//if we are at the very end of the stack

@@ -39,27 +39,33 @@ const Database = class {
         let queryString = '&'+this.serializeObjectToQueryString(params);
 
         let requestUrl = `${this.endpoint}${authTokenString}${queryString}`;
-        console.log('Sending request to URL');
-        console.log(requestUrl);
 
+        console.log('Sending database request');
+        console.log(requestUrl);
         const response = await fetch(requestUrl,{
-            method: 'GET'
+            method: 'GET'/*,
+            headers: {
+                'Authorization': authToken
+            }*/
         });
         
+        console.log('Got back response');
+        //let responseText = await response.text()
+        //console.log(responseText);
+
         const data = await response.json();
         return data;
     }
     async doPost(params={},authToken=''){
         params.authToken = authToken;
         let requestUrl = `${this.endpoint}`;
-        console.log('Sending request to URL');
-        console.log(requestUrl);
-        console.log('Post Body');
-        console.log(JSON.stringify(params));
 
         const response = await fetch(requestUrl,{
             method: 'POST',
-            body: JSON.stringify(params)
+            body: JSON.stringify(params)/*,
+            headers: {
+                'Authorization': authToken
+            }*/
         });
         
         const data = await response.json();

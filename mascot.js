@@ -19,7 +19,7 @@ const Mascot = class {
         }
     }
     audio = []
-    
+    chatGPTLoaded = false;
     speechBubbleDiv;
     moodImages = {
         angry: 'shibaAngry.png',
@@ -46,7 +46,7 @@ const Mascot = class {
     idleChatRandomChance = 10; //odds of random chat being sent (out of 100) if cooldown is met
     lastIdleChatSent = 0 //when was the idle last chat sent?
     userIsIdle = false; //tracks if user is currently idle
-
+    uninterruptableMessageDisplayed = false; //if the currently displayed message is uninterruptable track it
     //random event loop variables
     randomEventLoop;
     randomEventLoopIntervalMS = 20000; //every twenty seconds maybe do something random
@@ -102,6 +102,33 @@ const Mascot = class {
 
         this.setMood('happy');
         this.sayRandom('greeting');
+        this.initChatGpt();
+    }
+
+    async initChatGpt(){
+
+           
+           console.log('Chat GPT library loaded!');
+           this.chatGPTLoaded = true;
+    }
+
+    async askQuestion(questionString){
+
+        console.log('Asking');
+        console.log(questionString);
+
+        this.say('Asking ChatGPT ' + questionString + '...');
+
+        let chatGPTResponse = await database.sendRequest({
+            'action':'ask_chat_gpt',
+            'prompt': questionString,
+        });
+    
+        console.log(chatGPTResponse);
+        setTimeout(function(scope){
+            scope.say(chatGPTResponse.response.choices[0].message.content,true,false,false);
+        },2000,this)
+        
     }
 
 
@@ -179,9 +206,7 @@ const Mascot = class {
     registerMascotHotkeys(){
         document.addEventListener('keydown', function(e) {
             e = e || window.event;
-            // use e.keyCode
-            console.log(e.keyCode);
-            
+            // use e.keyCode            
             if (e.keyCode == '70') {
                 let prevSetting = this.mute;
                 this.mute = false;
@@ -229,7 +254,14 @@ const Mascot = class {
         this.say(randomWords);
     }
 
-    say(speechText, hideOtherSpeechBubbles=true){     
+    say(speechText, hideOtherSpeechBubbles=true, interruptable=true, autoFade=true){  
+        
+        if(this.uninterruptableMessageDisplayed) {
+            console.warn('Uninterruptable Message Displayed. Not showing message ' + speechText);
+            return;
+        }
+
+
         if(hideOtherSpeechBubbles) {
             ui.getElements('.mascot-speech-bubble').forEach(e => e.remove());
         }
@@ -237,26 +269,39 @@ const Mascot = class {
 
         let speechBubbleDiv = document.createElement("div");
         speechBubbleDiv.id = 'speech-bubble-'+divId;
+
+        if(!interruptable){
+            this.uninterruptableMessageDisplayed = true;
+            speechText += `</br><span onclick=mascot.removeSpeechBubble('${speechBubbleDiv.id}') class="close-speech-link">Ok</span>`;
+        }
+
         speechBubbleDiv.className = "bubble bubble-bottom-right mascot-speech-bubble";
         speechBubbleDiv.innerHTML = speechText;
-        
         this.container.appendChild(speechBubbleDiv);     
 
         let numWords = speechText.split(' ').length;
         let speechDelay = 2.5 * numWords * 1000 * this.speechBubbleFadeDelay;
         speechDelay = speechDelay > 1500 && speechDelay < 10000 ? speechDelay : 3000;
-        console.log('there are ' + numWords + ' about to be said. Average reading speed is 150 WPM, so .0025 per MS or 2.5 per second. ');
-        console.log('Delay is: ' + speechDelay)
     
-        setTimeout(function(elementId){
-            ui.addClass([document.getElementById(elementId)], 'fade-out');
+        if(autoFade){
+            this.removeSpeechBubble(speechBubbleDiv.id,speechDelay);
+        }
+
+        
+    }
+
+    removeSpeechBubble(bubbleId,speechDelay){
+        if(this.uninterruptableMessageDisplayed) this.uninterruptableMessageDisplayed = false;
+
+        setTimeout(function(bubbleId){
+            ui.addClass([document.getElementById(bubbleId)], 'fade-out');
     
-            setTimeout(function(elementId){
-                const bubbleDiv = document.getElementById(elementId);
+            setTimeout(function(bubbleId){
+                const bubbleDiv = document.getElementById(bubbleId);
                 if(bubbleDiv) bubbleDiv.remove();
-            },1900,speechBubbleDiv.id);
+            },1900,bubbleId);
     
-        },speechDelay,speechBubbleDiv.id);
+        },speechDelay,bubbleId);
     }
 
     fart(){

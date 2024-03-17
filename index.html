@@ -348,6 +348,7 @@
 			<div id="controls">
 				<div id="button-container">
 					<input type="button" class="big-button" id="prev-button" onclick="loadPrev()" data-default-value="&#8592; Previous" value="&#8592; Previous" ></input>
+					<input type="button" class="big-button" id="mnemonic-button" onclick="generateMnemonic()" value="Generate Mnemonic (M)"></input>
 					<input type="button" class="big-button" id="clue-button" onclick="showClue()" value="Hint (H)"></input>
 					<img src="media/flip.png" onclick="showAnswer()" id="flip-button" />
 					<input type="button" class="big-button" id="next-letter-button" onclick="performHintAction()" data-default-value="Next Letter &#8595;" value="Next Letter &#8595;"></input>
@@ -548,5 +549,8 @@
 		  </div>
 		</div>
 	</div>
+	<form>
+		<textarea></textarea>
+	</form>
 </body>
 </html>

@@ -23,26 +23,17 @@ async function registerGetScoresInterval(){
 }
 
 async function getScores(deckId){
-
-    console.log('Getting Scores for ' +deckId);
-
     let getResult = await database.sendRequest({
         'action':'get_scores',
         'deck':deckId,
     });
-
-    console.log('Result of high score get');
-    console.log(getResult);
-
     return getResult;
 }
 
 async function buildGlobalHighScoresTable(deckId, targetContainer){
-    console.log('Getting high scores for deck: ' + deckId)
+    if(!deckId || deckId.length === 0) return;
+    //console.log('Getting high scores for deck: ' + deckId)
     let scores = await getScores(deckId);
-
-    console.log('Got scores');
-    console.log(scores);
 
     table = document.createElement('table'),
     table.setAttribute('class', 'high-score-table');
@@ -57,7 +48,9 @@ async function buildGlobalHighScoresTable(deckId, targetContainer){
         tr.appendChild(th);
     });
 
-    scores.sObjects.forEach(function(score) {
+    console.log('Parsing Scores');
+    console.log(scores)
+    scores.forEach(function(score) {
         tr = document.createElement('tr'), 
         tr.setAttribute('class', 'sub-header-text-2');     
         table.appendChild(tr);
