@@ -48,15 +48,6 @@
             "url": "https://pharmacy-flashcards-2027.lol/cards/IntroToPharmacy2/Combined.cards"
           }
         }
-      ],
-      "DeveloperTest": [
-        {
-          "multiple_select_test": {
-            "name": "Multiple Choice Selection Test",
-            "description": "Developer test of multiple choice select",
-            "url": "https://pharmacy-flashcards-2027.lol/cards/DeveloperTest/multipleChoice.cards"
-          }
-        }
       ]
     }
   }

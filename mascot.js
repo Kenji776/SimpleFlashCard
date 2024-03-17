@@ -102,21 +102,11 @@ const Mascot = class {
 
         this.setMood('happy');
         this.sayRandom('greeting');
-        this.initChatGpt();
-    }
-
-    async initChatGpt(){
-
-           
-           console.log('Chat GPT library loaded!');
-           this.chatGPTLoaded = true;
     }
 
     async askQuestion(questionString){
-
-        console.log('Asking');
-        console.log(questionString);
-
+        this.uninterruptableMessageDisplayed = false;
+        
         this.say('Asking ChatGPT ' + questionString + '...');
 
         let chatGPTResponse = await database.sendRequest({
@@ -125,6 +115,7 @@ const Mascot = class {
         });
     
         console.log(chatGPTResponse);
+        
         setTimeout(function(scope){
             scope.say(chatGPTResponse.response.choices[0].message.content,true,false,false);
         },2000,this)
