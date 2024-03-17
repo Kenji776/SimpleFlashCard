@@ -26,7 +26,8 @@ const Mascot = class {
         confused: 'shibaConfused.png',
         fart: 'shibaFart.png',
         happy: 'shibaHappy.png',
-        sad: 'shibaSad.png'
+        sad: 'shibaSad.png',
+        think: 'shibaThink.png'
     };
 
     miscImages = {
@@ -106,8 +107,9 @@ const Mascot = class {
 
     async askQuestion(questionString){
         this.uninterruptableMessageDisplayed = false;
-        
-        this.say('Asking ChatGPT ' + questionString + '...');
+
+        this.setMood('think');
+        this.say('Alright.... gimme a second....');
 
         let chatGPTResponse = await database.sendRequest({
             'action':'ask_chat_gpt',
@@ -117,6 +119,7 @@ const Mascot = class {
         console.log(chatGPTResponse);
         
         setTimeout(function(scope){
+            scope.setMood('happy');
             scope.say(chatGPTResponse.response.choices[0].message.content,true,false,false);
         },2000,this)
         
