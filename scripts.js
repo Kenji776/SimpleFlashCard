@@ -1393,12 +1393,14 @@ function setUi(enableUi){
     doLog('toggling ui');
     if(enableUi){
         doLog('enabling UI');
-        document.getElementById('deck-controls').style.visibility='visible';
-        document.getElementById('controls').style.visibility='visible';
+        //document.getElementById('deck-controls').style.visibility='visible';
+        //document.getElementById('controls').style.visibility='visible';
+        ui.showElements(['deck-controls','controls','deck-variants'])
     }else{
         doLog('Hiding ui')
-        document.getElementById('deck-controls').style.visibility='hidden';
-        document.getElementById('controls').style.visibility='hidden';
+        //document.getElementById('deck-controls').style.visibility='hidden';
+        //document.getElementById('controls').style.visibility='hidden';
+        ui.hideElements(['deck-controls','controls','deck-variants'])
     }   
 }
 

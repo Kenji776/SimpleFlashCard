@@ -87,6 +87,8 @@
 						</input>				
 						<label for="randomize">Random Order</label>
 					</div>
+				</div>
+				<div class="misc-options">
 
 					<div>
 						<input 
@@ -163,7 +165,7 @@
 
 					<div class="spacer"></div>
 					
-					<div>
+					<div id="deck-variants">
 						<label for="prompt-key">Question Prompt:</label>
 						<select 
 							name="prompt-key" 
@@ -172,11 +174,11 @@
 							data-persistent="true"
 							onchange="setPromptKey(this.value)">
 						</select>
-					</div>
-
-					<div class="spacer"></div>
 					
-					<div>
+
+						<div class="spacer"></div>
+					
+					
 						<label for="load-variant-select">Load Variant Deck</label>
 						<select 
 							onchange="handleSetSelectedVariant(this.value)" 
