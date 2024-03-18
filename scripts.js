@@ -11,6 +11,7 @@ var storedSettings = new LS(settingsName); //instance of LS (local storage) obje
 var storedScores = new LS(scoresName); //instance of LS (local storage) object
 var database = new Database(databaseUrl);
 var utils = new Utils();
+var EL;
 
 var showLogs = false;
 var deckUrl;
@@ -67,6 +68,12 @@ var options = {
 
 async function init(){
     mascot = new Mascot();
+
+    database.sendRequest({
+        action: 'get_el_auth'
+    }).then(function(apiKey){
+        EL = new ElevenLabs(apiKey);
+    })
 
 	loadCardLibrary();
 	

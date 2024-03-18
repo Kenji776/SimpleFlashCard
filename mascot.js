@@ -21,6 +21,7 @@ const Mascot = class {
     audio = []
     chatGPTLoaded = false;
     speechBubbleDiv;
+    useTTS = true;
     moodImages = {
         angry: 'shibaAngry.png',
         confused: 'shibaConfused.png',
@@ -34,6 +35,9 @@ const Mascot = class {
         fart: 'fart.png'
     }
 
+    TTS = {
+        voice_id: '2ovNLFOsfyKPEWV5kqQi'
+    }
     //divs
     container; //outer container div that holds mascot and other animation divs
     mascotDiv; //div with mascot background image
@@ -250,6 +254,9 @@ const Mascot = class {
 
     say(speechText, hideOtherSpeechBubbles=true, interruptable=true, autoFade=true){  
         
+        if(this.useTTS && EL && !this.mute){
+            EL.tts(speechText,this.TTS.voice_id)
+        }
         if(this.uninterruptableMessageDisplayed) {
             console.warn('Uninterruptable Message Displayed. Not showing message ' + speechText);
             return;
