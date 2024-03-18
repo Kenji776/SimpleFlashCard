@@ -36,6 +36,14 @@ const ElevenLabs = class {
             return;
         }
 
+        //if the audio decoding fails it throws an uncatchable error it seems. So we have a manual timer to unset the isStreaming flag
+        //so that future calls can be ready
+        setTimeout(function(scope){
+            console.log('Unsetting is streaming flag');
+            scope.isStreaming = false;
+    
+        },3000,this);
+
         const req = new Request(this.streamingURL, {
             method: 'POST',
             body: JSON.stringify({text: text}),
@@ -53,13 +61,7 @@ const ElevenLabs = class {
             const reader = resp.body.getReader()
             const read = async () => {
 
-            //if the audio decoding fails it throws an uncatchable error it seems. So we have a manual timer to unset the isStreaming flag
-            //so that future calls can be ready
-            setTimeout(function(scope){
-                console.log('Unsetting is streaming flag');
-                scope.isStreaming = false;
-        
-            },3000,this);
+
 
             try{
                 await reader.read().then(({done, value}) => {
