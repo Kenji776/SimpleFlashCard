@@ -54,6 +54,8 @@ const Mascot = class {
     idleChatRandomChance = 10; //odds of random chat being sent (out of 100) if cooldown is met
     lastIdleChatSent = 0 //when was the idle last chat sent?
     userIsIdle = false; //tracks if user is currently idle
+    maxIdleEvents = 2; //maximum number of idle chats to send before stopping
+    numRunIdleEvents = 0;
     uninterruptableMessageDisplayed = false; //if the currently displayed message is uninterruptable track it
     //random event loop variables
     randomEventLoop;
@@ -167,6 +169,7 @@ const Mascot = class {
         if(this.userIsIdle){
             this.setMood('happy');
             this.sayRandom('idle_stop');
+            this.numRunIdleEvents = 0;
         }
 
         this.idleSeconds = 0;
@@ -238,16 +241,36 @@ const Mascot = class {
         }
     
         this.idleChatInterval = setInterval(function(scope){
-            let randomChance = Math.floor(Math.random() * 101);
 
-            let rightNow = new Date().getTime();
+            //console.log('Idle event values: ' +  scope.numRunIdleEvents + ' < ' + scope.maxIdleEvents)
+            if(scope.numRunIdleEvents < scope.maxIdleEvents){
+                
+                let randomChance = Math.floor(Math.random() * 101);
 
-            if(scope.userIsIdle && randomChance < scope.idleChatRandomChance && ( (rightNow-scope.lastIdleChatSent) / 1000 > scope.idleChatCooldownSeconds)){          
-                scope.setMood('happy');
-                scope.sayRandom('idle_chat');
-                scope.lastIdleChatSent = new Date().getTime(); 
+                let rightNow = new Date().getTime();
+
+                /*
+                console.log('Random chance check: ' + randomChance + ' < ' + scope.idleChatRandomChance)
+                console.log('User idle?: ' + scope.userIsIdle);
+                console.log('Cooldown met?: ' + (rightNow-scope.lastIdleChatSent) / 1000 > scope.idleChatCooldownSeconds);
+                */
+                if(scope.userIsIdle && randomChance < scope.idleChatRandomChance && ( (rightNow-scope.lastIdleChatSent) / 1000 > scope.idleChatCooldownSeconds)){
+                    scope.numRunIdleEvents++;          
+                    scope.setMood('happy');
+                    scope.sayRandom('idle_chat');
+                    scope.lastIdleChatSent = new Date().getTime(); 
+                }
+            }else{
+                if(scope.numRunIdleEvents == scope.maxIdleEvents){
+                    scope.numRunIdleEvents++;  
+                    console.warn('Max idle events reached.');
+                    scope.setMood('sad');
+                    scope.sayRandom('idle_max_events_reached');
+                    if(this.idleTimer) clearTimeout(this.idleTimer);
+                    return;
+                }
             }
-        },1000,this);
+        },2000,this);
     }
 
     randomEvent(){

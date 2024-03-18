@@ -212,6 +212,10 @@
         "Glad you made it back"
     ],
 
+    "idle_max_events_reached":[
+        "Alright, you're gone. I'm just going to shut up now."
+    ],
+
     "fart":[
         "Whoops",
         "Pardon Me",    
