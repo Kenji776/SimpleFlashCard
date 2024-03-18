@@ -82,7 +82,10 @@
     "return":[
         "Good to be back",
         "Hey there, glad to be back",
-        "Stinks like foot in here"
+        "Stinks like foot in here",
+        "Whaddup?",
+        "I return!",
+        "Miss me?"
     ],
 
     "click_leave_warning":[
@@ -164,16 +167,21 @@
     ],
 
     "clicked": [
-        "Dont fucking click me.",
         "Stop touching me",
-        "Ouch. What the fuck?",
-        "Fuck off",
         "OW! STOP!",
         "This is animal abuse",
         "I'm calling the police",
         "That's assult! I never said you could touch me",
         "Seriously knock it off",
-        "I will leave if you keep this up"
+        "I will leave if you keep this up",
+        "Rude!",
+        "How would you like it if I just poked you without consent?"
+    ],
+
+    "clicked_uncensored":[
+        "Fuck off",
+        "Ouch. What the fuck?",
+        "Dont fucking click me."
     ],
 
     "greeting":[
@@ -201,18 +209,21 @@
 
     "fart":[
         "Whoops",
-        "Pardon Me",
-        "You like that?",
+        "Pardon Me",    
         "HHHNNNGGGGGG",
         "Breath deep",
         "Better out than in",
         "I love farting",
         "The more you fart the better you feel",
         "You can blame this one on the dog",
+        "AAAARGGHHHH"
+    ],
+
+    "fart_uncensored":[
+        "You like that?",
         "MY ASSHOLE! ARGHGHDHGHAGHH",
         "Argghh that one stung a little bit",
-        "That was a little to wet for comfort",
-        "AAAARGGHHHH"
+        "That was a little to wet for comfort"
     ]
 
     
