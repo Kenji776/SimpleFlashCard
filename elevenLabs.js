@@ -28,11 +28,14 @@ const ElevenLabs = class {
     async tts(text,voiceId){
 
         if(!this.apiKey || this.apiKey.length === 0){
-            console.log('Eleven labs API key not set. Skipping TTS')
+            console.log('Eleven labs API key not set. Skipping TTS');
+            return;
         }
         if(this.isStreaming){
             console.log('Already reading content. Skipping reading of ' + text);
+            return;
         }
+
         const req = new Request(this.streamingURL, {
             method: 'POST',
             body: JSON.stringify({text: text}),
@@ -44,39 +47,65 @@ const ElevenLabs = class {
 
         fetch(req).then((resp) => {
 
-        this.isStreaming = true;
-        const audioContext = new AudioContext()
-        let startTime = 0
-        const reader = resp.body.getReader()
-        const read = async () => {
+            this.isStreaming = true;
+            const audioContext = new AudioContext()
+            let startTime = 0
+            const reader = resp.body.getReader()
+            const read = async () => {
 
-            await reader.read().then(({done, value}) => {
-                if (done) {
-                    console.log("THE STREAM HAS ENDED");
-                    this.isStreaming;
-                    return
-                }
+            //if the audio decoding fails it throws an uncatchable error it seems. So we have a manual timer to unset the isStreaming flag
+            //so that future calls can be ready
+            setTimeout(function(scope){
+                console.log('Unsetting is streaming flag');
+                scope.isStreaming = false;
+        
+            },3000,this);
 
-                audioContext.decodeAudioData(value.buffer, (audioBuffer) => {
-                    const source = audioContext.createBufferSource();
-                    source.buffer = audioBuffer;
-                    source.connect(audioContext.destination);
+            try{
+                await reader.read().then(({done, value}) => {
+                    try{
+                        if (done) {
+                            console.log("Audio stream ended");
+                            this.isStreaming = false;
+                            return
+                        }
 
-                    // Wait for the current audio part to finish playing
-                    source.onended = () => {
-                        console.log("Ended playing: " + Date.now())
-                        read()
-                    };
+                        audioContext.decodeAudioData(value.buffer, (audioBuffer) => {
+                            try{
+                                const source = audioContext.createBufferSource();
+                                source.buffer = audioBuffer;
+                                source.connect(audioContext.destination);
 
-                    if (startTime == 0) {
-                        startTime = audioContext.currentTime + 0.1 //adding 50ms latency to work well across all systems
+                                // Wait for the current audio part to finish playing
+                                source.onended = () => {
+                                    read()
+                                };
+
+                                if (startTime == 0) {
+                                    startTime = audioContext.currentTime + 0.1 //adding 50ms latency to work well across all systems
+                                }
+                                source.start(audioContext.currentTime)
+                                startTime = startTime + source.buffer.duration
+                            }catch(ex){
+                                console.error('Error playing audio chunk');
+                                console.log(value.buffer);
+                                this.isStreaming = false;
+                            }
+                        });
+                    }catch(ex){
+                        console.error('Error processing data chunk for audio stream');
+                        console.log(done);
+                        console.log(value);
+                        console.log(ex);  
+                        this.isStreaming = false;                     
                     }
-                    source.start(audioContext.currentTime)
-                    startTime = startTime + source.buffer.duration
 
-                });
-
-            })
+                })
+            }catch(ex){
+                console.error('Error reading data chunk for audio stream');
+                console.log(ex);
+                this.isStreaming = false;
+            }
         }
         read()
     })

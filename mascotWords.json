@@ -66,10 +66,15 @@
     ],
 
     "rage_leave":[
-        "Fuck this I'm outta here",
+        
         "I don't have to take this, I'm leaving",
         "Have fun studying by yourself.",
         "You just couldn't help yourself could you? And now I'm leaving"
+    ],
+
+    "rage_leave_uncensored":[
+        "Fuck this I'm outta here",
+        "This is bullshit. Im out"
     ],
 
     "leave_neutral":[
@@ -153,7 +158,7 @@
         "You will never stand backward on a staircase.",
         "There are two E's in bee, but they're both silent.",
         "Ever think it's weird that trees drink with their feet?",
-        "We laugh at dogs getting excited when they hear a bark on TV, but if TV was a nonstop stream of unintelligible noises and then someone suddenly spoke to you in your language, you'd be pretty fucking startled too.",
+        "We laugh at dogs getting excited when they hear a bark on TV, but if TV was a nonstop stream of unintelligible noises and then someone suddenly spoke to you in your language, you'd be pretty startled too.",
         "The adjective for metal is metallic, but not so for iron, which is ironic.",
         "Did you know if you hold your ear up to a stranger’s leg, you can actually hear them say, 'What the hell are you doing?'",
         "It's quite ironic that 'strap on', backwards, spells 'no parts'",

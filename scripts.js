@@ -1370,6 +1370,12 @@ function toggleMascot(){
 function toggleMuteMascot(){
     mascot.mute = !mascot.mute;
 }
+
+function toggleUncensoredMascot(){
+    console.log('Toggle uncensored mode');
+    mascot.uncensoredMode = !mascot.uncensoredMode;
+}
+
 function setPromptKey(value){
     doLog('Setting prompt key: ' + value);
     promptKey = value;

@@ -9,6 +9,8 @@ const Mascot = class {
     isActive = true;
     canReactivate = true;
     mood = 50;
+    uncensoredMode = false;
+
     imageBaseFolderURL = 'https://pharmacy-flashcards-2027.lol/media/';
     soundsFolder = 'https://pharmacy-flashcards-2027.lol/media/sounds/'
     urls = {
@@ -35,6 +37,7 @@ const Mascot = class {
         fart: 'fart.png'
     }
 
+    //elevenlabs text to speech settins. 
     TTS = {
         voice_id: '2ovNLFOsfyKPEWV5kqQi'
     }
@@ -47,14 +50,27 @@ const Mascot = class {
     idleTimer;        //container for idle timer
     idleChatInterval; //how long user must be idle for chat message to appear
     idleThesholdSeconds =20; //how long with no user interation before we consider them idle
-    idleChatCooldownSeconds = 5; //minimum amount of time between idle chat messages
+    idleChatCooldownSeconds = 10; //minimum amount of time between idle chat messages
     idleChatRandomChance = 10; //odds of random chat being sent (out of 100) if cooldown is met
     lastIdleChatSent = 0 //when was the idle last chat sent?
     userIsIdle = false; //tracks if user is currently idle
     uninterruptableMessageDisplayed = false; //if the currently displayed message is uninterruptable track it
     //random event loop variables
     randomEventLoop;
-    randomEventLoopIntervalMS = 20000; //every twenty seconds maybe do something random
+    randomEventLoopIntervalMS = 5000; //every twenty seconds maybe do something random
+    actions = {
+        fart : {
+            enabled: false,
+            functionToCall: 'fart',
+            name: 'Fart',
+            lastRun: null,
+            cooldownSeconds: 5,
+            trigger: {
+                type: 'random',
+                chance: 5
+            }
+        }
+    }
 
     currentStatus = {
         mood: {
@@ -235,21 +251,81 @@ const Mascot = class {
     }
 
     randomEvent(){
-        let eventId = Math.floor(Math.random() * 101);
+        //generate a random percentage chance between 0 - 100
+        let randomChance = Math.floor(Math.random() * 101);
 
+        console.log('Random event loop called with chance: ' + randomChance);
+        console.log(this.actions);
+        //we only want to perform one action per loop, so we create a sub collection of potential actions based on % chance
+        let potentialActions = [];
+        let currentTime = Date.now();
+
+        for(let thisActionName in this.actions){
+            let thisAction = this.actions[thisActionName];
+
+            let cooldownMet = thisAction.lastCalled == null || currentTime - thisAction.lastCalled >= (thisAction.cooldownSeconds * 1000) ? true : false;
+
+            if(thisAction?.trigger?.type == 'random' && randomChance <= thisAction?.trigger?.chance && cooldownMet){
+                potentialActions.push(thisAction);
+            }
+        }
+
+        if(potentialActions.length > 0){
+            var thisAction = potentialActions[Math.floor(Math.random()*potentialActions.length)];
+            console.log('Selected Random Event:');
+            console.log(thisAction);
+
+            this[thisAction.functionToCall](randomChance, this);
+            thisAction.lastCalled = Date.now();
+            
+        }
+
+        /*
         if(eventId > 50){
             this.fart();
         }
+        */
     }
 
-    sayRandom(speechCategory){
-        if(!this.words.hasOwnProperty(speechCategory)){
-            console.error(`Could not find speech category ${speechCategory}. Not reading text`);
-            this.say('I don\'t know what to say!')
-            return;
+    sayRandom(speechCategories=[]){
+
+
+        let possiblePhrases = []; 
+        if(typeof speechCategories === 'string') speechCategories = speechCategories.split(',');
+        else if(isArray(speechCategories)) speechCategories = speechCategories;
+
+
+        let uncensoredCategories = [];
+
+        console.log('Uncensored mode?: ' + this.uncensoredMode);
+        if(this.uncensoredMode){
+            for(let category of speechCategories){
+                if(this.words.hasOwnProperty(category+'_uncensored')){
+                    console.log('Adding uncensored property!');
+                    uncensoredCategories.push(category+'_uncensored');
+                }
+            }
         }
-        let randomWords = this.words[speechCategory][Math.floor(Math.random() *  this.words[speechCategory].length)];
-        this.say(randomWords);
+        speechCategories = speechCategories.concat(uncensoredCategories);
+
+        console.log('Got speech categorioes');
+        console.log(speechCategories);
+
+        for(let category of speechCategories){
+            if(!this.words.hasOwnProperty(category)){
+                console.error(`Could not find speech category ${category}. Not adding words to list`);
+                //this.say('I don\'t know what to say!')
+            }else{
+                possiblePhrases = possiblePhrases.concat(this.words[category])
+            }
+        }
+
+        if(possiblePhrases.length > 0){
+            let randomWords = possiblePhrases[Math.floor(Math.random() *  possiblePhrases.length)];
+            this.say(randomWords);
+        }else{
+            this.say('I don\'t know what to say!');
+        }
     }
 
     say(speechText, hideOtherSpeechBubbles=true, interruptable=true, autoFade=true){  
@@ -266,6 +342,7 @@ const Mascot = class {
         if(hideOtherSpeechBubbles) {
             ui.getElements('.mascot-speech-bubble').forEach(e => e.remove());
         }
+
         let divId = Math.floor(Math.random() * 101);
 
         let speechBubbleDiv = document.createElement("div");
@@ -312,7 +389,9 @@ const Mascot = class {
         if(resetToStatusAfterFart === 'fart') return;
 
         this.setMood('fart');
-        this.sayRandom('fart');
+
+        let speechCategories = ['fart'];
+        this.sayRandom(speechCategories);
 
         this.playRandomSound('fart');
 
