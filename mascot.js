@@ -277,12 +277,10 @@ const Mascot = class {
 
     randomEvent(){
         if(!this.isActive) return;
-        
+
         //generate a random percentage chance between 0 - 100
         let randomChance = Math.floor(Math.random() * 101);
 
-        console.log('Random event loop called with chance: ' + randomChance);
-        console.log(this.actions);
         //we only want to perform one action per loop, so we create a sub collection of potential actions based on % chance
         let potentialActions = [];
         let currentTime = Date.now();
@@ -299,19 +297,10 @@ const Mascot = class {
 
         if(potentialActions.length > 0){
             var thisAction = potentialActions[Math.floor(Math.random()*potentialActions.length)];
-            console.log('Selected Random Event:');
-            console.log(thisAction);
-
             this[thisAction.functionToCall](randomChance, this);
             thisAction.lastCalled = Date.now();
             
         }
-
-        /*
-        if(eventId > 50){
-            this.fart();
-        }
-        */
     }
 
     sayRandom(speechCategories=[]){
