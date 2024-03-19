@@ -1,10 +1,9 @@
 const ElevenLabs = class {
     apiKey;
-    streamingURL = "https://api.elevenlabs.io/v1/text-to-speech/{voice_id}/stream?optimize_streaming_latency=3";
+    streamingURL = "https://api.elevenlabs.io/v1/text-to-speech/{voice_id}/stream?optimize_streaming_latency=2";
     voiceURL = "https://api.elevenlabs.io/v1/voices";
     isStreaming = false;
     constructor(apiKey){
-        console.log('Eleven Labs init!');
         this.apiKey = apiKey;
     } 
 
@@ -26,9 +25,6 @@ const ElevenLabs = class {
     }
 
     async tts(text,voiceId,config) {
-
-        console.log('tts2 called with string: ' + text);
-
         if(!this.apiKey || this.apiKey.length === 0){
             console.log('Eleven labs API key not set. Skipping TTS');
             return;
@@ -39,11 +35,6 @@ const ElevenLabs = class {
         }
 
         this.isStreaming = true;
-        setTimeout(function(scope){
-            console.log('Unsetting is streaming flag');
-            scope.isStreaming = false;
-    
-        },3000,this);
         // Create an audio context
         const audioContext = new (window.AudioContext || window.webkitAudioContext)();
     
@@ -72,13 +63,10 @@ const ElevenLabs = class {
                 source.start(0);
 
                 source.onended = function(){
-                    console.log('Audio complete. Setting delay until next message readable');
-
                     setTimeout(function(scope){
-                        console.log('Unsetting is streaming flag');
                         scope.isStreaming = false;
                 
-                    },2000,this);
+                    },500,this);
                 }
             }, function(error) {
                 console.error('Error decoding audio data: ', error);
@@ -105,6 +93,7 @@ const ElevenLabs = class {
             if(voiceSettings) this.voiceSettings = voiceSettings;
         }
         text = '';
+        model = 'eleven_turbo_v2'
         voice_settings = {
             "similarity_boost":0.5,
             "stability": 0.25,
