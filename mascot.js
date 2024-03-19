@@ -354,7 +354,7 @@ const Mascot = class {
     say(speechText, hideOtherSpeechBubbles=true, interruptable=true, autoFade=true){  
         
         if(this.useTTS && EL && !this.mute){
-            EL.tts(speechText,this.TTS.voice_id)
+            EL.tts(speechText,this.TTS.voice_id);
         }
         if(this.uninterruptableMessageDisplayed) {
             console.warn('Uninterruptable Message Displayed. Not showing message ' + speechText);
