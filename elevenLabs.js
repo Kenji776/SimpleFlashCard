@@ -48,11 +48,11 @@ const ElevenLabs = class {
         request.setRequestHeader('Content-Type', 'application/json');
         request.setRequestHeader('xi-api-key', this.apiKey);
 
-
-    
+        //put the scope in a variable that's locally accessible/wont lost context since 'this' won't work inside the onload/onended handlers
+        var scope = this;
         request.onload = function() {
             const audioData = request.response;
-    
+
             // Decode the audio data
             audioContext.decodeAudioData(audioData, function(buffer) {
                 // Set the buffer to the source node
@@ -64,9 +64,9 @@ const ElevenLabs = class {
 
                 source.onended = function(){
                     setTimeout(function(scope){
+                        console.warn('Unsetting isStreaming flag');
                         scope.isStreaming = false;
-                
-                    },500,this);
+                    },500,scope);
                 }
             }, function(error) {
                 console.error('Error decoding audio data: ', error);
@@ -74,7 +74,7 @@ const ElevenLabs = class {
         };
 
         request.onloadend = function(){
-            console.log('Audio fetch complete')
+            //console.log('Audio fetch complete')
         }
     
         request.onerror = function() {

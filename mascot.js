@@ -54,7 +54,7 @@ const Mascot = class {
     idleChatRandomChance = 10; //odds of random chat being sent (out of 100) if cooldown is met
     lastIdleChatSent = 0 //when was the idle last chat sent?
     userIsIdle = false; //tracks if user is currently idle
-    maxIdleEvents = 2; //maximum number of idle chats to send before stopping
+    maxIdleEvents = 15; //maximum number of idle chats to send before stopping
     numRunIdleEvents = 0;
     uninterruptableMessageDisplayed = false; //if the currently displayed message is uninterruptable track it
     //random event loop variables
