@@ -166,6 +166,8 @@ const Mascot = class {
     }
 
     resetIdleTimer(){
+
+        if(!this.isActive) return;
         if(this.userIsIdle){
             this.setMood('happy');
             this.sayRandom('idle_stop');
@@ -274,6 +276,8 @@ const Mascot = class {
     }
 
     randomEvent(){
+        if(!this.isActive) return;
+        
         //generate a random percentage chance between 0 - 100
         let randomChance = Math.floor(Math.random() * 101);
 
@@ -353,6 +357,10 @@ const Mascot = class {
 
     say(speechText, hideOtherSpeechBubbles=true, interruptable=true, autoFade=true){  
         
+        if(!this.isActive){
+            console.warn('Mascot invactive. Not reading text');
+            return;            
+        }
         if(this.useTTS && EL && !this.mute){
             EL.tts(speechText,this.TTS.voice_id);
         }
