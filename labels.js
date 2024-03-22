@@ -16,13 +16,13 @@ const Labels = class {
     getLabels(){
         if(!this.isMobile){
             return {
-                nextButton: 'Next →',
+                nextButton: 'Next \u{2192}',
                 nextButtonFinish: 'Finish',
-                previousButton: '← Previous',
+                previousButton: '\u{2190} Previous',
                 generateMnemonic: 'Generate Mnemonic (M)',
                 hintButton: 'Hint (H)',
-                nextLetterButton: 'Next Letter ↓',
-                nextAnswerButton: 'Next Answer  ↓'
+                nextLetterButton: 'Next Letter \u{2193}',
+                nextAnswerButton: 'Next Answer  \u{2193}'
             }
         }else{
             return {

@@ -97,7 +97,7 @@
 					<div>
 						<input 
 							type="checkbox" 
-							onclick="ui.toggleDisplay('history-items')" 
+							onclick="ui.toggleDisplay('#history-panel')" 
 							name="toggleHistory" 
 							id="toggleHistory"
 							data-option-key="deckOptions.hideHistory"
@@ -117,6 +117,7 @@
 						</input>
 						<label for="toggleTimer">Hide Timer</label>
 					</div>
+
 					<div>
 						<input 
 							type="checkbox" 
@@ -128,6 +129,7 @@
 						</input>
 						<label for="toggleScoreDisplay">Hide Score</label>
 					</div>
+
 					<div>
 						<input 
 							type="checkbox" 
@@ -316,7 +318,7 @@
 				</div>
 			</div> 
 
-			<div class="panel history">
+			<div class="panel history" id="history-panel">
 				<span class="sub-header-text" style="text-align:center">History <span id="viewed-total" class="sub-header-text-2"></span></span>
 				<div id="history-items"></div>
 			</div>
