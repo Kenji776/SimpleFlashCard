@@ -12,7 +12,6 @@ var storedScores = new LS(scoresName); //instance of LS (local storage) object
 var database = new Database(databaseUrl);
 var utils = new Utils();
 var EL;
-var CGPT = new ChatGPT();
 var template = new Template();
 var labels = new Labels();
 
