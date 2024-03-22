@@ -313,24 +313,20 @@ const Mascot = class {
 
         let uncensoredCategories = [];
 
-        console.log('Uncensored mode?: ' + this.uncensoredMode);
+        //automatically injects uncensored words collection for this category if it exists and we are uncensored mode
         if(this.uncensoredMode){
             for(let category of speechCategories){
                 if(this.words.hasOwnProperty(category+'_uncensored')){
-                    console.log('Adding uncensored property!');
                     uncensoredCategories.push(category+'_uncensored');
                 }
             }
         }
-        speechCategories = speechCategories.concat(uncensoredCategories);
 
-        console.log('Got speech categorioes');
-        console.log(speechCategories);
+        speechCategories = speechCategories.concat(uncensoredCategories);
 
         for(let category of speechCategories){
             if(!this.words.hasOwnProperty(category)){
                 console.error(`Could not find speech category ${category}. Not adding words to list`);
-                //this.say('I don\'t know what to say!')
             }else{
                 possiblePhrases = possiblePhrases.concat(this.words[category])
             }
@@ -431,7 +427,7 @@ const Mascot = class {
             if(fartDiv) {
                 fartDiv.remove();
             }
-        },3000,fartDiv);
+        },2800,fartDiv);
     }
 
     setMood(moodName){

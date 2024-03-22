@@ -12,6 +12,10 @@ var storedScores = new LS(scoresName); //instance of LS (local storage) object
 var database = new Database(databaseUrl);
 var utils = new Utils();
 var EL;
+var CGPT = new ChatGPT();
+var template = new Template();
+var labels = new Labels();
+
 
 var showLogs = false;
 var deckUrl;
@@ -900,13 +904,13 @@ function setNavigationButtonStates(cardIndex,stackLength){
 	//if we are one away from the end of the stack
 	else if(cardIndex+1 == stackLength){
 		doLog('If block 2');
-		ui.getElements('next-button')[0].value = 'Finish';
+		ui.getElements('next-button')[0].value = '{nextButtonFinish}';
 	}
 	//if we are somewhere in middle of the stack
 	else if(cardIndex < cards.length){
 		doLog('If block 3');
 		ui.enable(['next-button','prev-button','clue-button','next-letter-button','next-answer-button','mnemonic-button']);
-		ui.getElements('next-button')[0].value = 'Next';
+		ui.getElements('next-button')[0].value = ui.getElements('next-button')[0].getAttribute('data-default-value');
 	}
 	//if we are at the very end of the stack
 	else if(cardIndex == cards.length){
@@ -1359,7 +1363,7 @@ function setSelectOptions(selectId, optionsArray, defaultValue, includeRandom, c
     
 }
 
-function toggleMascot(){
+function toggleMascot(event){
     console.log('Toggling mascot. Active Status: ' + mascot.isActive);
     mascot.isActive = !mascot.isActive;
 
@@ -1367,12 +1371,13 @@ function toggleMascot(){
     else mascot.mascotReturn();
 }
 
-function toggleMuteMascot(){
+function toggleMuteMascot(event){
     mascot.mute = !mascot.mute;
 }
 
-function toggleUncensoredMascot(){
+function toggleUncensoredMascot(event){
     console.log('Toggle uncensored mode');
+    console.log(event.target)
     mascot.uncensoredMode = !mascot.uncensoredMode;
 }
 
