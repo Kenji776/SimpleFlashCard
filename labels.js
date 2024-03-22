@@ -19,7 +19,7 @@ const Labels = class {
                 nextButton: 'Next \u{2192}',
                 nextButtonFinish: 'Finish',
                 previousButton: '\u{2190} Previous',
-                generateMnemonic: 'Generate Mnemonic (M)',
+                generateMnemonic: 'Mnemonic (M)',
                 hintButton: 'Hint (H)',
                 nextLetterButton: 'Next Letter \u{2193}',
                 nextAnswerButton: 'Next Answer  \u{2193}'

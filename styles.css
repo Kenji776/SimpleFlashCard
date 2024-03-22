@@ -327,11 +327,11 @@ input[type=button]:disabled,button[disabled],button:disabled{
      animation: spin 1s infinite linear;
 }
 
-.flip-button.disabled{
+#flip-button.disabled{
      cursor:not-allowed;
      opacity: 0.5;
 }
-.flip-button.disabled:hover{
+#flip-button.disabled:hover{
      animation:none;
 }
 
