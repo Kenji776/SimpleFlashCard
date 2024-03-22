@@ -138,6 +138,8 @@ ui.disable  = function(elements,className){
         thisElement = element;
         if(typeof element === 'string') thisElement = ui.getElements(element)[0];
         thisElement.disabled = true;
+        thisElement.setAttribute('disabled',true);
+        ui.addClass(element,'disabled');
     }	
 }
 
@@ -149,6 +151,8 @@ ui.enable  = function(elements,className){
         thisElement = element;
         if(typeof element === 'string') thisElement = ui.getElements(element)[0];
         thisElement.disabled = false;
+        thisElement.setAttribute('disabled',false);
+        ui.removeClass(element,'disabled');
     }	
 }
 

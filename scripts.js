@@ -896,7 +896,7 @@ function setNavigationButtonStates(cardIndex,stackLength){
 	//if we are the beginning of the deck
 	if(cardIndex == 0){
 		doLog('If block 1');
-		ui.disable(['prev-button','clue-button','next-letter-button','next-answer-button', 'mnemonic-button']);
+		ui.disable(['prev-button','clue-button','next-letter-button','next-answer-button', 'mnemonic-button','flip-button']);
 		
 	}
 	
@@ -908,7 +908,7 @@ function setNavigationButtonStates(cardIndex,stackLength){
 	//if we are somewhere in middle of the stack
 	else if(cardIndex < cards.length){
 		doLog('If block 3');
-		ui.enable(['next-button','prev-button','clue-button','next-letter-button','next-answer-button','mnemonic-button']);
+		ui.enable(['next-button','prev-button','clue-button','next-letter-button','next-answer-button','mnemonic-button','flip-button']);
 		ui.getElements('next-button')[0].value = ui.getElements('next-button')[0].getAttribute('data-default-value');
 	}
 	//if we are at the very end of the stack
@@ -1036,8 +1036,10 @@ function loadPrev(){
 
 function showAnswer(){
     
-    document.getElementById('answer').style.visibility='visible';
-    let card = document.getElementById('answer-card').classList.toggle("flip-card-flipped")
+    if(currentCard && currentCard.Id != null){
+        document.getElementById('answer').style.visibility='visible';
+        document.getElementById('answer-card').classList.toggle("flip-card-flipped")
+    }
 }
 
 function setRandom(){
