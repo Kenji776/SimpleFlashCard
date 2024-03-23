@@ -7,11 +7,36 @@ const Template = class {
     matchedElements = [];
 
     constructor(){
-        this.updateTemplate();
+        this.findTemplateVariables();
         this.registerUpdateLoop();
+        this.updateTemplateStrings();
     }
 
-    updateTemplate(){
+
+    updateTemplateStrings(){
+        console.log('Updating template strings');
+        for(let templateElement of this.matchedElements){
+            console.log(templateElement);
+
+            if(!this.variables[templateElement.variable]){
+                console.warn('No registered variable value for template');
+                console.warn(templateElement);
+            }
+            if(templateElement.attribute != null){
+                templateElement.element.setAttribute(templateElement.attribute,this.variables[templateElement.variable]);
+                console.log('Setting attribute: ' + templateElement.attribute + ' to ' + this.variables[templateElement.variable]);
+                console.log(templateElement.element);
+            }else{
+                // Update the element's text content with the new text
+                if (templateElement.element.textContent) {
+                    templateElement.element.textContent = this.variables[templateElement.variable];
+                } else {
+                    templateElement.element.innerText = this.variables[templateElement.variable];
+                }                
+            }
+        }
+    }
+    findTemplateVariables(){
         // Find all elements in the DOM
         const allElements = document.querySelectorAll('*');
 
@@ -30,10 +55,8 @@ const Template = class {
                         let varName = this.removeFirstAndLastCharacter(attributes[i].value);
 
                         if(this.variables[varName]){
-                            this.matchedElements.push({element:attributes[i]});
-                            let variableValue = this.variables[varName];
-                                const newText = variableValue.trim();       
-                                element.setAttribute(attributes[i].name,newText);
+                            this.matchedElements.push(new TemplateElement(element,varName,attributes[i].name));
+                            console.log('Found matched element. Added template string');
                         }
                     }
                 }
@@ -48,16 +71,7 @@ const Template = class {
 
                 //if an element exists in our variables collection with the same 'name' then replace it
                 if(this.variables[varName]){
-                    this.matchedElements.push(element);
-                    let variableValue = this.variables[varName];
-                        const newText = variableValue.trim();
-
-                        // Update the element's text content with the new text
-                        if (element.textContent) {
-                            element.textContent = newText;
-                        } else {
-                            element.innerText = newText;
-                        }
+                    this.matchedElements.push(new TemplateElement(element,varName));
                 }
             }
         });
@@ -81,10 +95,21 @@ const Template = class {
 
     registerUpdateLoop(){
         this.updateLoop = setInterval((scope) => {
-            scope.updateTemplate();
-        }, 3000, this);
-
+            scope.findTemplateVariables();
+            scope.updateTemplateStrings();
+        }, this.updateLoopInterval, this);
         return this.updateLoop;
     }
+}
 
+const TemplateElement = class{
+    element;
+    attribute;
+    variable;
+
+    constructor(domElement, variableString, attribute){
+        this.element = domElement;
+        this.variable = variableString;
+        this.attribute = attribute;
+    }
 }

@@ -69,11 +69,33 @@ var options = {
 	}
 }
 
-window.addEventListener('resize', function(event) {
-    console.log('windows resized: ' + window.innerWidth);
-    //regenerate the labels for the new screen size
+function debounce(func, delay) {
+    let timeoutId;
+    return function() {
+        const context = this;
+        const args = arguments;
+        clearTimeout(timeoutId);
+        timeoutId = setTimeout(() => {
+            func.apply(context, args);
+        }, delay);
+    };
+}
+
+// Event handler function
+const handleResize = debounce(function(event) {
+    // Get the new window dimensions
+    var newWidth = window.innerWidth;
+    var newHeight = window.innerHeight;
+
     labels = new Labels();
-});
+    console.log('Got new labels');
+    console.log(labels);
+    // Do something with the new dimensions
+    console.log('Window resized to width: ' + newWidth + ', height: ' + newHeight);
+}, 200); // Adjust the delay as needed
+
+window.addEventListener('resize', handleResize);
+
 
 async function init(){
     mascot = new Mascot();
@@ -101,6 +123,8 @@ async function init(){
     registerPersistantDataStorage();
 
     if(settings && settings?.config?.username) setUsername(settings.config.username);
+
+    
 }
 
 async function loadCardLibrary(){
