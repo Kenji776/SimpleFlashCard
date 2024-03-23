@@ -1,7 +1,7 @@
 const Template = class {
     variables = {};
     updateLoop;
-    updateLoopInterval = 1000;
+    updateLoopInterval = 500;
     // Define a regular expression to match curly brackets and anything inside them
     regex = /{([^}]+)}/g;
     matchedElements = [];

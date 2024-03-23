@@ -233,7 +233,7 @@ input[type=button]:disabled,button[disabled],button:disabled{
 }
 
 /* Media query for mobile devices */
-@media only screen and (max-width: 1000px) {
+@media only screen and (max-width: 1300px) {
      /* Adjust size for mobile devices */
      .big-button {
           height: 45px;
