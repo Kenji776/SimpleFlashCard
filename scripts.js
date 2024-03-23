@@ -37,7 +37,7 @@ var showHistory = true;
 var selectedDeckCategory;
 var showUi = false;
 var categories = [];
-var autoLoadNextCardOnAnswer = true;
+var autoLoadNextCardOnAnswer = false;
 var selectedVariantDeck = '';
 var userName = 'Test User';
 
@@ -68,6 +68,12 @@ var options = {
 		promptKey: ''
 	}
 }
+
+window.addEventListener('resize', function(event) {
+    console.log('windows resized: ' + window.innerWidth);
+    //regenerate the labels for the new screen size
+    labels = new Labels();
+});
 
 async function init(){
     mascot = new Mascot();
@@ -1036,7 +1042,8 @@ function loadPrev(){
 
 function showAnswer(){
     
-    if(currentCard && currentCard.Id != null){
+    console.log(currentCard);
+    if(currentCard && currentCard.id != null){
         document.getElementById('answer').style.visibility='visible';
         document.getElementById('answer-card').classList.toggle("flip-card-flipped")
     }

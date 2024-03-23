@@ -4,6 +4,7 @@ const Template = class {
     updateLoopInterval = 1000;
     // Define a regular expression to match curly brackets and anything inside them
     regex = /{([^}]+)}/g;
+    matchedElements = [];
 
     constructor(){
         this.updateTemplate();
@@ -29,6 +30,7 @@ const Template = class {
                         let varName = this.removeFirstAndLastCharacter(attributes[i].value);
 
                         if(this.variables[varName]){
+                            this.matchedElements.push({element:attributes[i]});
                             let variableValue = this.variables[varName];
                                 const newText = variableValue.trim();       
                                 element.setAttribute(attributes[i].name,newText);
@@ -46,6 +48,7 @@ const Template = class {
 
                 //if an element exists in our variables collection with the same 'name' then replace it
                 if(this.variables[varName]){
+                    this.matchedElements.push(element);
                     let variableValue = this.variables[varName];
                         const newText = variableValue.trim();
 
@@ -58,6 +61,9 @@ const Template = class {
                 }
             }
         });
+
+        console.log('Template elements');
+        console.log(this.matchedElements)
     }
 
     setTemplateValues(values){

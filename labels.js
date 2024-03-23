@@ -10,7 +10,7 @@ const Labels = class {
     }
 
     isMobileDevice() {
-        return (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.screen.availWidth < 1000);
+        return (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth < 1300);
     }
 
     getLabels(){
