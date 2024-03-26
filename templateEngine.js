@@ -14,18 +14,13 @@ const Template = class {
 
 
     updateTemplateStrings(){
-        console.log('Updating template strings');
         for(let templateElement of this.matchedElements){
-            console.log(templateElement);
-
             if(!this.variables[templateElement.variable]){
                 console.warn('No registered variable value for template');
                 console.warn(templateElement);
             }
             if(templateElement.attribute != null){
                 templateElement.element.setAttribute(templateElement.attribute,this.variables[templateElement.variable]);
-                console.log('Setting attribute: ' + templateElement.attribute + ' to ' + this.variables[templateElement.variable]);
-                console.log(templateElement.element);
             }else{
                 // Update the element's text content with the new text
                 if (templateElement.element.textContent) {
@@ -56,7 +51,6 @@ const Template = class {
 
                         if(this.variables[varName]){
                             this.matchedElements.push(new TemplateElement(element,varName,attributes[i].name));
-                            console.log('Found matched element. Added template string');
                         }
                     }
                 }

@@ -151,7 +151,7 @@ ui.enable  = function(elements,className){
         thisElement = element;
         if(typeof element === 'string') thisElement = ui.getElements(element)[0];
         thisElement.disabled = false;
-        thisElement.setAttribute('disabled',false);
+        thisElement.removeAttribute('disabled');
         ui.removeClass(element,'disabled');
     }	
 }

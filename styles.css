@@ -279,6 +279,7 @@ input[type=button]:disabled,button[disabled],button:disabled{
      font-family: 'Work Sans', sans-serif;
      font-weight: 900;
      text-transform: uppercase;
+     resize: both;
 }
 /* This container is needed to position the front and back side */
 .flip-card-inner {
