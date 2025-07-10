@@ -1,567 +1,768 @@
 const Mascot = class {
-	
-	name = 'Default Mascot'
-    containerName = 'mascot-container';
-    defaultMascotClass = 'happy';
-    speechBubbleFadeDelay = 1;
+	rootServerUrl = "";
+	name = "Default Mascot";
+	containerName = "mascot-container";
+	defaultMascotClass = "happy";
+	speechBubbleFadeDelay = 1;
 	words = {};
-    mute = false;
-    isActive = true;
-    canReactivate = true;
-    mood = 50;
-    uncensoredMode = false;
+	mute = false;
+	isActive = true;
+	canReactivate = true;
+	mood = 50;
+	uncensoredMode = false;
 
-    imageBaseFolderURL = 'https://pharmacy-flashcards-2027.lol/media/';
-    soundsFolder = 'https://pharmacy-flashcards-2027.lol/media/sounds/'
-    urls = {
-        wordsLibrary: 'https://pharmacy-flashcards-2027.lol/mascotWords.json',
-        sounds: {
-            fart: ['fart1.wav','fart2.wav','fart3.wav','fart4.wav','fart5.wav'],
-            bark: ['bark1.wav']
-        }
-    }
-    audio = []
-    chatGPTLoaded = false;
-    speechBubbleDiv;
-    useTTS = true;
-    moodImages = {
-        angry: 'shibaAngry.png',
-        confused: 'shibaConfused.png',
-        fart: 'shibaFart.png',
-        happy: 'shibaHappy.png',
-        sad: 'shibaSad.png',
-        think: 'shibaThink.png'
-    };
+	urls = {
+		wordsLibrary: "https://pharmacy-flashcards-2027.lol/mascotWords.json",
+		sounds: {
+			fart: [
+				"fart1.wav",
+				"fart2.wav",
+				"fart3.wav",
+				"fart4.wav",
+				"fart5.wav",
+			],
+			bark: ["bark1.wav"],
+		},
+	};
+	audio = [];
+	chatGPTLoaded = false;
+	speechBubbleDiv;
+	useTTS = true;
+	moodImages = {
+		angry: "shibaAngry.png",
+		confused: "shibaConfused.png",
+		fart: "shibaFart.png",
+		happy: "shibaHappy.png",
+		sad: "shibaSad.png",
+		think: "shibaThink.png",
+	};
 
-    miscImages = {
-        fart: 'fart.png'
-    }
+	miscImages = {
+		fart: "fart.png",
+	};
 
-    //elevenlabs text to speech settins. 
-    TTS = {
-        voice_id: '2ovNLFOsfyKPEWV5kqQi'
-    }
-    //divs
-    container; //outer container div that holds mascot and other animation divs
-    mascotDiv; //div with mascot background image
+	//elevenlabs text to speech settins.
+	TTS = {
+		voice_id: "QzTKubutNn9TjrB7Xb2Q",
+	};
+	//divs
+	container; //outer container div that holds mascot and other animation divs
+	mascotDiv; //div with mascot background image
 
-    //Idle chat variables
-    idleSeconds = 0;  //internal timer that keeps track of how long the user has been idle
-    idleTimer;        //container for idle timer
-    idleChatInterval; //how long user must be idle for chat message to appear
-    idleThesholdSeconds =20; //how long with no user interation before we consider them idle
-    idleChatCooldownSeconds = 10; //minimum amount of time between idle chat messages
-    idleChatRandomChance = 10; //odds of random chat being sent (out of 100) if cooldown is met
-    lastIdleChatSent = 0 //when was the idle last chat sent?
-    userIsIdle = false; //tracks if user is currently idle
-    maxIdleEvents = 15; //maximum number of idle chats to send before stopping
-    numRunIdleEvents = 0;
-    uninterruptableMessageDisplayed = false; //if the currently displayed message is uninterruptable track it
-    //random event loop variables
-    randomEventLoop;
-    randomEventLoopIntervalMS = 5000; //every twenty seconds maybe do something random
-    actions = {
-        fart : {
-            enabled: false,
-            functionToCall: 'fart',
-            name: 'Fart',
-            lastRun: null,
-            cooldownSeconds: 5,
-            trigger: {
-                type: 'random',
-                chance: 5
-            }
-        }
-    }
+	//Idle chat variables
+	idleSeconds = 0; //internal timer that keeps track of how long the user has been idle
+	idleTimer; //container for idle timer
+	idleChatInterval; //how long user must be idle for chat message to appear
+	idleThesholdSeconds = 20; //how long with no user interation before we consider them idle
+	idleChatCooldownSeconds = 10; //minimum amount of time between idle chat messages
+	idleChatRandomChance = 10; //odds of random chat being sent (out of 100) if cooldown is met
+	lastIdleChatSent = 0; //when was the idle last chat sent?
+	userIsIdle = false; //tracks if user is currently idle
+	maxIdleEvents = 15; //maximum number of idle chats to send before stopping
+	numRunIdleEvents = 0;
+	uninterruptableMessageDisplayed = false; //if the currently displayed message is uninterruptable track it
+	//random event loop variables
+	randomEventLoop;
+	randomEventLoopIntervalMS = 5000; //every twenty seconds maybe do something random
+	actions = {
+		fart: {
+			enabled: false,
+			functionToCall: "fart",
+			name: "Fart",
+			lastRun: null,
+			cooldownSeconds: 5,
+			trigger: {
+				type: "random",
+				chance: 5,
+			},
+		},
+	};
 
-    currentStatus = {
-        mood: {
-            type: 'neutral',
-            sadness: 0,
-            anger: 0,
-            confusion: 0,
-            happiness: 50
-        },
-        value: '',
-        lastIdleChatSent: null,
-        clickedTimes: 0,
-        clickLimit: 10
-    }
+	currentStatus = {
+		mood: {
+			type: "neutral",
+			sadness: 0,
+			anger: 0,
+			confusion: 0,
+			happiness: 50,
+		},
+		value: "",
+		lastIdleChatSent: null,
+		clickedTimes: 0,
+		clickLimit: 10,
+	};
 
+	constructor(constructorData, server) {
+		try {
+			if (!ui) {
+				console.error("UI Library not loaded. Cannot init Mascot");
+				return;
+			}
 
-	
-	constructor(constructorData) {
-		try{
-            if(!ui) {
-                console.error('UI Library not loaded. Cannot init Mascot');
-                return;
-            }
+			//set object properties
+			if (typeof constructorData === "object") {
+				for (var k in this)
+					if (constructorData[k] != undefined)
+						this[k] = constructorData[k];
+			}
 
-            //set object properties
-            if(typeof constructorData === 'object'){
-                for (var k in this) if (constructorData[k] != undefined) this[k] = constructorData[k];
-            } 
-
-			console.log('New instance of Mascot class initiated.');
-            this.initMascot();
-            console.log(this);
-
-		}catch(ex){
-			console.error(`Unable to register div with id ${modalId} as a modal!`);
+			console.log("New instance of Mascot class initiated.");
+			this.initMascot(server);
+			console.log(this);
+		} catch (ex) {
+			console.error(
+				`Unable to register div with id ${modalId} as a modal!`
+			);
 			console.log(ex);
 		}
 	}
 
-    async initMascot(){
-        this.container = document.getElementById(this.containerName);
-        this.mascotDiv = this.createMascotImageContainer();
-        this.words = await this.loadMascotWords();
-        this.registerMascotEventHandlers();
-        this.preloadMascotImages();
-        this.registerMascotRandomEventTimer();
-        this.registerMascotIdleTimer();
-        this.registerMascotIdleChat();
-        this.registerMascotHotkeys();
+	async initMascot(server) {
+		this.container = document.getElementById(this.containerName);
+		this.mascotDiv = this.createMascotImageContainer();
+		this.words = await this.loadMascotWords();
+		this.registerMascotEventHandlers();
+		this.preloadMascotImages();
+		this.registerMascotRandomEventTimer();
+		this.registerMascotIdleTimer();
+		this.registerMascotIdleChat();
+		this.registerMascotHotkeys();
 
-        this.setMood('happy');
-        this.sayRandom('greeting');
-    }
+		this.setMood("happy");
+		this.sayRandom("greeting");
 
-    async askQuestion(questionString){
-        this.uninterruptableMessageDisplayed = false;
+		if (server) this.rootServerUrl = server;
+	}
 
-        this.setMood('think');
-        this.say('Alright.... gimme a second....');
+	async askQuestion(questionString) {
+		this.uninterruptableMessageDisplayed = false;
 
-        let chatGPTResponse = await database.sendRequest({
-            'action':'ask_chat_gpt',
-            'prompt': questionString,
-        });
-    
-        console.log(chatGPTResponse);
-        
-        setTimeout(function(scope){
-            scope.setMood('happy');
-            scope.say(chatGPTResponse.response.choices[0].message.content,true,false,false);
-        },2000,this)
-        
-    }
+		this.setMood("think");
+		this.say("Alright.... gimme a second....");
 
+		let chatGPTResponse = await database.sendRequest({
+			action: "ask_chat_gpt",
+			prompt: questionString,
+		});
 
-    async loadMascotWords(){
-        let mascotWordsData = await fetch(`${this.urls.wordsLibrary}?cache-invalidate=${Date.now()}`, {cache: "no-store"});
-        let words =  await mascotWordsData.json();
-        return words;
-    }
+		console.log(chatGPTResponse);
 
-    registerMascotIdleTimer(){
-        let activityEvents = ['load','mousemove','mousedown','click','touchstart','keydown'];
+		setTimeout(
+			function(scope) {
+				scope.setMood("happy");
 
-        for(let thisEvent of activityEvents){
-            document.addEventListener(thisEvent, function() {
-                this.resetIdleTimer();
-            }.bind(this));
-        }
-        this.resetIdleTimer();
-    }
+				console.log(
+					"--------------------This is the chatGPT Response Object Being Fed Into the mascot say function"
+				);
+				console.log(chatGPTResponse);
+				scope.say(
+					chatGPTResponse.data.response.choices[0].message.content,
+					true,
+					false,
+					false
+				);
+			},
+			2000,
+			this
+		);
+	}
 
-    resetIdleTimer(){
+	async loadMascotWords() {
+		let mascotWordsData = await fetch(
+			`${this.urls.wordsLibrary}?cache-invalidate=${Date.now()}`,
+			{ cache: "no-store" }
+		);
+		let words = await mascotWordsData.json();
+		return words;
+	}
 
-        if(!this.isActive) return;
-        if(this.userIsIdle){
-            this.setMood('happy');
-            this.sayRandom('idle_stop');
-            this.numRunIdleEvents = 0;
-        }
+	registerMascotIdleTimer() {
+		let activityEvents = [
+			"load",
+			"mousemove",
+			"mousedown",
+			"click",
+			"touchstart",
+			"keydown",
+		];
 
-        this.idleSeconds = 0;
-        this.userIsIdle = false;
-        if(this.idleTimer) clearTimeout(this.idleTimer);
-        this.idleTimer = setInterval(function(scope){
-            scope.idleSeconds++;
- 
-            if(scope.idleSeconds > scope.idleThesholdSeconds) {
-                if(!scope.userIsIdle){
-                    console.log('User Went Idle!');
-                    scope.setMood('confused');
-                    scope.sayRandom('idle_start');
-                }
-                scope.userIsIdle = true;
-            }
-        }, 1000, this)
-    }
+		for (let thisEvent of activityEvents) {
+			document.addEventListener(
+				thisEvent,
+				function() {
+					this.resetIdleTimer();
+				}.bind(this)
+			);
+		}
+		this.resetIdleTimer();
+	}
 
-    registerMascotRandomEventTimer(){
-        this.randomEventLoop = setInterval(function(scope){
-            scope.randomEvent();
-        }, this.randomEventLoopIntervalMS, this)        
-    }
+	resetIdleTimer() {
+		if (!this.isActive) return;
+		if (this.userIsIdle) {
+			this.setMood("happy");
+			this.sayRandom("idle_stop");
+			this.numRunIdleEvents = 0;
+		}
 
-    registerMascotEventHandlers(){
-        this.mascotDiv.addEventListener('click', function() {
-            this.setMood('angry')
-            
-            this.playRandomSound('bark');
+		this.idleSeconds = 0;
+		this.userIsIdle = false;
+		if (this.idleTimer) clearTimeout(this.idleTimer);
+		this.idleTimer = setInterval(
+			function(scope) {
+				scope.idleSeconds++;
 
-            ui.addClass([this.mascotDiv],'hit-impact');
+				if (scope.idleSeconds > scope.idleThesholdSeconds) {
+					if (!scope.userIsIdle) {
+						console.log("User Went Idle!");
+						scope.setMood("confused");
+						scope.sayRandom("idle_start");
+					}
+					scope.userIsIdle = true;
+				}
+			},
+			1000,
+			this
+		);
+	}
 
-            setTimeout(function(scope){
-                ui.removeClass([scope.mascotDiv],'hit-impact');
-            },100,this);
-            
-            //ui.removeClass([this.mascotDiv],'hit-impact');
-            this.currentStatus.clickedTimes++;
-            if(this.currentStatus.clickedTimes+1 == this.currentStatus.clickLimit){
-                this.sayRandom('click_leave_warning')
-            }
-            else if(this.currentStatus.clickedTimes == this.currentStatus.clickLimit){
-                this.rageQuit('rage_leave');
-            }else{
-                this.sayRandom('clicked');
-            }
-        }.bind(this));
-    }
+	registerMascotRandomEventTimer() {
+		this.randomEventLoop = setInterval(
+			function(scope) {
+				scope.randomEvent();
+			},
+			this.randomEventLoopIntervalMS,
+			this
+		);
+	}
 
-    registerMascotHotkeys(){
-        document.addEventListener('keydown', function(e) {
-            e = e || window.event;
-            // use e.keyCode            
-            if (e.keyCode == '70') {
-                let prevSetting = this.mute;
-                this.mute = false;
-                this.fart();
-                this.mute = prevSetting;
-                e.preventDefault();
-            }
-        }.bind(this));
-    }
+	registerMascotEventHandlers() {
+		this.mascotDiv.addEventListener(
+			"click",
+			function() {
+				this.setMood("angry");
 
-    registerMascotIdleChat(){
-        if(!this.words.hasOwnProperty('idle_chat')) {
-            console.log('No idle chat words in library. Aborting')
-            return;
-        }
-    
-        this.idleChatInterval = setInterval(function(scope){
+				this.playRandomSound("bark");
 
-            //console.log('Idle event values: ' +  scope.numRunIdleEvents + ' < ' + scope.maxIdleEvents)
-            if(scope.numRunIdleEvents < scope.maxIdleEvents){
-                
-                let randomChance = Math.floor(Math.random() * 101);
+				ui.addClass([this.mascotDiv], "hit-impact");
 
-                let rightNow = new Date().getTime();
+				setTimeout(
+					function(scope) {
+						ui.removeClass([scope.mascotDiv], "hit-impact");
+					},
+					100,
+					this
+				);
 
-                /*
+				//ui.removeClass([this.mascotDiv],'hit-impact');
+				this.currentStatus.clickedTimes++;
+				if (
+					this.currentStatus.clickedTimes + 1 ==
+					this.currentStatus.clickLimit
+				) {
+					this.sayRandom("click_leave_warning");
+				} else if (
+					this.currentStatus.clickedTimes ==
+					this.currentStatus.clickLimit
+				) {
+					this.rageQuit("rage_leave");
+				} else {
+					this.sayRandom("clicked");
+				}
+			}.bind(this)
+		);
+	}
+
+	registerMascotHotkeys() {
+		document.addEventListener(
+			"keydown",
+			function(e) {
+				e = e || window.event;
+				// use e.keyCode
+				if (e.keyCode == "70") {
+					let prevSetting = this.mute;
+					this.mute = false;
+					this.fart();
+					this.mute = prevSetting;
+					e.preventDefault();
+				}
+			}.bind(this)
+		);
+	}
+
+	registerMascotIdleChat() {
+		if (!this.words.hasOwnProperty("idle_chat")) {
+			console.log("No idle chat words in library. Aborting");
+			return;
+		}
+
+		this.idleChatInterval = setInterval(
+			function(scope) {
+				//console.log('Idle event values: ' +  scope.numRunIdleEvents + ' < ' + scope.maxIdleEvents)
+				if (scope.numRunIdleEvents < scope.maxIdleEvents) {
+					let randomChance = Math.floor(Math.random() * 101);
+
+					let rightNow = new Date().getTime();
+
+					/*
                 console.log('Random chance check: ' + randomChance + ' < ' + scope.idleChatRandomChance)
                 console.log('User idle?: ' + scope.userIsIdle);
                 console.log('Cooldown met?: ' + (rightNow-scope.lastIdleChatSent) / 1000 > scope.idleChatCooldownSeconds);
                 */
-                if(scope.userIsIdle && randomChance < scope.idleChatRandomChance && ( (rightNow-scope.lastIdleChatSent) / 1000 > scope.idleChatCooldownSeconds)){
-                    scope.numRunIdleEvents++;          
-                    scope.setMood('happy');
-                    scope.sayRandom('idle_chat');
-                    scope.lastIdleChatSent = new Date().getTime(); 
-                }
-            }else{
-                if(scope.numRunIdleEvents == scope.maxIdleEvents){
-                    scope.numRunIdleEvents++;  
-                    console.warn('Max idle events reached.');
-                    scope.setMood('sad');
-                    scope.sayRandom('idle_max_events_reached');
-                    if(this.idleTimer) clearTimeout(this.idleTimer);
-                    return;
-                }
-            }
-        },2000,this);
-    }
+					if (
+						scope.userIsIdle &&
+						randomChance < scope.idleChatRandomChance &&
+						(rightNow - scope.lastIdleChatSent) / 1000 >
+							scope.idleChatCooldownSeconds
+					) {
+						scope.numRunIdleEvents++;
+						scope.setMood("happy");
+						scope.sayRandom("idle_chat");
+						scope.lastIdleChatSent = new Date().getTime();
+					}
+				} else {
+					if (scope.numRunIdleEvents == scope.maxIdleEvents) {
+						scope.numRunIdleEvents++;
+						console.warn("Max idle events reached.");
+						scope.setMood("sad");
+						scope.sayRandom("idle_max_events_reached");
+						if (this.idleTimer) clearTimeout(this.idleTimer);
+						return;
+					}
+				}
+			},
+			2000,
+			this
+		);
+	}
 
-    randomEvent(){
-        if(!this.isActive) return;
+	randomEvent() {
+		if (!this.isActive) return;
 
-        //generate a random percentage chance between 0 - 100
-        let randomChance = Math.floor(Math.random() * 101);
+		//generate a random percentage chance between 0 - 100
+		let randomChance = Math.floor(Math.random() * 101);
 
-        //we only want to perform one action per loop, so we create a sub collection of potential actions based on % chance
-        let potentialActions = [];
-        let currentTime = Date.now();
+		//we only want to perform one action per loop, so we create a sub collection of potential actions based on % chance
+		let potentialActions = [];
+		let currentTime = Date.now();
 
-        for(let thisActionName in this.actions){
-            let thisAction = this.actions[thisActionName];
+		for (let thisActionName in this.actions) {
+			let thisAction = this.actions[thisActionName];
 
-            let cooldownMet = thisAction.lastCalled == null || currentTime - thisAction.lastCalled >= (thisAction.cooldownSeconds * 1000) ? true : false;
+			let cooldownMet =
+				thisAction.lastCalled == null ||
+				currentTime - thisAction.lastCalled >=
+					thisAction.cooldownSeconds * 1000
+					? true
+					: false;
 
-            if(thisAction?.trigger?.type == 'random' && randomChance <= thisAction?.trigger?.chance && cooldownMet){
-                potentialActions.push(thisAction);
-            }
-        }
+			if (
+				thisAction?.trigger?.type == "random" &&
+				randomChance <= thisAction?.trigger?.chance &&
+				cooldownMet
+			) {
+				potentialActions.push(thisAction);
+			}
+		}
 
-        if(potentialActions.length > 0){
-            var thisAction = potentialActions[Math.floor(Math.random()*potentialActions.length)];
-            this[thisAction.functionToCall](randomChance, this);
-            thisAction.lastCalled = Date.now();
-            
-        }
-    }
+		if (potentialActions.length > 0) {
+			var thisAction =
+				potentialActions[
+					Math.floor(Math.random() * potentialActions.length)
+				];
+			this[thisAction.functionToCall](randomChance, this);
+			thisAction.lastCalled = Date.now();
+		}
+	}
 
-    sayRandom(speechCategories=[]){
+	sayRandom(speechCategories = []) {
+		let possiblePhrases = [];
+		if (typeof speechCategories === "string")
+			speechCategories = speechCategories.split(",");
+		else if (isArray(speechCategories)) speechCategories = speechCategories;
 
+		let uncensoredCategories = [];
 
-        let possiblePhrases = []; 
-        if(typeof speechCategories === 'string') speechCategories = speechCategories.split(',');
-        else if(isArray(speechCategories)) speechCategories = speechCategories;
+		//automatically injects uncensored words collection for this category if it exists and we are uncensored mode
+		if (this.uncensoredMode) {
+			for (let category of speechCategories) {
+				if (this.words.hasOwnProperty(category + "_uncensored")) {
+					uncensoredCategories.push(category + "_uncensored");
+				}
+			}
+		}
 
+		speechCategories = speechCategories.concat(uncensoredCategories);
 
-        let uncensoredCategories = [];
+		for (let category of speechCategories) {
+			if (!this.words.hasOwnProperty(category)) {
+				console.error(
+					`Could not find speech category ${category}. Not adding words to list`
+				);
+			} else {
+				possiblePhrases = possiblePhrases.concat(this.words[category]);
+			}
+		}
 
-        //automatically injects uncensored words collection for this category if it exists and we are uncensored mode
-        if(this.uncensoredMode){
-            for(let category of speechCategories){
-                if(this.words.hasOwnProperty(category+'_uncensored')){
-                    uncensoredCategories.push(category+'_uncensored');
-                }
-            }
-        }
+		if (possiblePhrases.length > 0) {
+			let randomWords =
+				possiblePhrases[
+					Math.floor(Math.random() * possiblePhrases.length)
+				];
+			this.say(randomWords);
+		} else {
+			this.say("I don't know what to say!");
+		}
+	}
 
-        speechCategories = speechCategories.concat(uncensoredCategories);
+	say(
+		speechText,
+		hideOtherSpeechBubbles = true,
+		interruptable = true,
+		autoFade = true
+	) {
+		if (!this.isActive) {
+			console.warn("Mascot invactive. Not reading text");
+			return;
+		}
+		if (this.useTTS && EL && !this.mute) {
+			EL.tts(speechText, this.TTS.voice_id);
+		} else {
+			console.log("----- noUseTTS or EL");
+		}
+		if (this.uninterruptableMessageDisplayed) {
+			console.warn(
+				"Uninterruptable Message Displayed. Not showing message " +
+					speechText
+			);
+			return;
+		}
 
-        for(let category of speechCategories){
-            if(!this.words.hasOwnProperty(category)){
-                console.error(`Could not find speech category ${category}. Not adding words to list`);
-            }else{
-                possiblePhrases = possiblePhrases.concat(this.words[category])
-            }
-        }
+		if (hideOtherSpeechBubbles) {
+			ui.getElements(".mascot-speech-bubble").forEach((e) => e.remove());
+		}
 
-        if(possiblePhrases.length > 0){
-            let randomWords = possiblePhrases[Math.floor(Math.random() *  possiblePhrases.length)];
-            this.say(randomWords);
-        }else{
-            this.say('I don\'t know what to say!');
-        }
-    }
+		let divId = Math.floor(Math.random() * 101);
 
-    say(speechText, hideOtherSpeechBubbles=true, interruptable=true, autoFade=true){  
-        
-        if(!this.isActive){
-            console.warn('Mascot invactive. Not reading text');
-            return;            
-        }
-        if(this.useTTS && EL && !this.mute){
-            EL.tts(speechText,this.TTS.voice_id);
-        }
-        if(this.uninterruptableMessageDisplayed) {
-            console.warn('Uninterruptable Message Displayed. Not showing message ' + speechText);
-            return;
-        }
+		let speechBubbleDiv = document.createElement("div");
+		speechBubbleDiv.id = "speech-bubble-" + divId;
 
+		if (!interruptable) {
+			this.uninterruptableMessageDisplayed = true;
+			speechText += `</br><span onclick=mascot.removeSpeechBubble('${speechBubbleDiv.id}') class="close-speech-link">Ok</span>`;
+		}
 
-        if(hideOtherSpeechBubbles) {
-            ui.getElements('.mascot-speech-bubble').forEach(e => e.remove());
-        }
+		speechBubbleDiv.className =
+			"bubble bubble-bottom-right mascot-speech-bubble";
+		speechBubbleDiv.innerHTML = speechText;
+		this.container.appendChild(speechBubbleDiv);
 
-        let divId = Math.floor(Math.random() * 101);
+		let numWords = speechText.split(" ").length;
+		let speechDelay = 2.5 * numWords * 1000 * this.speechBubbleFadeDelay;
+		speechDelay =
+			speechDelay > 1500 && speechDelay < 10000 ? speechDelay : 3000;
 
-        let speechBubbleDiv = document.createElement("div");
-        speechBubbleDiv.id = 'speech-bubble-'+divId;
+		if (autoFade) {
+			this.removeSpeechBubble(speechBubbleDiv.id, speechDelay);
+		}
+	}
 
-        if(!interruptable){
-            this.uninterruptableMessageDisplayed = true;
-            speechText += `</br><span onclick=mascot.removeSpeechBubble('${speechBubbleDiv.id}') class="close-speech-link">Ok</span>`;
-        }
+	removeSpeechBubble(bubbleId, speechDelay) {
+		if (this.uninterruptableMessageDisplayed)
+			this.uninterruptableMessageDisplayed = false;
 
-        speechBubbleDiv.className = "bubble bubble-bottom-right mascot-speech-bubble";
-        speechBubbleDiv.innerHTML = speechText;
-        this.container.appendChild(speechBubbleDiv);     
+		setTimeout(
+			function(bubbleId) {
+				ui.addClass([document.getElementById(bubbleId)], "fade-out");
 
-        let numWords = speechText.split(' ').length;
-        let speechDelay = 2.5 * numWords * 1000 * this.speechBubbleFadeDelay;
-        speechDelay = speechDelay > 1500 && speechDelay < 10000 ? speechDelay : 3000;
-    
-        if(autoFade){
-            this.removeSpeechBubble(speechBubbleDiv.id,speechDelay);
-        }
+				setTimeout(
+					function(bubbleId) {
+						const bubbleDiv = document.getElementById(bubbleId);
+						if (bubbleDiv) bubbleDiv.remove();
+					},
+					1900,
+					bubbleId
+				);
+			},
+			speechDelay,
+			bubbleId
+		);
+	}
 
-        
-    }
+	fart() {
+		let resetToStatusAfterFart = this.currentStatus.value;
 
-    removeSpeechBubble(bubbleId,speechDelay){
-        if(this.uninterruptableMessageDisplayed) this.uninterruptableMessageDisplayed = false;
+		if (resetToStatusAfterFart === "fart") return;
 
-        setTimeout(function(bubbleId){
-            ui.addClass([document.getElementById(bubbleId)], 'fade-out');
-    
-            setTimeout(function(bubbleId){
-                const bubbleDiv = document.getElementById(bubbleId);
-                if(bubbleDiv) bubbleDiv.remove();
-            },1900,bubbleId);
-    
-        },speechDelay,bubbleId);
-    }
+		this.setMood("fart");
 
-    fart(){
+		let speechCategories = ["fart"];
+		this.sayRandom(speechCategories);
 
-        let resetToStatusAfterFart = this.currentStatus.value;
-        
-        if(resetToStatusAfterFart === 'fart') return;
+		this.playRandomSound("fart");
 
-        this.setMood('fart');
+		let fartDiv = document.createElement("div");
+		fartDiv.className = "slide-in-out-left mascot-fart-cloud";
+		fartDiv.style.backgroundImage = `url(${this.buildMascotMediaUrl(this.miscImages.fart, 'img')})`;
+		fartDiv.id = "mascot-fart-cloud";
+		this.container.appendChild(fartDiv);
 
-        let speechCategories = ['fart'];
-        this.sayRandom(speechCategories);
+		//reset back to previous mood after done farting.
+		setTimeout(
+			function(scope) {
+				scope.setMood(resetToStatusAfterFart);
+			},
+			1000,
+			this
+		);
 
-        this.playRandomSound('fart');
+		//remove the fart cloud after a few seconds
+		setTimeout(
+			function(fartDiv) {
+				if (fartDiv) {
+					fartDiv.remove();
+				}
+			},
+			2800,
+			fartDiv
+		);
+	}
 
-        let fartDiv = document.createElement("div");
-        fartDiv.className = 'slide-in-out-left mascot-fart-cloud';
-        fartDiv.style.backgroundImage=`url(${this.imageBaseFolderURL}${this.miscImages.fart})`;
-        fartDiv.id = 'mascot-fart-cloud';
-        this.container.appendChild(fartDiv);     
+	setMood(moodName) {
+		if (!this.moodImages.hasOwnProperty(moodName)) {
+			console.error(
+				`Invalid mascot mood provided: ${moodName}. Valid moods are ${Object.keys(
+					this.moodImages
+				)}`
+			);
+			return;
+		}
+		this.currentStatus.value = moodName;
+		this.setMascotImage(this.moodImages[moodName]);
+	}
 
-        //reset back to previous mood after done farting.
-        setTimeout(function(scope){
-            scope.setMood(resetToStatusAfterFart);
-        },1000,this);
+	createMascotImageContainer() {
+		const mascotId = `mascot-image-${this.name}`;
+		const existingMascotDiv = document.getElementById(mascotId);
 
-        //remove the fart cloud after a few seconds
-        setTimeout(function(fartDiv){ 
-            if(fartDiv) {
-                fartDiv.remove();
-            }
-        },2800,fartDiv);
-    }
+		// Remove existing mascot div if found
+		if (existingMascotDiv) {
+			console.warn(
+				`Mascot div with id "${mascotId}" already exists. Removing it.`
+			);
+			existingMascotDiv.remove();
+		}
 
-    setMood(moodName){
-        if(!this.moodImages.hasOwnProperty(moodName)){
-            console.error(`Invalid mascot mood provided: ${moodName}. Valid moods are ${Object.keys(this.moodImages)}`);
-            return;
-        }
+		// Create new mascot div
+		const mascotDiv = document.createElement("div");
+		mascotDiv.id = mascotId;
+		mascotDiv.className = `${this.defaultMascotClass} mascot-image`;
 
-        let imageURL = `${this.imageBaseFolderURL}${this.moodImages[moodName]}`;
-        this.currentStatus.value = moodName;
-        this.setMascotImage(imageURL);
-    }
+		// Append to container
+		const container = document.getElementById(this.containerName);
+		if (!container) {
+			console.error(
+				`Container with id "${this.containerName}" not found. Mascot div not created.`
+			);
+			return null;
+		}
 
-    createMascotImageContainer(){
-        let mascotDiv = document.createElement("div");
-        mascotDiv.id = `mascot-image-${this.name}`;
-        mascotDiv.className = `${this.defaultMascotClass} mascot-image`;
-        document.getElementById(this.containerName).appendChild(mascotDiv);
-        return mascotDiv;
-    }
+		container.appendChild(mascotDiv);
+		return mascotDiv;
+	}
 
-    setMascotImage(imageURL){
-        this.mascotDiv.style.backgroundImage=`url(${imageURL})`; // specify the image path here
-    }
+	/**
+	 * Builds the correct URL to request mascot media files from the server proxy route
+	 */
+	buildMascotMediaUrl(fileName, dataType) {
+		// Example output: /mascot-media/shiba/shibaHappy.png
+        let folderName = '';
+        if (dataType == "img") folderName = "img";
+		else if (dataType == "sfx") folderName = "sfx";
+		const basePath = `/mascot-media/${this.name}/${folderName}/${fileName}`;
+		return this.rootServerUrl
+			? `${this.rootServerUrl}${basePath}`
+			: basePath;
+	}
 
-    addMascotAnimationEffect(animationName){
-        ui.addClass([this.mascotDiv],animationName)
-    }
+	setMascotImage(imageName) {
+		console.log("Trying to get image from node proxy url");
+		console.log(imageName);
 
-    removeMascotAnimationEffect(animationName){
-        ui.removeClass([this.mascotDiv],animationName)
-    }
+		const imageUrl = this.buildMascotMediaUrl(imageName,'img');
+		this.mascotDiv.style.backgroundImage = `url(${imageUrl})`;
+	}
 
-    playRandomSound(category){
-        if(!this.urls.sounds.hasOwnProperty(category)){
-            console.error(`No sound category ${category} could be found in sound library. Valid sounds are: ${Object.keys(this.urls.sounds)}`);
-            return;
-        }
-        let thisSound =  this.urls.sounds[category][Math.floor(Math.random() *  this.urls.sounds[category].length)];
-        this.playSound(category,thisSound);
-    }
-    playSound(category, soundName){
+	async preloadMascotImages() {
+		for (let imageKey in this.moodImages) {
+			const imageUrl = this.buildMascotMediaUrl(
+				this.moodImages[imageKey],
+                'img'
+			);
+			this.preloadImage(imageUrl);
+		}
+	}
 
+	preloadImage(url) {
+		console.log("Attempting to preload image: " + url);
+		const img = new Image();
+		img.src = url;
+	}
 
-        if(this.mute){
-            console.error(`Sounds disabled. Not playing sounds`);
-            return;
-        }
-        
-        if(!this.urls.sounds.hasOwnProperty(category)){
-            console.error(`No sound category ${category} could be found in sound library. Valid sounds are: ${Object.keys(this.urls.sounds)}`);
-            return;
-        }
-        if(this.urls.sounds[category].indexOf(soundName) === -1){
-            console.error(`No sound named ${soundName} could be found in sound library. Valid sounds are: ${this.urls.sounds[category]}`);
-            return;
-        }
-        
+	addMascotAnimationEffect(animationName) {
+		ui.addClass([this.mascotDiv], animationName);
+	}
 
-        let thisSound;
-        if(!this.audio[category]) this.audio[category] = {};
+	removeMascotAnimationEffect(animationName) {
+		ui.removeClass([this.mascotDiv], animationName);
+	}
 
-        if(!this.audio[category].hasOwnProperty(soundName)){
-            thisSound = new Audio(`${this.soundsFolder}${soundName}`);
-            this.audio[category][soundName] = thisSound;
-        }else{
-            thisSound = this.audio[category][soundName];
-        }
-        try{
-            thisSound.play();
-        }catch(exception){
-            console.error('Unable to play sound: ' + exception.message)
-        }
-    }
+	playRandomSound(category) {
+		if (!this.urls.sounds.hasOwnProperty(category)) {
+			console.error(
+				`No sound category ${category} could be found in sound library. Valid sounds are: ${Object.keys(
+					this.urls.sounds
+				)}`
+			);
+			return;
+		}
+		let thisSound = this.urls.sounds[category][
+			Math.floor(Math.random() * this.urls.sounds[category].length)
+		];
+		this.playSound(category, thisSound);
+	}
+	playSound(category, soundName) {
+		if (this.mute) {
+			console.error(`Sounds disabled. Not playing sounds`);
+			return;
+		}
 
-    rageQuit(textType){
-        
-        this.sayRandom(textType);
-        this.setMood('angry');
-        this.fart();
-        this.addMascotAnimationEffect('leave-right');
-        this.canReactivate = false;
-        setTimeout(function(scope){
-            scope.deactivate();
-        },5000,this)
-    }
+		if (!this.urls.sounds.hasOwnProperty(category)) {
+			console.error(
+				`No sound category ${category} could be found in sound library. Valid sounds are: ${Object.keys(
+					this.urls.sounds
+				)}`
+			);
+			return;
+		}
+		if (this.urls.sounds[category].indexOf(soundName) === -1) {
+			console.error(
+				`No sound named ${soundName} could be found in sound library. Valid sounds are: ${this.urls.sounds[category]}`
+			);
+			return;
+		}
 
-    neutralLeave(){     
-        this.sayRandom('leave_neutral');
-        this.setMood('confused');
-        this.addMascotAnimationEffect('leave-right');
-        setTimeout(function(scope){
-            scope.removeMascotAnimationEffect('leave-right');
-            scope.deactivate();
-        },5000,this)
-    }
+		let thisSound;
+		if (!this.audio[category]) this.audio[category] = {};
 
-    mascotReturn(){
-        if(!this.canReactivate) {
-            console.warn('Mascot was requested to reactivate but canReactivate is set to false. Not reactivating');
-            return;
-        }
-        this.activate();
-        this.addMascotAnimationEffect('fade-in');
-        this.sayRandom('return');
-        this.setMood('happy');
-    }
+		if (!this.audio[category].hasOwnProperty(soundName)) {
+			thisSound = new Audio(this.buildMascotMediaUrl(soundName,'sfx'));
+			this.audio[category][soundName] = thisSound;
+		} else {
+			thisSound = this.audio[category][soundName];
+		}
+		try {
+			thisSound.play();
+		} catch (exception) {
+			console.error("Unable to play sound: " + exception.message);
+		}
+	}
 
-    deactivate(){
-        this.currentStatus.isActive = false;
-        if(this.idleTimer) clearTimeout(this.idleTimer);
-        if(this.randomEventLoop) clearTimeout(this.randomEventLoop);
-        ui.hideElements([this.container]);
-    }
+	rageQuit(textType) {
+		this.sayRandom(textType);
+		this.setMood("angry");
+		this.fart();
+		this.addMascotAnimationEffect("leave-right");
+		this.canReactivate = false;
+		setTimeout(
+			function(scope) {
+				scope.deactivate();
+			},
+			5000,
+			this
+		);
+	}
 
-    activate(){
-        if(!this.canReactivate) {
-            console.warn('Mascot was requested to reactivate but canReactivate is set to false. Not reactivating');
-            return;
-        }
-        this.currentStatus.isActive = true;
-        this.registerMascotIdleTimer();
-        this.registerMascotIdleChat();
-        ui.showElements([this.container]);        
-    }
+	neutralLeave() {
+		this.sayRandom("leave_neutral");
+		this.setMood("confused");
+		this.addMascotAnimationEffect("leave-right");
+		setTimeout(
+			function(scope) {
+				scope.removeMascotAnimationEffect("leave-right");
+				scope.deactivate();
+			},
+			5000,
+			this
+		);
+	}
 
+	mascotReturn() {
+		if (!this.canReactivate) {
+			console.warn(
+				"Mascot was requested to reactivate but canReactivate is set to false. Not reactivating"
+			);
+			return;
+		}
+		this.activate();
+		this.addMascotAnimationEffect("fade-in");
+		this.sayRandom("return");
+		this.setMood("happy");
+	}
 
-    async preloadMascotImages(){
-        for(let imageKey in this.moodImages){
-            this.preloadImage(`${this.imageBaseFolderURL}${this.moodImages[imageKey]}`);
-        }
-    }
-    preloadImage(url){
-        var img=new Image();
-        img.src=url;
-    }
-}
+	deactivate() {
+		this.currentStatus.isActive = false;
+		if (this.idleTimer) clearTimeout(this.idleTimer);
+		if (this.randomEventLoop) clearTimeout(this.randomEventLoop);
+		ui.hideElements([this.container]);
+	}
+
+	activate() {
+		if (!this.canReactivate) {
+			console.warn(
+				"Mascot was requested to reactivate but canReactivate is set to false. Not reactivating"
+			);
+			return;
+		}
+		this.currentStatus.isActive = true;
+		this.registerMascotIdleTimer();
+		this.registerMascotIdleChat();
+		ui.showElements([this.container]);
+	}
+
+	destroy() {
+		console.log(`Destroying mascot: ${this.name}`);
+
+		// Mark mascot as inactive
+		this.isActive = false;
+		this.canReactivate = false;
+
+		// Stop timers
+		if (this.idleTimer) clearInterval(this.idleTimer);
+		if (this.idleChatInterval) clearInterval(this.idleChatInterval);
+		if (this.randomEventLoop) clearInterval(this.randomEventLoop);
+
+		// Remove event listeners from document
+		document.removeEventListener("keydown", this.boundKeydownHandler);
+		document.removeEventListener("mousemove", this.boundActivityHandler);
+		document.removeEventListener("mousedown", this.boundActivityHandler);
+		document.removeEventListener("click", this.boundActivityHandler);
+		document.removeEventListener("touchstart", this.boundActivityHandler);
+		document.removeEventListener("keydown", this.boundActivityHandler);
+
+		// Remove mascot DOM elements
+		if (this.mascotDiv) this.mascotDiv.remove();
+		// Remove any remaining speech bubbles
+		const speechBubbles = document.querySelectorAll(
+			".mascot-speech-bubble"
+		);
+		speechBubbles.forEach((bubble) => bubble.remove());
+
+		// Optionally hide or remove the whole mascot container if desired
+		console.log("Container");
+		console.log(this.container);
+		if (this.container) {
+			this.container.innerHTML = "";
+		}
+	}
+};

@@ -32,25 +32,16 @@
     <div class="container">
 		<!---->
         <div class="header panel center" >
-            <span class="header-text" id="content-header">Flash Cards.lol (V.2)!</span>
+            <span class="header-text" id="content-header">Flash Cards.lol (V.3)!</span>
         </div>    
 
         <div class="settings panel">
-			<label for="username">Leaderboard Alias</label>
-			<input 
-				type="text" 
-				name="username" 
-				id="username" 
-				data-option-key="config.username"
-				onkeyup="setUsername(this.value)"
-				value="Your Name Here"
-				data-persistent="true">
-			</input>
 			<div class="spacer"></div>
 
-            <span class="sub-header-text">Select Deck</span>
+            
                 
-            <div>
+            <div class="connected-options">
+				<span class="sub-header-text">Select Deck</span>
 				<div>
 					<label for="deck-category">Category</label><br/>
                     <select name="deck-category" id="deck-category" onchange="setSelectedDeckCategory(this.value)">
@@ -170,7 +161,7 @@
 
 					<div class="spacer"></div>
 					
-					<div id="deck-variants">
+					<div id="deck-variants" class="connected-options">
 						<label for="prompt-key">Question Prompt:</label>
 						<select 
 							name="prompt-key" 
@@ -196,7 +187,13 @@
 
 						</select>
 						<input type="button" onclick="loadVariantDeck()" value="Load Variant Deck" title="Load Variant Deck"/>
-					</div>				
+					</div>	
+					<div class="connected-options">
+						<label for="mascot-selector">Mascot Selector</label>
+						<select id="mascot-selector"></select>
+						<button onclick="loadSelectedMascot()">Load Mascot</button>
+						<button onclick="loadMascotOptions()">Get Mascots</button>
+					</div>
                 
 					<!--
 						<br/>
@@ -338,7 +335,7 @@
 					<div class="flip-card-front">
 						<div id="prompt">
 							<div id="load-deck-message" class="bounce">
-								<span class="animated-heading ">Load Deck To Begin</span>
+								<span class="animated-heading">Connect to Server and Load Deck To Begin</span>
 							</div>
 						</div>
 						<img src="media/shibeleft.png" class="deck-intro-image mascot" id="intro-slide-image"/>
@@ -393,8 +390,47 @@
         </div>
     </div>
 	
-	<!-- MODAL WINDOW -->
-	
+	<!-- Server connect modal -->
+	<div id="server-connect-modal" class="modal">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h2 class="inline pulse sub-header-text-2" id="new-high-score-alert">Connect To Server</h2>
+			</div>
+
+			<div class="modal-body">
+				<div class="form-group">
+					<label for="username">Player Name:</label>
+					<input
+						type="text"
+						name="username"
+						id="username"
+						data-option-key="config.username"
+						onkeyup="setUsername(this.value)"
+						value="Your Name Here"
+						data-persistent="true"
+						placeholder="Your Name Here"
+					>
+				</div>
+
+				<div class="form-group">
+					<label for="server-url">Server:</label>
+					<input
+						type="text"
+						id="server-url"
+						placeholder="Enter server URL"
+						value="http://localhost:3000"
+						aria-placeholder="http://localhost:3000"
+					>
+				</div>
+			</div>
+
+			<div class="modal-footer">
+				<button onclick="connectToServer()">Connect</button>
+			</div>
+		</div>
+	</div>
+
+	<!-- High scores modal -->
 	<div id="high-scores-modal" class="modal">
 		  <!-- Modal content -->
 		  <div class="modal-content">
@@ -415,7 +451,7 @@
 			</div>
 		</div>		
 	</div>
-	<!-- The Modal -->
+	<!-- Deck end results -->
 	<div id="results-modal" class="modal">
 		  <!-- Modal content -->
 		<div class="modal-content">

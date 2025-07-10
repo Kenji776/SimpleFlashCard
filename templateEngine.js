@@ -69,9 +69,6 @@ const Template = class {
                 }
             }
         });
-
-        console.log('Template elements');
-        console.log(this.matchedElements)
     }
 
     setTemplateValues(values){

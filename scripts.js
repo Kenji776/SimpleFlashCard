@@ -1,11 +1,28 @@
 
 const settingsName = 'SimpleFlashCardSettings';
 const scoresName = 'SimpleFlashCardHighScores';
-const databaseUrl = 'https://daj000002wi3eeas-dev-ed.develop.my.salesforce-sites.com/services/apexrest/flashCard';
+//const databaseUrl = 'https://daj000002wi3eeas-dev-ed.develop.my.salesforce-sites.com/services/apexrest/flashCard';
+var databaseUrl = "http://localhost:3000";
 
 //class objects
-var resultsModal = new Modal(); //instance of Modal
+
+let _connectedToServer = false; // backing variable
+
+const appState = {
+	get connectedToServer() {
+		return _connectedToServer;
+	},
+	set connectedToServer(value) {
+		_connectedToServer = value;
+		console.log(`🔔 connectedToServer changed to: ${value}`);
+		if(!value) ui.hideElements(".connected-options");
+        else ui.showElements(".connected-options");
+	},
+};
+
+var resultsModal = new Modal(); 
 var highScoresModal = new Modal();
+var serverConnectModal = new Modal();
 var mascot; //instance of Mascot
 var storedSettings = new LS(settingsName); //instance of LS (local storage) object
 var storedScores = new LS(scoresName); //instance of LS (local storage) object
@@ -41,6 +58,7 @@ var autoLoadNextCardOnAnswer = false;
 var selectedVariantDeck = '';
 var userName = 'Test User';
 
+
 var mascotLeaveLimit = 15;
 
 
@@ -69,6 +87,8 @@ var options = {
 	}
 }
 
+
+
 function debounce(func, delay) {
     let timeoutId;
     return function() {
@@ -96,15 +116,84 @@ const handleResize = debounce(function(event) {
 
 window.addEventListener('resize', handleResize);
 
+ async function connectToServer() {
+    appState.connectedToServer = false;
+    const urlInput = document.getElementById("server-url").value;
+    if (!urlInput || urlInput.trim() === "") {
+        alert("Please enter a server URL.");
+        return;
+    }
+
+    databaseUrl = urlInput.trim();
+    database = new Database(databaseUrl);
+ 
+
+    console.log(`🔌 Connecting to server at ${databaseUrl}`);
+
+    try {
+        // Confirm the server is alive and announce the user
+        const announceResp = await fetch(
+            `${databaseUrl}/api/announce?username=${encodeURIComponent(
+                userName
+            )}`,
+            {
+                cache: "no-store",
+            }
+        );
+        const announceResult = await announceResp.json();
+
+        if (!announceResp.ok || !announceResult.success) {
+            throw new Error(announceResult.message || "Connection failed");
+        }
+        try {
+            const apiKeyResp = await database.sendRequest({
+                action: "get_el_auth",
+            });
+            console.log("✅ Received API key:", apiKeyResp.data);
+            EL = new ElevenLabs(apiKeyResp.data);
+        } catch (err) {
+            console.error("❌ Failed to initialize ElevenLabs:", err);
+            //mascot.say("Failed to initialize voice system.", true);
+            alert("Failed to initialize voice system.");
+            return;
+        }
+
+        appState.connectedToServer = true;
+        console.log('Calling mascot.say');
+        //mascot.say('Successfully connected to server', true);
+        serverConnectModal.hideModal();
+    } catch (err) {
+        console.error("❌ Connection check failed:", err);
+        //mascot.say(`Connection failed: ${err.message}`, true);
+        alert(`Connection failed: ${err.message}`);
+        return;
+    }
+
+
+
+    await loadCardLibrary();
+
+    loadMascotOptions();
+
+    registerKeyboardShortcuts();
+    resultsModal.registerModal("results-modal");
+    resultsModal.registerModalCloseHandler(() =>
+        ui.hideElements("confetti_outer")
+    );
+    highScoresModal.registerModal("high-scores-modal");
+    registerPersistantDataStorage();
+
+    const settings = loadSettings();
+    if (settings?.config?.username) setUsername(settings.config.username);
+
+    setUi(true);
+}
+
+    
 
 async function init(){
-    mascot = new Mascot();
+    
 
-    database.sendRequest({
-        action: 'get_el_auth'
-    }).then(function(apiKey){
-        EL = new ElevenLabs(apiKey);
-    })
 
 	loadCardLibrary();
 	
@@ -129,10 +218,9 @@ async function init(){
 
 async function loadCardLibrary(){
     doLog('Loading card library');
-    const response = await fetch("https://pharmacy-flashcards-2027.lol/cardLibrary.json?cache-invalidate="+Date.now(), {cache: "no-store"});
-    cardLibrary = await response.json();
-    doLog(cardLibrary);
-
+    const response = await fetch(`${databaseUrl}?action=get_decks&cache-invalidate=${Date.now()}`, {cache: "no-store"});
+    const container = await response.json();
+    cardLibrary = container.data;
     setDeckCategories(cardLibrary);
 
     if(selectedDeckCategory) setDeckOptions(cardLibrary);
@@ -161,40 +249,66 @@ async function sendScore(){
 function registerKeyboardShortcuts(){
 	
  
-	doLog('Registering shortcut keys!');
 	document.onkeydown = function (e) {
 		e = e || window.event;
 		// use e.keyCode
-		console.log(e.keyCode + ' or key: ' + e.key);
 		
         //up arrow
-		if (e.keyCode == '38') showAnswer();
-        //down arrow
-		else if (e.keyCode == '40') performHintAction();
-        // left arrow
-		else if (e.keyCode == '37') loadPrev();
-        //right arrow
-		else if (e.keyCode == '39') loadNext();
-        //"h"	   
-		else if(e.key == 'h') showClue();
-        //1
-		else if(e.key == '1') answerCorrect();
-        //2
-		else if(e.key == '2') answerIncorrect();
-        //"s"
-        else if(e.key == 's') saveSettings();
-        //"l"
-        else if(e.key == 'l') loadSettings();
-        //"r"
-        else if(e.key == 'r') savePerformance();
-        //"p"
-        else if(e.key == 'p') getPastPerformanceData();
-
-        else if(e.key == 'm') generateMnemonic();
-
+		if (e.keyCode == "38") showAnswer();
+		//down arrow
+		else if (e.keyCode == "40") performHintAction();
+		// left arrow
+		else if (e.keyCode == "37") loadPrev();
+		//right arrow
+		else if (e.keyCode == "39") loadNext();
+		//"h"
+		else if (e.key == "h") showClue();
+		//1
+		else if (e.key == "1") answerCorrect();
+		//2
+		else if (e.key == "2") answerIncorrect();
+		//"s"
+		else if (e.key == "s") saveSettings();
+		//"l"
+		else if (e.key == "l") loadSettings();
+		//"r"
+		else if (e.key == "r") savePerformance();
+		//"p"
+		else if (e.key == "p") getPastPerformanceData();
+		else if (e.key == "m") generateMnemonic();
+		else if (e.key == "-") {
+            mascot.say("You fucking cheater");
+            submitScore(performance);
+        }
         
         //e.preventDefault();
 	};
+}
+
+async function submitScore(scoreData) {
+	try {
+        scoreData.player = userName;
+		const response = await fetch(`${databaseUrl}?action=post_score`, {
+			method: "POST",
+			headers: {
+				"Content-Type": "application/json",
+			},
+			body: JSON.stringify(scoreData),
+		});
+
+		const result = await response.json();
+
+		if (!response.ok) {
+			console.error("❌ Server responded with error:", result);
+			return { success: false, error: result };
+		}
+
+		console.log("✅ Score submitted successfully:", result);
+		return result;
+	} catch (error) {
+		console.error("❌ Error submitting score:", error);
+		return { success: false, error: error.message };
+	}
 }
 
 function savePerformance(){
@@ -225,6 +339,10 @@ function savePerformance(){
 function saveSettings(){
     let currentSettings = storedSettings.getPersistentValuesFromUI();
     storedSettings.value =currentSettings;
+
+    console.log('Current Settings');
+    console.log(currentSettings);
+    //mascot.say("Settings Saved " + userName);
 }
 
 function loadSettings(){
@@ -246,7 +364,41 @@ function loadSettings(){
         }
     }
 
+    console.log('Saved Settings');
+    console.log(savedSettings);
     return savedSettings;
+}
+
+async function loadSelectedMascot() {
+	const selectedFile = document.getElementById("mascot-selector").value;
+	if (!selectedFile) {
+		alert("Please select a mascot file.");
+		return;
+	}
+
+	try {
+		const response = await fetch(
+			`${databaseUrl}/mascots/${encodeURIComponent(selectedFile)}`,
+			{
+				cache: "no-store",
+			}
+		);
+        if(mascot){
+            mascot.destroy();
+        }
+		const mascotData = await response.json();
+        
+
+		// Update mascot instance
+		mascot = new Mascot(mascotData, databaseUrl);
+
+		console.log("✅ Loaded mascot data", mascot);
+		mascot.initMascot();
+		mascot.say("New mascot loaded!", "happy");
+	} catch (err) {
+		console.error("❌ Failed to load mascot:", err);
+		mascot.say("Error loading mascot.", "sad");
+	}
 }
 
 function getPastPerformanceData(){
@@ -308,23 +460,45 @@ function setDeckCategories(deckData){
 /*
 * @description Populates the 'card-deck' select with options from the selected deck category
 */
-function setDeckOptions(){
+function setDeckOptions() {
+	let optionsArray = [];
+	doLog("Select deck options for selectedDeck " + selectedDeckCategory);
+	doLog(cardLibrary);
 
-    let optionsArray = [];
-    doLog('Select deck options for selectedDeck ' + selectedDeckCategory);
-    doLog(cardLibrary)
-	
-	doLog('Selected category: ' + selectedDeckCategory);
-    for(let deckIndex in cardLibrary.card_stacks.categories[selectedDeckCategory][0]){
-        let deck = cardLibrary.card_stacks.categories[selectedDeckCategory][0][deckIndex];
+	doLog("Selected category: " + selectedDeckCategory);
+	for (let deckIndex in cardLibrary.card_stacks.categories[
+		selectedDeckCategory
+	][0]) {
+		let deck =
+			cardLibrary.card_stacks.categories[selectedDeckCategory][0][
+				deckIndex
+			];
 
-        doLog(deck);
-        optionsArray.push({'value':deck.url,'label':deck.name});
-    }
-    setSelectOptions('card-deck', optionsArray, null, false, true);
-    
-    //set default deck url to first element in list
-    deckUrl = optionsArray[0].value;
+		doLog(deck);
+		optionsArray.push({
+			value: deck.deck_slug, // was deck.url
+			label: deck.name,
+		});
+	}
+
+	setSelectOptions("card-deck", optionsArray, null, false, true);
+
+	// Set default deck slug to first element in list
+	deckUrl = optionsArray[0].value;
+}
+
+async function loadMascotOptions() {
+	const response = await fetch(`${databaseUrl}/api/mascots`);
+	const data = await response.json();
+
+	const select = document.getElementById("mascot-selector");
+	select.innerHTML = ""; // Clear old options
+	data.mascots.forEach((fileName) => {
+		const option = document.createElement("option");
+		option.value = fileName;
+		option.textContent = fileName;
+		select.appendChild(option);
+	});
 }
 
 function setVariantDeckOptions(){
@@ -380,23 +554,37 @@ function loadVariantDeck(){
     generateDeckFromData(new ShuffleDeckConfig({config: config, cards: cards}, variantConfig));
 }
 
-async function handleLoadDeckSelect(){
-    doLog('handleLoadDeckSelect called with deckUrl: ' + deckUrl)
-    let deckData = await fetchRemoteDeck(deckUrl);
-    loadDeck(deckData);
+async function handleLoadDeckSelect() {
+	doLog("handleLoadDeckSelect called with deckUrl: " + deckUrl);
+	let deckData = await fetchRemoteDeck(deckUrl);
+	loadDeck(deckData);
 }
 
-async function fetchRemoteDeck(deckUrl){
-    if(!deckUrl || deckUrl == 'none'){
-        console.warn('No deck URL provided to load deck. Aborting');
-        return;
-    }
+async function fetchRemoteDeck(deckSlug) {
+	if (!deckSlug || deckSlug == "none") {
+		console.warn("No deck slug provided to load deck. Aborting");
+		return;
+	}
 
-    doLog('Loading card library: ' + deckUrl);
-    const response = await fetch(deckUrl+'?cache-invalidate='+Date.now(), {cache: "no-store"});
-    const deckData = await response.json();
+	doLog("Loading card library slug: " + deckSlug);
 
-    return deckData;
+	// Build the API request to your Node server
+	const response = await fetch(
+		`${databaseUrl}/api/deck?slug=${encodeURIComponent(
+			deckSlug
+		)}&cache-invalidate=${Date.now()}`,
+		{
+			cache: "no-store",
+		}
+	);
+
+	if (!response.ok) {
+		console.error(`⚠️ Failed to load deck: ${response.status}`);
+		return;
+	}
+
+	const deckDataResult = await response.json();
+	return deckDataResult.data;
 }
 
 async function loadDeck(deckData){
@@ -912,7 +1100,7 @@ function incorrectAnswerAlert(){
 function generateMnemonic(){
     console.log('Calling Chat GPT!');
     console.log(currentCard);
-    let question = 'Please give me a Mnemonic Device to remember the pharmacy drug brand name ' + currentCard.brandName + ' that has a generic name of ' + currentCard.genericName + ' that is of the class ' + currentCard.drugClassName;
+    let question = 'Please give me a Mnemonic Device to remember the pharmacy drug brand name ' + currentCard.brandName + ' that has a generic name of ' + currentCard.genericName + ' that is of the class ' + currentCard.drugClassName + '. Please keep the description breif and only reply in plain text, do not use emoji or formatting of any kind';
     mascot.askQuestion(question);
 
 
@@ -958,8 +1146,13 @@ function loadNext(){
         
         //card object to load next
         let cardToLoad;
+        const answerCard = document.getElementById("answer-card");
+        const front = answerCard.querySelector(".flip-card-front");
+        const back = answerCard.querySelector(".flip-card-back");
 
-
+        //undo firefox backface invisibility hack
+        front.style.visibility = "visible";
+        back.style.visibility = "hidden";
         if(timer && timer.timerInterval && cardIndex == 0){
             ui.hideElements('deck-loaded-image');
             timer.startTimer();
@@ -1067,9 +1260,24 @@ function loadPrev(){
 function showAnswer(){
     
     console.log(currentCard);
-    if(currentCard && currentCard.id != null){
-        document.getElementById('answer').style.visibility='visible';
-        document.getElementById('answer-card').classList.toggle("flip-card-flipped")
+    if (currentCard && currentCard.id != null) {
+        const answerCard = document.getElementById("answer-card");
+        const isFlipped = answerCard.classList.toggle("flip-card-flipped");
+
+        // Ensure the answer is visible
+        document.getElementById("answer").style.visibility = "visible";
+
+        // Show/hide front and back manually
+        const front = answerCard.querySelector(".flip-card-front");
+        const back = answerCard.querySelector(".flip-card-back");
+
+        if (isFlipped) {
+            front.style.visibility = "hidden";
+            back.style.visibility = "visible";
+        } else {
+            front.style.visibility = "visible";
+            back.style.visibility = "hidden";
+        }
     }
 }
 
@@ -1507,5 +1715,6 @@ function doLog(logData){
 }
 
 window.onload = function() {
-	init();
+    serverConnectModal.registerModal("server-connect-modal");
+    serverConnectModal.showModal();
 };
