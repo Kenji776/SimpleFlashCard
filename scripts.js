@@ -116,106 +116,133 @@ const handleResize = debounce(function(event) {
 
 window.addEventListener('resize', handleResize);
 
- async function connectToServer() {
-    appState.connectedToServer = false;
-    const urlInput = document.getElementById("server-url").value;
-    if (!urlInput || urlInput.trim() === "") {
-        alert("Please enter a server URL.");
-        return;
-    }
+async function connectToServer() {
+	const {
+		connectButton,
+		connectButtonText,
+		connectSpinner,
+		connectStatus,
+	} = getConnectElements();
 
-    databaseUrl = urlInput.trim();
-    database = new Database(databaseUrl);
- 
+	try {
+		startLoading(
+			connectButton,
+			connectButtonText,
+			connectSpinner,
+			connectStatus
+		);
+		const urlInput = getServerUrl();
+		const username = userName; // Make sure userName is defined in your context
 
-    console.log(`🔌 Connecting to server at ${databaseUrl}`);
+		await announceToServer(urlInput, username, connectStatus);
+		const apiKey = await initializeElevenLabs(urlInput, connectStatus);
 
-    try {
-        // Confirm the server is alive and announce the user
-        const announceResp = await fetch(
-            `${databaseUrl}/api/announce?username=${encodeURIComponent(
-                userName
-            )}`,
-            {
-                cache: "no-store",
-            }
-        );
-        const announceResult = await announceResp.json();
+		await performPostConnectionSetup(apiKey, connectStatus);
 
-        if (!announceResp.ok || !announceResult.success) {
-            throw new Error(announceResult.message || "Connection failed");
-        }
-        try {
-            const apiKeyResp = await database.sendRequest({
-                action: "get_el_auth",
-            });
-            console.log("✅ Received API key:", apiKeyResp.data);
-            EL = new ElevenLabs(apiKeyResp.data);
-        } catch (err) {
-            console.error("❌ Failed to initialize ElevenLabs:", err);
-            //mascot.say("Failed to initialize voice system.", true);
-            alert("Failed to initialize voice system.");
-            return;
-        }
-
-        appState.connectedToServer = true;
-        console.log('Calling mascot.say');
-        //mascot.say('Successfully connected to server', true);
-        serverConnectModal.hideModal();
-    } catch (err) {
-        console.error("❌ Connection check failed:", err);
-        //mascot.say(`Connection failed: ${err.message}`, true);
-        alert(`Connection failed: ${err.message}`);
-        return;
-    }
-
-
-
-    await loadCardLibrary();
-
-    loadMascotOptions();
-
-    registerKeyboardShortcuts();
-    resultsModal.registerModal("results-modal");
-    resultsModal.registerModalCloseHandler(() =>
-        ui.hideElements("confetti_outer")
-    );
-    highScoresModal.registerModal("high-scores-modal");
-    registerPersistantDataStorage();
-
-    const settings = loadSettings();
-    if (settings?.config?.username) setUsername(settings.config.username);
-
-    setUi(true);
+		appState.connectedToServer = true;
+		serverConnectModal.hideModal();
+	} catch (err) {
+		console.error("❌ Connection failed:", err);
+		alert(`Connection failed: ${err.message}`);
+	} finally {
+		stopLoading(
+			connectButton,
+			connectButtonText,
+			connectSpinner,
+			connectStatus
+		);
+	}
+}
+function getConnectElements() {
+	return {
+		connectButton: document.getElementById("connect-button"),
+		connectButtonText: document.getElementById("connect-button-text"),
+		connectSpinner: document.getElementById("connect-spinner"),
+		connectStatus: document.getElementById("connect-status"),
+	};
 }
 
-    
+function startLoading(button, buttonText, spinner, statusElement) {
+	button.disabled = true;
+	buttonText.style.display = "none";
+	spinner.style.display = "inline-block";
+	updateStatus(statusElement, "Connecting to server...");
+}
 
-async function init(){
-    
+function stopLoading(button, buttonText, spinner, statusElement) {
+	button.disabled = false;
+	buttonText.style.display = "inline";
+	spinner.style.display = "none";
+	updateStatus(statusElement, "");
+}
 
+function updateStatus(element, message) {
+	element.textContent = message;
+}
 
-	loadCardLibrary();
-	
+function getServerUrl() {
+	const urlInput = document.getElementById("server-url").value.trim();
+	if (!urlInput) {
+		throw new Error("Please enter a server URL.");
+	}
+	databaseUrl = urlInput;
+	database = new Database(databaseUrl);
+	return databaseUrl;
+}
+
+async function announceToServer(url, username, statusElement) {
+	updateStatus(statusElement, "Announcing to server...");
+	const response = await fetch(
+		`${url}/api/announce?username=${encodeURIComponent(username)}`,
+		{
+			cache: "no-store",
+		}
+	);
+	const result = await response.json();
+
+	if (!response.ok || !result.success) {
+		throw new Error(result.message || "Failed to announce to server.");
+	}
+}
+
+async function initializeElevenLabs(url, statusElement) {
+	updateStatus(statusElement, "Retrieving API key...");
+	try {
+		const apiKeyResp = await database.sendRequest({
+			action: "get_el_auth",
+		});
+		console.log("✅ Received API key:", apiKeyResp.data);
+		EL = new ElevenLabs(apiKeyResp.data);
+		return apiKeyResp.data;
+	} catch (err) {
+		throw new Error("Failed to initialize ElevenLabs.");
+	}
+}
+
+async function performPostConnectionSetup(apiKey, statusElement) {
+	updateStatus(statusElement, "Loading card library...");
+	await loadCardLibrary();
+
+	updateStatus(statusElement, "Initializing mascot...");
+	loadMascotOptions();
+
+	updateStatus(statusElement, "Finalizing...");
 	registerKeyboardShortcuts();
-	
-	resultsModal.registerModal('results-modal');
-	
-	resultsModal.registerModalCloseHandler(function(scope){
-		ui.hideElements('confetti_outer');
-	});		
+	resultsModal.registerModal("results-modal");
+	resultsModal.registerModalCloseHandler(() =>
+		ui.hideElements("confetti_outer")
+	);
+	highScoresModal.registerModal("high-scores-modal");
+	registerPersistantDataStorage();
 
-    highScoresModal.registerModal('high-scores-modal');
-	
-    let settings = loadSettings();
+	const settings = loadSettings();
+	if (settings?.config?.username) {
+		setUsername(settings.config.username);
+	}
 
-    registerPersistantDataStorage();
-
-    if(settings && settings?.config?.username) setUsername(settings.config.username);
-
-    
+	setUi(true);
 }
-
+    
 async function loadCardLibrary(){
     doLog('Loading card library');
     const response = await fetch(`${databaseUrl}?action=get_decks&cache-invalidate=${Date.now()}`, {cache: "no-store"});

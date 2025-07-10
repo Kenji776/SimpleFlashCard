@@ -391,7 +391,7 @@
     </div>
 	
 	<!-- Server connect modal -->
-	<div id="server-connect-modal" class="modal">
+	<div id="server-connect-modal" class="modal login-modal">
 		<div class="modal-content">
 			<div class="modal-header">
 				<h2 class="inline pulse sub-header-text-2" id="new-high-score-alert">Connect To Server</h2>
@@ -418,14 +418,18 @@
 						type="text"
 						id="server-url"
 						placeholder="Enter server URL"
-						value="http://localhost:3000"
-						aria-placeholder="http://localhost:3000"
+						value="https://fc.kenji776-labs.org"
+						aria-placeholder="https://fc.kenji776-labs.org"
 					>
 				</div>
 			</div>
 
 			<div class="modal-footer">
-				<button onclick="connectToServer()">Connect</button>
+				<button id="connect-button" onclick="connectToServer()">
+					<span id="connect-button-text">Connect</span>
+					<span id="connect-spinner" class="spinner" style="display:none;"></span>
+				</button>
+				<div id="connect-status" class="status-text"></div>
 			</div>
 		</div>
 	</div>

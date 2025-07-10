@@ -4,7 +4,7 @@ const Mascot = class {
 	containerName = "mascot-container";
 	defaultMascotClass = "happy";
 	speechBubbleFadeDelay = 1;
-	words = {};
+	words = {}; ///gets populated from the speech property. Used to come from external source.
 	mute = false;
 	isActive = true;
 	canReactivate = true;
@@ -12,7 +12,6 @@ const Mascot = class {
 	uncensoredMode = false;
 
 	urls = {
-		wordsLibrary: "https://pharmacy-flashcards-2027.lol/mascotWords.json",
 		sounds: {
 			fart: [
 				"fart1.wav",
@@ -92,6 +91,8 @@ const Mascot = class {
 		clickLimit: 10,
 	};
 
+	speech ={};
+
 	constructor(constructorData, server) {
 		try {
 			if (!ui) {
@@ -150,11 +151,6 @@ const Mascot = class {
 		setTimeout(
 			function(scope) {
 				scope.setMood("happy");
-
-				console.log(
-					"--------------------This is the chatGPT Response Object Being Fed Into the mascot say function"
-				);
-				console.log(chatGPTResponse);
 				scope.say(
 					chatGPTResponse.data.response.choices[0].message.content,
 					true,
@@ -167,13 +163,8 @@ const Mascot = class {
 		);
 	}
 
-	async loadMascotWords() {
-		let mascotWordsData = await fetch(
-			`${this.urls.wordsLibrary}?cache-invalidate=${Date.now()}`,
-			{ cache: "no-store" }
-		);
-		let words = await mascotWordsData.json();
-		return words;
+	async loadMascotWords() {		
+		return this.speech;
 	}
 
 	registerMascotIdleTimer() {
@@ -303,12 +294,6 @@ const Mascot = class {
 					let randomChance = Math.floor(Math.random() * 101);
 
 					let rightNow = new Date().getTime();
-
-					/*
-                console.log('Random chance check: ' + randomChance + ' < ' + scope.idleChatRandomChance)
-                console.log('User idle?: ' + scope.userIsIdle);
-                console.log('Cooldown met?: ' + (rightNow-scope.lastIdleChatSent) / 1000 > scope.idleChatCooldownSeconds);
-                */
 					if (
 						scope.userIsIdle &&
 						randomChance < scope.idleChatRandomChance &&
@@ -427,8 +412,6 @@ const Mascot = class {
 		}
 		if (this.useTTS && EL && !this.mute) {
 			EL.tts(speechText, this.TTS.voice_id);
-		} else {
-			console.log("----- noUseTTS or EL");
 		}
 		if (this.uninterruptableMessageDisplayed) {
 			console.warn(
@@ -579,6 +562,10 @@ const Mascot = class {
         let folderName = '';
         if (dataType == "img") folderName = "img";
 		else if (dataType == "sfx") folderName = "sfx";
+		else {
+			console.warn('Invalid data type provided for filename" ' + fileName + '. Type: ' + dataType);
+			return null;
+		}
 		const basePath = `/mascot-media/${this.name}/${folderName}/${fileName}`;
 		return this.rootServerUrl
 			? `${this.rootServerUrl}${basePath}`
@@ -604,7 +591,6 @@ const Mascot = class {
 	}
 
 	preloadImage(url) {
-		console.log("Attempting to preload image: " + url);
 		const img = new Image();
 		img.src = url;
 	}

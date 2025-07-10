@@ -26,22 +26,18 @@ The **Simple Flashcard Client** is a fun, interactive front-end application for 
 
 ## 🚀 Getting Started
 
-### 1. Clone the Repository
+### Option 1. Connect Directly 
+
+Just open the hosted version of this repo at: ([https://kenji776.github.io/SimpleFlashCard/](https://kenji776.github.io/SimpleFlashCard/)) 
+
+### Option 2. Run Directly
 
 ```bash
 git clone https://github.com/Kenji776/SimpleFlashCard.git
 cd SimpleFlashCard
 ```
 
-### 2. Serve the Static Files
-
 You can open `index.html` directly in your browser, but it is recommended to serve it via a local dev server:
-
-```bash
-npx http-server .
-```
-
-Or use your favorite static server like `live-server`, `serve`, etc.
 
 ### 3. Connect to the Flashcard Server
 
