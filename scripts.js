@@ -28,7 +28,6 @@ var storedSettings = new LS(settingsName); //instance of LS (local storage) obje
 var storedScores = new LS(scoresName); //instance of LS (local storage) object
 var database = new Database(databaseUrl);
 var utils = new Utils();
-var EL;
 var template = new Template();
 var labels = new Labels();
 var serverPassword = "";
@@ -204,23 +203,6 @@ async function announceToServer(url, username, statusElement) {
 		throw new Error(result.message || "Failed to announce to server.");
 	}
 }
-
-/*
-async function initializeElevenLabs(url, statusElement) {
-	updateStatus(statusElement, "Retrieving API key...");
-	try {
-		const apiKeyResp = await database.sendRequest({
-			action: "get_el_auth",
-            password: serverPassword
-		});
-		console.log("✅ Received API key:", apiKeyResp.data);
-		EL = new ElevenLabs(apiKeyResp.data);
-		return apiKeyResp.data;
-	} catch (err) {
-		throw new Error("Failed to initialize ElevenLabs.");
-	}
-}
-*/
 
 async function performPostConnectionSetup(statusElement) {
 	updateStatus(statusElement, "Loading card library...");

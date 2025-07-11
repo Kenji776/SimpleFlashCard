@@ -91,7 +91,7 @@ const Mascot = class {
 		clickLimit: 10,
 	};
 
-	speech ={};
+	speech = {};
 
 	constructor(constructorData, server) {
 		try {
@@ -163,7 +163,7 @@ const Mascot = class {
 		);
 	}
 
-	async loadMascotWords() {		
+	async loadMascotWords() {
 		return this.speech;
 	}
 
@@ -410,8 +410,8 @@ const Mascot = class {
 			console.warn("Mascot invactive. Not reading text");
 			return;
 		}
-		if (this.useTTS && EL && !this.mute) {
-			EL.tts(speechText, this.TTS.voice_id);
+		if (this.useTTS && !this.mute) {
+			this.tts(speechText, this.TTS.voice_id);
 		}
 		if (this.uninterruptableMessageDisplayed) {
 			console.warn(
@@ -450,6 +450,22 @@ const Mascot = class {
 		}
 	}
 
+	async tts(speechText, voice_id) {
+		console.log('Sending text for TTS: ' + speechText);
+		const response = await fetch(`${this.rootServerUrl}/api/text-to-speech`, {
+			method: "POST",
+			headers: { "Content-Type": "application/json" },
+			body: JSON.stringify({
+				text: speechText,
+				voiceId: voice_id,
+			}),
+		});
+		const audioBlob = await response.blob();
+		const audioUrl = URL.createObjectURL(audioBlob);
+		const audio = new Audio(audioUrl);
+		audio.play();
+	}
+
 	removeSpeechBubble(bubbleId, speechDelay) {
 		if (this.uninterruptableMessageDisplayed)
 			this.uninterruptableMessageDisplayed = false;
@@ -486,7 +502,10 @@ const Mascot = class {
 
 		let fartDiv = document.createElement("div");
 		fartDiv.className = "slide-in-out-left mascot-fart-cloud";
-		fartDiv.style.backgroundImage = `url(${this.buildMascotMediaUrl(this.miscImages.fart, 'img')})`;
+		fartDiv.style.backgroundImage = `url(${this.buildMascotMediaUrl(
+			this.miscImages.fart,
+			"img"
+		)})`;
 		fartDiv.id = "mascot-fart-cloud";
 		this.container.appendChild(fartDiv);
 
@@ -559,11 +578,16 @@ const Mascot = class {
 	 */
 	buildMascotMediaUrl(fileName, dataType) {
 		// Example output: /mascot-media/shiba/shibaHappy.png
-        let folderName = '';
-        if (dataType == "img") folderName = "img";
+		let folderName = "";
+		if (dataType == "img") folderName = "img";
 		else if (dataType == "sfx") folderName = "sfx";
 		else {
-			console.warn('Invalid data type provided for filename" ' + fileName + '. Type: ' + dataType);
+			console.warn(
+				'Invalid data type provided for filename" ' +
+					fileName +
+					". Type: " +
+					dataType
+			);
 			return null;
 		}
 		const basePath = `/mascot-media/${this.name}/${folderName}/${fileName}`;
@@ -576,7 +600,7 @@ const Mascot = class {
 		console.log("Trying to get image from node proxy url");
 		console.log(imageName);
 
-		const imageUrl = this.buildMascotMediaUrl(imageName,'img');
+		const imageUrl = this.buildMascotMediaUrl(imageName, "img");
 		this.mascotDiv.style.backgroundImage = `url(${imageUrl})`;
 	}
 
@@ -584,7 +608,7 @@ const Mascot = class {
 		for (let imageKey in this.moodImages) {
 			const imageUrl = this.buildMascotMediaUrl(
 				this.moodImages[imageKey],
-                'img'
+				"img"
 			);
 			this.preloadImage(imageUrl);
 		}
@@ -642,7 +666,7 @@ const Mascot = class {
 		if (!this.audio[category]) this.audio[category] = {};
 
 		if (!this.audio[category].hasOwnProperty(soundName)) {
-			thisSound = new Audio(this.buildMascotMediaUrl(soundName,'sfx'));
+			thisSound = new Audio(this.buildMascotMediaUrl(soundName, "sfx"));
 			this.audio[category][soundName] = thisSound;
 		} else {
 			thisSound = this.audio[category][soundName];
