@@ -24,15 +24,13 @@ async function registerGetScoresInterval(){
     },refreshGlobalScoresIntervalMS,this)
 }
 
-async function getScores(deckId, databaseUrl = "http://localhost:3000/") {
+async function getScores(deckId) {
 	if (!deckId) {
 		console.warn("⚠️ No deckId provided to getScores()");
 		return { success: false, message: "Missing deckId" };
 	}
 
-	const url = `${databaseUrl}?action=get_scores&deck=${encodeURIComponent(
-		deckId
-	)}`;
+	const url = `${database.endpoint}/api/scores?deck=${encodeURIComponent(deckId)}`;
 
 	console.log(`➡️ Fetching scores from: ${url}`);
 

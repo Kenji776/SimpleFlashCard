@@ -39,6 +39,7 @@ const ElevenLabs = class {
 		return data;
 	}
 
+	/*
 	async tts(text, voiceId, config) {
 		console.log(`🎤 Requested TTS for "${text}" with voiceId "${voiceId}"`);
 
@@ -118,6 +119,22 @@ const ElevenLabs = class {
 		const payload = JSON.stringify(new this.TtsRequest(text, config));
 		console.log(`📦 Sending TTS request payload: ${payload}`);
 		request.send(payload);
+	}
+	*/
+
+	async tts(speechText, voice_id){
+		const response = await fetch("/api/text-to-speech", {
+			method: "POST",
+			headers: { "Content-Type": "application/json" },
+			body: JSON.stringify({
+				text: speechText,
+				voiceId: voice_id,
+			}),
+		});
+		const audioBlob = await response.blob();
+		const audioUrl = URL.createObjectURL(audioBlob);
+		const audio = new Audio(audioUrl);
+		audio.play();
 	}
 
 	TtsRequest = class {

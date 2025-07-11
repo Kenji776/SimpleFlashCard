@@ -31,7 +31,7 @@ var utils = new Utils();
 var EL;
 var template = new Template();
 var labels = new Labels();
-
+var serverPassword = "";
 
 var showLogs = false;
 var deckUrl;
@@ -135,9 +135,9 @@ async function connectToServer() {
 		const username = userName; // Make sure userName is defined in your context
 
 		await announceToServer(urlInput, username, connectStatus);
-		const apiKey = await initializeElevenLabs(urlInput, connectStatus);
+		//const apiKey = await initializeElevenLabs(urlInput, connectStatus);
 
-		await performPostConnectionSetup(apiKey, connectStatus);
+		await performPostConnectionSetup(connectStatus);
 
 		appState.connectedToServer = true;
 		serverConnectModal.hideModal();
@@ -193,7 +193,7 @@ function getServerUrl() {
 async function announceToServer(url, username, statusElement) {
 	updateStatus(statusElement, "Announcing to server...");
 	const response = await fetch(
-		`${url}/api/announce?username=${encodeURIComponent(username)}`,
+		`${url}/api/announce?username=${encodeURIComponent(username)}&password=${encodeURIComponent(serverPassword)}`,
 		{
 			cache: "no-store",
 		}
@@ -205,11 +205,13 @@ async function announceToServer(url, username, statusElement) {
 	}
 }
 
+/*
 async function initializeElevenLabs(url, statusElement) {
 	updateStatus(statusElement, "Retrieving API key...");
 	try {
 		const apiKeyResp = await database.sendRequest({
 			action: "get_el_auth",
+            password: serverPassword
 		});
 		console.log("✅ Received API key:", apiKeyResp.data);
 		EL = new ElevenLabs(apiKeyResp.data);
@@ -218,8 +220,9 @@ async function initializeElevenLabs(url, statusElement) {
 		throw new Error("Failed to initialize ElevenLabs.");
 	}
 }
+*/
 
-async function performPostConnectionSetup(apiKey, statusElement) {
+async function performPostConnectionSetup(statusElement) {
 	updateStatus(statusElement, "Loading card library...");
 	await loadCardLibrary();
 
@@ -245,7 +248,7 @@ async function performPostConnectionSetup(apiKey, statusElement) {
     
 async function loadCardLibrary(){
     doLog('Loading card library');
-    const response = await fetch(`${databaseUrl}?action=get_decks&cache-invalidate=${Date.now()}`, {cache: "no-store"});
+    const response = await fetch(`${databaseUrl}/api/decks?password=${encodeURIComponent(serverPassword)}`, {cache: "no-store"});
     const container = await response.json();
     cardLibrary = container.data;
     setDeckCategories(cardLibrary);
@@ -263,7 +266,8 @@ async function sendScore(){
             'player':userName,
             'score':performance.runningTotalScore,
             'deck': utils.formatId(performance.deckId), 
-            'recordId': performance.performanceRecordId
+            'recordId': performance.performanceRecordId,
+            'password': serverPassword
         });
 
         console.log('Result of high score create');
@@ -315,7 +319,7 @@ function registerKeyboardShortcuts(){
 async function submitScore(scoreData) {
 	try {
         scoreData.player = userName;
-		const response = await fetch(`${databaseUrl}?action=post_score`, {
+		const response = await fetch(`${databaseUrl}?action=post_score&password=${encodeURIComponent(serverPassword)}`, {
 			method: "POST",
 			headers: {
 				"Content-Type": "application/json",
@@ -405,7 +409,7 @@ async function loadSelectedMascot() {
 
 	try {
 		const response = await fetch(
-			`${databaseUrl}/mascots/${encodeURIComponent(selectedFile)}`,
+			`${databaseUrl}/mascots/${encodeURIComponent(selectedFile)}?password=${encodeURIComponent(serverPassword)}`,
 			{
 				cache: "no-store",
 			}
@@ -515,7 +519,7 @@ function setDeckOptions() {
 }
 
 async function loadMascotOptions() {
-	const response = await fetch(`${databaseUrl}/api/mascots`);
+	const response = await fetch(`${databaseUrl}/api/mascots?password=${encodeURIComponent(serverPassword)}`);
 	const data = await response.json();
 
 	const select = document.getElementById("mascot-selector");
@@ -599,7 +603,9 @@ async function fetchRemoteDeck(deckSlug) {
 	const response = await fetch(
 		`${databaseUrl}/api/deck?slug=${encodeURIComponent(
 			deckSlug
-		)}&cache-invalidate=${Date.now()}`,
+		)}&cache-invalidate=${Date.now()}&password=${encodeURIComponent(
+			serverPassword
+		)}`,
 		{
 			cache: "no-store",
 		}
@@ -1740,6 +1746,12 @@ function handleError(e, customMessage){
 function doLog(logData){
    if(showLogs) console.log(logData);
 }
+
+function setServerPassword(password) {
+	serverPassword = password;
+	console.log(`🔑 Server password set to: ${"*".repeat(password.length)}`);
+}
+
 
 window.onload = function() {
     serverConnectModal.registerModal("server-connect-modal");
