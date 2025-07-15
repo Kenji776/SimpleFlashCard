@@ -1,4 +1,3 @@
-
 const settingsName = 'SimpleFlashCardSettings';
 const scoresName = 'SimpleFlashCardHighScores';
 //const databaseUrl = 'https://daj000002wi3eeas-dev-ed.develop.my.salesforce-sites.com/services/apexrest/flashCard';
@@ -26,7 +25,7 @@ var serverConnectModal = new Modal();
 var mascot; //instance of Mascot
 var storedSettings = new LS(settingsName); //instance of LS (local storage) object
 var storedScores = new LS(scoresName); //instance of LS (local storage) object
-var database = new Database(databaseUrl);
+let flashCardClient;
 var utils = new Utils();
 var template = new Template();
 var labels = new Labels();
@@ -132,7 +131,11 @@ async function connectToServer() {
 		);
 		const urlInput = getServerUrl();
 		const username = userName; // Make sure userName is defined in your context
-
+        
+        flashCardClient = new FlashcardServerClient(
+			databaseUrl,
+			serverPassword
+		);
 		await announceToServer(urlInput, username, connectStatus);
 		//const apiKey = await initializeElevenLabs(urlInput, connectStatus);
 
@@ -184,24 +187,15 @@ function getServerUrl() {
 	if (!urlInput) {
 		throw new Error("Please enter a server URL.");
 	}
-	databaseUrl = urlInput;
-	database = new Database(databaseUrl);
 	return databaseUrl;
 }
 
 async function announceToServer(url, username, statusElement) {
 	updateStatus(statusElement, "Announcing to server...");
-	const response = await fetch(
-		`${url}/api/announce?username=${encodeURIComponent(username)}&password=${encodeURIComponent(serverPassword)}`,
-		{
-			cache: "no-store",
-		}
-	);
-	const result = await response.json();
-
-	if (!response.ok || !result.success) {
-		throw new Error(result.message || "Failed to announce to server.");
-	}
+    const response = await flashCardClient.announce(username);
+    if (!response.success) {
+        throw new Error(response.message || "Failed to announce to server.");
+    }
 }
 
 async function performPostConnectionSetup(statusElement) {
@@ -230,9 +224,8 @@ async function performPostConnectionSetup(statusElement) {
     
 async function loadCardLibrary(){
     doLog('Loading card library');
-    const response = await fetch(`${databaseUrl}/api/decks?password=${encodeURIComponent(serverPassword)}`, {cache: "no-store"});
-    const container = await response.json();
-    cardLibrary = container.data;
+    const result = await flashCardClient.listDecks();
+    cardLibrary = result.data;
     setDeckCategories(cardLibrary);
 
     if(selectedDeckCategory) setDeckOptions(cardLibrary);
@@ -243,13 +236,11 @@ async function sendScore(){
     if(userName.length > 0 && userName != 'Your Name Here'){
         console.log('Sending Score!');
 
-        let createResult = await database.sendRequest({
-            'action':'log_score',
-            'player':userName,
-            'score':performance.runningTotalScore,
-            'deck': utils.formatId(performance.deckId), 
-            'recordId': performance.performanceRecordId,
-            'password': serverPassword
+        let createResult = await flashCardClient.submitScore({
+            deckId: utils.formatId(performance.deckId),
+            performanceRecordId: performance.performanceRecordId,
+            player: userName,
+            correctPercent: performance.correctPercent || 0,
         });
 
         console.log('Result of high score create');
@@ -291,37 +282,11 @@ function registerKeyboardShortcuts(){
 		else if (e.key == "m") generateMnemonic();
 		else if (e.key == "-") {
             mascot.say("You fucking cheater");
-            submitScore(performance);
+            sendScore(performance);
         }
         
         //e.preventDefault();
 	};
-}
-
-async function submitScore(scoreData) {
-	try {
-        scoreData.player = userName;
-		const response = await fetch(`${databaseUrl}?action=post_score&password=${encodeURIComponent(serverPassword)}`, {
-			method: "POST",
-			headers: {
-				"Content-Type": "application/json",
-			},
-			body: JSON.stringify(scoreData),
-		});
-
-		const result = await response.json();
-
-		if (!response.ok) {
-			console.error("❌ Server responded with error:", result);
-			return { success: false, error: result };
-		}
-
-		console.log("✅ Score submitted successfully:", result);
-		return result;
-	} catch (error) {
-		console.error("❌ Error submitting score:", error);
-		return { success: false, error: error.message };
-	}
 }
 
 function savePerformance(){
@@ -390,24 +355,13 @@ async function loadSelectedMascot() {
 	}
 
 	try {
-		const response = await fetch(
-			`${databaseUrl}/mascots/${encodeURIComponent(selectedFile)}?password=${encodeURIComponent(serverPassword)}`,
-			{
-				cache: "no-store",
-			}
-		);
-        if(mascot){
-            mascot.destroy();
-        }
-		const mascotData = await response.json();
-        
+        const mascotData = await flashCardClient.getMascotSettings(selectedFile);
+        if (mascot) mascot.destroy();
 
-		// Update mascot instance
-		mascot = new Mascot(mascotData, databaseUrl);
-
-		console.log("✅ Loaded mascot data", mascot);
-		mascot.initMascot();
-		mascot.say("New mascot loaded!", "happy");
+        mascot = new Mascot(mascotData, databaseUrl);
+        console.log("✅ Loaded mascot data", mascot);
+        mascot.initMascot();
+        mascot.say("New mascot loaded!", "happy");
 	} catch (err) {
 		console.error("❌ Failed to load mascot:", err);
 		mascot.say("Error loading mascot.", "sad");
@@ -578,27 +532,9 @@ async function fetchRemoteDeck(deckSlug) {
 		console.warn("No deck slug provided to load deck. Aborting");
 		return;
 	}
-
 	doLog("Loading card library slug: " + deckSlug);
 
-	// Build the API request to your Node server
-	const response = await fetch(
-		`${databaseUrl}/api/deck?slug=${encodeURIComponent(
-			deckSlug
-		)}&cache-invalidate=${Date.now()}&password=${encodeURIComponent(
-			serverPassword
-		)}`,
-		{
-			cache: "no-store",
-		}
-	);
-
-	if (!response.ok) {
-		console.error(`⚠️ Failed to load deck: ${response.status}`);
-		return;
-	}
-
-	const deckDataResult = await response.json();
+    const deckDataResult = await flashCardClient.getDeck(deckSlug);
 	return deckDataResult.data;
 }
 

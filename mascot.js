@@ -10,6 +10,7 @@ const Mascot = class {
 	canReactivate = true;
 	mood = 50;
 	uncensoredMode = false;
+	apiClient;
 
 	urls = {
 		sounds: {
@@ -93,12 +94,16 @@ const Mascot = class {
 
 	speech = {};
 
-	constructor(constructorData, server) {
+	constructor(constructorData, server, apiClient) {
 		try {
 			if (!ui) {
 				console.error("UI Library not loaded. Cannot init Mascot");
 				return;
 			}
+
+			if(!apiClient){
+				console.warn('API Client Object Required for TTS and LLM Integration!')
+			}else this.apiClient = apiClient;
 
 			//set object properties
 			if (typeof constructorData === "object") {
@@ -141,10 +146,7 @@ const Mascot = class {
 		this.setMood("think");
 		this.say("Alright.... gimme a second....");
 
-		let chatGPTResponse = await database.sendRequest({
-			action: "ask_chat_gpt",
-			prompt: questionString,
-		});
+		let chatGPTResponse = await this.apiClient.chat(questionString);
 
 		console.log(chatGPTResponse);
 
@@ -452,15 +454,11 @@ const Mascot = class {
 
 	async tts(speechText, voice_id) {
 		console.log('Sending text for TTS: ' + speechText);
-		const response = await fetch(`${this.rootServerUrl}/api/text-to-speech`, {
-			method: "POST",
-			headers: { "Content-Type": "application/json" },
-			body: JSON.stringify({
-				text: speechText,
-				voiceId: voice_id,
-			}),
+		const audioData = await this.apiClient.textToSpeech({
+			text: speechText,
+			voiceId: voice_id,
 		});
-		const audioBlob = await response.blob();
+		const audioBlob = new Blob([audioData], { type: "audio/mpeg" });
 		const audioUrl = URL.createObjectURL(audioBlob);
 		const audio = new Audio(audioUrl);
 		audio.play();
