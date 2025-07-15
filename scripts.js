@@ -280,10 +280,6 @@ function registerKeyboardShortcuts(){
 		//"p"
 		else if (e.key == "p") getPastPerformanceData();
 		else if (e.key == "m") generateMnemonic();
-		else if (e.key == "-") {
-            mascot.say("You fucking cheater");
-            sendScore(performance);
-        }
         
         //e.preventDefault();
 	};
@@ -617,7 +613,7 @@ function generateDeckFromData(shuffleConfig=new ShuffleDeckConfig()){
                 let thisGroupCards = groups.hasOwnProperty(thisCard[shuffleConfig.options.groupBy]) ? groups[thisCard[shuffleConfig.options.groupBy]] : [];
                 
                 if(thisCard[shuffleConfig.options.groupBy] === undefined){
-                    mascot.say('There is some bad data in the card set. This drug has an undefined group!','confused');
+                    if(mascot) mascot.say('There is some bad data in the card set. This drug has an undefined group!','confused');
                 }
 
                 thisGroupCards.push(thisCard);
@@ -963,7 +959,7 @@ function recordQuestionResponse(card,givenAnswers,correctAnswers,awardedPoints){
         incorrectAnswerAlert();
 
         if(performance.missStreak >= mascotLeaveLimit){
-            mascot.rageQuit('sad_leave');
+            if (mascot) mascot.rageQuit("sad_leave");
         }
     }
     if(autoLoadNextCardOnAnswer) loadNext();
@@ -1041,18 +1037,18 @@ function getIncorrectAnswerText(){
 }
 
 function correctAnswerAlert(){
-    mascot.sayRandom(getCorrectAnswerText(),'happy')
+    if (mascot) mascot.sayRandom(getCorrectAnswerText(), "happy");
 }
 
 function incorrectAnswerAlert(){
-    mascot.sayRandom(getIncorrectAnswerText(),'sad')
+    if (mascot) mascot.sayRandom(getIncorrectAnswerText(), "sad");
 }
 
 function generateMnemonic(){
     console.log('Calling Chat GPT!');
     console.log(currentCard);
     let question = 'Please give me a Mnemonic Device to remember the pharmacy drug brand name ' + currentCard.brandName + ' that has a generic name of ' + currentCard.genericName + ' that is of the class ' + currentCard.drugClassName + '. Please keep the description breif and only reply in plain text, do not use emoji or formatting of any kind';
-    mascot.askQuestion(question);
+    if (mascot) mascot.askQuestion(question);
 
 
 }
@@ -1192,7 +1188,7 @@ function loadPrev(){
     
     let cardToLoad;
     
-    if(cardIndex == 0 || cardIndex == 1) mascot.say('There is some kind of bug with clicking previous on the first card. Don\'t do it....','sad')
+    if( (cardIndex == 0 || cardIndex == 1) && mascot) mascot.say('There is some kind of bug with clicking previous on the first card. Don\'t do it....','sad')
 
     if(cardIndex > 0) {
         cardIndex--;
@@ -1238,7 +1234,7 @@ function setRandom(){
 
 function showClue() {
     document.getElementById('clue-text').style.visibility='visible';
-    mascot.say(document.getElementById('clue-text').innerHTML,'happy');
+    if(mascot) mascot.say(document.getElementById('clue-text').innerHTML,'happy');
     
 }
 
@@ -1255,7 +1251,7 @@ function showNextHintLetter(){
     document.getElementById("hint-text").innerHTML=hintText;
     document.getElementById('hint-text').style.visibility='visible';   
     
-    mascot.say(hintText,'happy')
+    if (mascot) mascot.say(hintText, "happy");
 }
 
 function showNextAnswer(){
@@ -1265,7 +1261,7 @@ function showNextAnswer(){
 
     if(hintIndex > currentCard.correctAnswerValues.length-1) {
         document.getElementById("hint-text").innerHTML='All correct answers highlighted';
-        mascot.say('I already highlighted them all for you....','confused')
+        if(mascot) mascot.say('I already highlighted them all for you....','confused')
         return;
     }
 
@@ -1283,7 +1279,7 @@ function showNextAnswer(){
 
     document.getElementById("hint-text").innerHTML='Next correct answer highlighted ' + currentCard.options[highlightAnswerIndex].label;
 
-    mascot.say(currentCard.options[highlightAnswerIndex].label,'happy')
+    if(mascot) mascot.say(currentCard.options[highlightAnswerIndex].label,'happy')
 
     document.getElementById('hint-text').style.visibility='visible';  
     
@@ -1563,13 +1559,13 @@ function toggleMascot(event){
 }
 
 function toggleMuteMascot(event){
-    mascot.mute = !mascot.mute;
+    if (mascot) mascot.mute = !mascot.mute;
 }
 
 function toggleUncensoredMascot(event){
     console.log('Toggle uncensored mode');
     console.log(event.target)
-    mascot.uncensoredMode = !mascot.uncensoredMode;
+    if (mascot) mascot.uncensoredMode = !mascot.uncensoredMode;
 }
 
 function setPromptKey(value){
@@ -1658,7 +1654,7 @@ function handleError(e, customMessage){
     console.error('Error in application!')
     doLog(e.message);
     doLog(e);
-    mascot.say(message,'sad')
+    if (mascot) mascot.say(message, "sad");
 }
 
 function doLog(logData){
