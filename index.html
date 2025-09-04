@@ -352,6 +352,13 @@
 									<td>Yup, I Got It! (1)</td>
 									<td>Nope, Didn't know it. (2)</td>
 								</tr>
+								<tr>
+									<td colspan="2">
+										<center>
+											<input type="button" class="big-button" id="show-card-detail-button" onclick="cardDetailsModal.showModal()" value="Show Details"></input>
+										</center>
+									</td>
+								</tr>
 							</table>
 						</div>
 						
@@ -463,6 +470,26 @@
 			</div>
 		</div>		
 	</div>
+
+	<!-- card details modal -->
+	<div id="card-details-modal" class="modal">
+		  <!-- Modal content -->
+		  <div class="modal-content">
+			<div class="modal-header">
+				<span class="close-modal-button modal-close">&times;</span>
+				<center><h2 class="inline pulse sub-header-text-2" id="card-details-title"></h2></center>
+			</div>
+			
+			<div class="modal-body">
+				<div id="card-details-frame"></div>
+			</div>
+			
+			<div class="modal-footer">
+				<h3></h3>
+			</div>
+		</div>		
+	</div>
+
 	<!-- Deck end results -->
 	<div id="results-modal" class="modal">
 		  <!-- Modal content -->

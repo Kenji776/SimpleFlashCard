@@ -22,6 +22,7 @@ const appState = {
 var resultsModal = new Modal(); 
 var highScoresModal = new Modal();
 var serverConnectModal = new Modal();
+var cardDetailsModal = new Modal();
 var mascot; //instance of Mascot
 var storedSettings = new LS(settingsName); //instance of LS (local storage) object
 var storedScores = new LS(scoresName); //instance of LS (local storage) object
@@ -55,6 +56,7 @@ var categories = [];
 var autoLoadNextCardOnAnswer = false;
 var selectedVariantDeck = '';
 var userName = 'Test User';
+var cardLabel = "Card Details";
 
 
 var mascotLeaveLimit = 15;
@@ -208,6 +210,7 @@ async function performPostConnectionSetup(statusElement) {
 	updateStatus(statusElement, "Finalizing...");
 	registerKeyboardShortcuts();
 	resultsModal.registerModal("results-modal");
+    cardDetailsModal.registerModal("card-details-modal");
 	resultsModal.registerModalCloseHandler(() =>
 		ui.hideElements("confetti_outer")
 	);
@@ -806,7 +809,7 @@ function loadCard(cardId, forceIndex){
         let selectedAnswerKeyText = '';
         let selectedPromptKeyText = '';
 
-    
+   
 
         //if this is a multple choice question then we can't randomize the answers
         if(currentCard.hasOwnProperty('options')){
@@ -833,7 +836,29 @@ function loadCard(cardId, forceIndex){
         }
 
 
-
+		const detailsFrame = document.getElementById("card-details-frame");
+		//set card notes info if we have it
+		if (
+			currentCard &&
+			typeof currentCard.note !== "undefined" &&
+			String(currentCard.note).trim() !== ""
+		) {
+			console.log("Current card has details. Setting them now");
+			console.log(currentCard.note);
+			if (detailsFrame) {
+				document.getElementById(
+					"card-details-title"
+				).innerHTML = currentCard[promptVal]
+				detailsFrame.innerHTML = utils.decodeHtml(
+					String(currentCard.note)
+				);
+				ui.showElements("show-card-detail-button");
+			} else {
+				throw "Details frame is not available";
+			}
+		} else {
+			ui.hideElements("show-card-detail-button");
+		}
 
         //create the history entry if it doesn't exist for this card.
         if(!viewedCards.some(e => e.id === currentCard.id)) {
@@ -886,7 +911,13 @@ function loadCard(cardId, forceIndex){
 
             document.getElementById("answer").appendChild(generateSelectListFromOptions(currentCard.options,currentCard.correctAnswerValues));
         }else{
-            document.getElementById("answer").innerHTML= `${generateAnswerText(currentCard)}`;
+            // Remove 'note' from what we feed into the answer generator
+            const cardForAnswer = { ...currentCard };
+            if ("note" in cardForAnswer) delete cardForAnswer.note;
+
+            document.getElementById(
+                "answer"
+            ).innerHTML = `${generateAnswerText(cardForAnswer)}`;
         }
         
         
