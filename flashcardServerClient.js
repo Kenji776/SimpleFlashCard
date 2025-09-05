@@ -33,6 +33,8 @@ const FlashcardServerClient = class{
 		};
 		if (body) fetchOptions.body = JSON.stringify(body);
 
+		console.log(body);
+
 		const response = await fetch(url, fetchOptions);
 
 		if (!response.ok) {

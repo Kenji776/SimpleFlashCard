@@ -99,6 +99,20 @@ a:hover {
 .settings > input{
      width:100%;
 }
+
+.settings.panel {
+  position: relative;     /* create containing block */
+     margin-bottom:0px;
+  padding-bottom:0px;
+}
+
+.settings.panel .bottom-bar {
+  position: absolute;
+  left: 10px;
+  bottom: 5px;
+  margin-bottom:0px;
+  padding-bottom:0px;
+}
 .history {
      grid-area: history;
      height: 50vh;
@@ -156,6 +170,10 @@ a:hover {
  #deck-controls{
      visibility:hidden;
      display:none;
+}
+
+label{
+     font-weight: bolder;
 }
 #deck-variants{
      visibility:hidden;
@@ -284,6 +302,7 @@ input[type=button]:disabled,button[disabled],button:disabled{
      font-weight: 900;
      text-transform: uppercase;
      resize: both;
+     min-height: 550px;
 }
 /* This container is needed to position the front and back side */
 .flip-card-inner {
@@ -484,24 +503,38 @@ input[type=button]:disabled,button[disabled],button:disabled{
     /*text-shadow: black 0.1em 0.1em 0.2em*/
 }
 
- select select{
-     background: transparent;
-     width: 268px;
-     padding: 5px;
-     font-size: 0.875rem;
-     line-height: 1;
-     border: 0;
-     border-radius: 0;
-     height: 34px;
-     -webkit-appearance: none;
+select {
+    width: 100%;
+    height: 34px;
+    padding: 5px 35px 5px 10px; /* space for arrow on right */
+    font-size: 0.875rem;
+    line-height: 1.2;
+    color: #f0f0f0;              /* light text for contrast */
+    background: #222 url(new_arrow.png) no-repeat right 10px center;
+    background-size: 12px;       /* scale down arrow if needed */
+    border: 1px solid #444;
+    border-radius: 4px;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    cursor: pointer;
+    transition: border-color 0.2s, background-color 0.2s;
 }
- select {
-     width: 100%;
-     height: 34px;
-     overflow: hidden;
-     background: url(new_arrow.png) no-repeat right #ddd;
-     margin-top:5px;
-     border: 1px solid #ccc;
+
+select:hover {
+    border-color: #04AA6D;       /* green accent on hover */
+}
+
+select:focus {
+    outline: none;
+    border-color: #04AA6D;
+    box-shadow: 0 0 0 2px rgba(4,170,109,0.3);
+}
+
+/* For nested select styling, if you keep that selector */
+select select {
+    background: #222;
+    color: #f0f0f0;
 }
  svg#one {
      position: absolute;
@@ -702,50 +735,102 @@ input[type="radio"]:checked::before {
          background-color: #1d815c;
     }
 }
- input[type="checkbox"] {
-     appearance: none;
-     -webkit-appearance: none;
-     width: 20px;
-     height: 20px;
-     border: 1px solid #fff;
-     margin-right: 10px;
-     background-color: transparent;
-     position: relative;
-     top: 6px;
-     cursor:hand;
+/* YOUR EXISTING CHECKBOX THEME */
+input[type="checkbox"] {
+    appearance: none;
+    -webkit-appearance: none;
+    width: 20px;
+    height: 20px;
+    margin-right: 10px;
+    position: relative;
+    /* top: 6px;  <-- You can remove this when using flex alignment */
+    cursor: pointer;
+    border: 2px solid #333;
+    border-radius: 4px;
+    background-color: #222;
+    transition: background-color 0.2s, border-color 0.2s;
 }
- input[type="checkbox"]:checked::before {
-     content: "";
-     display: block;
-     width: 12px;
-     height: 12px;
-     background-color: #04AA6D;
-     position: absolute;
-     top: 50%;
-     left: 50%;
-     transform: translate(-50%, -50%);
-     animation: appear 0.8s;
+input[type="checkbox"]:hover { border-color: #555; }
+input[type="checkbox"]:checked {
+    background-color: #111;
+    border-color: #04AA6D;
+}
+input[type="checkbox"]:checked::before {
+    content: "";
+    display: block;
+    width: 12px;
+    height: 12px;
+    background-color: #04AA6D;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    border-radius: 2px;
+    animation: appear 0.2s ease-in;
 }
 @keyframes appear {
-     0% {
-         transform: translate(-50%, -50%) scale(0);
-         background-color: #fff;
-    }
-     45% {
-         transform: translate(-50%, -50%) scale(1.6);
-         background-color: #64dfc0;
-    }
-     50% {
-         transform: translate(-50%, -50%) scale(1.7);
-         background-color: #3e913e;
-    }
-     55% {
-         transform: translate(-50%, -50%) scale(1.6);
-    }
-     100% {
-         transform: translate(-50%, -50%) scale(1);
-         background-color: #1d815c;
-    }
+  from { transform: translate(-50%, -50%) scale(0); opacity: 0; }
+  to   { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+}
+
+/* Stack each control vertically and align checkbox + label */
+#deck-controls .control,
+.misc-options .control {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 8px;          /* space between checkbox and label */
+  margin: 6px 0;     /* vertical spacing between rows */
+}
+
+/* Optional: ensure the label aligns nicely and is clickable */
+#deck-controls .control label,
+.misc-options .control label {
+  line-height: 1.2;
+  cursor: pointer;
+}
+
+/* Custom tooltip on the wrapper so it doesn't conflict with checkbox ::before */
+.control[data-tooltip]::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  left: 0;                 /* anchor near the text; change to 50% for centered */
+  bottom: 100%;            /* above the row */
+  transform: translateY(-6px);
+  white-space: nowrap;
+  background: #222;
+  color: #f5f5f5;
+  padding: 6px 10px;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  line-height: 1.2;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+  z-index: 1000;
+}
+
+/* Small arrow for the tooltip (also on wrapper, not input) */
+.control[data-tooltip]::before {
+  content: "";
+  position: absolute;
+  left: 10px;              /* aligns under the tooltip bubble */
+  bottom: calc(100% - 2px);
+  border-width: 6px;
+  border-style: solid;
+  border-color: #222 transparent transparent transparent;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  z-index: 1000;
+}
+
+/* Show tooltip when hovering the row or focusing anything inside it */
+.control:hover::after,
+.control:hover::before,
+.control:focus-within::after,
+.control:focus-within::before {
+  opacity: 1;
 }
 
 .big-text{
@@ -818,3 +903,39 @@ input[type="radio"]:checked::before {
     color: #333;
     text-align: left;
 }
+
+/* Disable pointer and hover effects for disabled buttons/images */
+.big-button:disabled,
+.big-button.disabled,
+.flip-button:disabled,
+.flip-button.disabled {
+  pointer-events: none;   /* prevent clicks */
+  cursor: default;        /* no hand cursor */
+  opacity: 0.5;           /* visually dim to show disabled */
+  transition: none !important; /* stop hover/active animations */
+}
+
+/* Optional: prevent hover styles specifically on disabled */
+.big-button:disabled:hover,
+.big-button.disabled:hover,
+.flip-button:disabled:hover,
+.flip-button.disabled:hover {
+  background-color: inherit;
+  box-shadow: none;
+}
+
+/* Type Attack values */
+.tg-row { display: flex; justify-content: space-between; align-items: center; }
+.tg-top { font-weight: 600; margin-bottom: 10px; }
+.tg-word { font-size: 1.8rem; text-align: center; min-height: 2.4rem; margin: 10px 0; }
+.tg-progress { text-align: center; margin-bottom: 10px; }
+.tg-input-row { display: flex; gap: 8px; justify-content: center; margin-bottom: 10px; }
+.tg-input { padding: 8px; min-width: 260px; }
+.tg-btn { padding: 8px 12px; cursor: pointer; }
+.tg-ctrls { display: flex; gap: 8px; justify-content: center; }
+.tg-feedback { text-align: center; min-height: 1.2rem; }
+.tg-success { color: green; font-weight: 600; }
+.tg-error { color: #b00020; font-weight: 600; }
+.tg-muted { color: #777; }
+.tg-hidden { filter: blur(6px); }
+.disabled { opacity: 0.6; pointer-events: none; }

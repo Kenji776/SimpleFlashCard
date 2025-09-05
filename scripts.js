@@ -23,6 +23,8 @@ var resultsModal = new Modal();
 var highScoresModal = new Modal();
 var serverConnectModal = new Modal();
 var cardDetailsModal = new Modal();
+var typeAttackModal = new Modal();
+var optionsModal = new Modal();
 var mascot; //instance of Mascot
 var storedSettings = new LS(settingsName); //instance of LS (local storage) object
 var storedScores = new LS(scoresName); //instance of LS (local storage) object
@@ -83,11 +85,19 @@ var options = {
 		hideTimer: false,
 		hideScore: false,
 		hideMascots: false,
-		promptKey: ''
+		promptKey: '',
+
+		//typing game options
+		displaySeconds: 3,     // N: how long the word is visible before typing starts
+		requiredCorrect: 3,    // X: correct streak needed for each word
+		roundSeconds: 20,      // Y: time limit to achieve the streak (after the word hides)
+		caseSensitive: false,  // compare with case sensitivity or not
+		shuffleWords: true     // randomize the input list
+
 	}
 }
 
-
+const typingGame = new TypingMiniGame({ modalId: "type-attack-modal" });
 
 function debounce(func, delay) {
     let timeoutId;
@@ -211,6 +221,9 @@ async function performPostConnectionSetup(statusElement) {
 	registerKeyboardShortcuts();
 	resultsModal.registerModal("results-modal");
     cardDetailsModal.registerModal("card-details-modal");
+	optionsModal.registerModal("options-modal");
+	typeAttackModal.registerModal("type-attack-modal");
+
 	resultsModal.registerModalCloseHandler(() =>
 		ui.hideElements("confetti_outer")
 	);
@@ -323,6 +336,7 @@ function saveSettings(){
 }
 
 function loadSettings(){
+	
     let savedSettings = storedSettings.value;
     let affectedElements = storedSettings.setPersistantValuesInUI(savedSettings);
 
@@ -357,10 +371,12 @@ async function loadSelectedMascot() {
         const mascotData = await flashCardClient.getMascotSettings(selectedFile);
         if (mascot) mascot.destroy();
 
-        mascot = new Mascot(mascotData, databaseUrl);
+		flashCardClient.textToSpeech('test');
+
+        mascot = new Mascot(mascotData, flashCardClient);
         console.log("✅ Loaded mascot data", mascot);
         mascot.initMascot();
-        mascot.say("New mascot loaded!", "happy");
+
 	} catch (err) {
 		console.error("❌ Failed to load mascot:", err);
 		mascot.say("Error loading mascot.", "sad");
@@ -422,7 +438,21 @@ function setDeckCategories(deckData){
     
     return categories;
 }
-
+function setInitialButtonStates() {
+	// Hard-disable action buttons until the right app states happen
+	ui.disable([
+		"load-deck-button",
+		"type-attack-button",
+		"prev-button",
+		"next-button",
+		"clue-button",
+		"next-letter-button",
+		"next-answer-button",
+		"mnemonic-button",
+		"flip-button",
+		"high-scores-button",
+	]);
+}
 /*
 * @description Populates the 'card-deck' select with options from the selected deck category
 */
@@ -490,18 +520,26 @@ function setVariantDeckOptions(){
 }
 
 function setSelectedDeckCategory(categoryId){
-    selectedDeckCategory = categoryId;
-    if(categoryId) setDeckOptions()
+    if (categoryId) {
+		selectedDeckCategory = categoryId;
+		setDeckOptions();
+		ui.enable("card-deck");
+		ui.enable("load-deck-button");
+		
+	}
 }
 
 function handleSetSelectedDeck(value){
-    doLog('Setting deck url to...' + value);
-    var select = document.getElementById("card-deck");
-    selectedIndex = select.selectedIndex;
-    var options = select.options;
-    var selectedValue = options[selectedIndex].value;
-    deckUrl = selectedValue;
-    doLog('Deck url is...' + deckUrl);
+	if(value){
+		doLog('Setting deck url to...' + value);
+		var select = document.getElementById("card-deck");
+		selectedIndex = select.selectedIndex;
+		var options = select.options;
+		var selectedValue = options[selectedIndex].value;
+		deckUrl = selectedValue;
+		doLog('Deck url is...' + deckUrl);
+		
+	}
 }
 
 function handleSetSelectedVariant(value){
@@ -582,6 +620,8 @@ async function loadDeck(deckData){
     setNavigationButtonStates(0,cards.length);
 	
     document.getElementById("prompt").innerHTML= `${config.name} Loaded. Press Next To Begin`;
+
+	setControlsEnabled(true);
 
 }
 
@@ -1084,6 +1124,27 @@ function generateMnemonic(){
 
 }
 
+function setControlsEnabled(enabled) {
+	// List all element IDs you want to toggle
+	const elements = [
+		"prev-button",
+		"mnemonic-button",
+		"clue-button",
+		"flip-button",
+		"next-letter-button",
+		"next-answer-button",
+		"next-button",
+		"type-attack-button",
+		"high-scores-button",
+	];
+
+	if (enabled) {
+		ui.enable(elements);
+	} else {
+		ui.disable(elements);
+	}
+}
+
 function setNavigationButtonStates(cardIndex,stackLength){
 	
 	doLog('Setting button navigation states');
@@ -1582,11 +1643,11 @@ function setSelectOptions(selectId, optionsArray, defaultValue, includeRandom, c
 }
 
 function toggleMascot(event){
-    console.log('Toggling mascot. Active Status: ' + mascot.isActive);
-    mascot.isActive = !mascot.isActive;
-
-    if(!mascot.isActive) mascot.neutralLeave();
-    else mascot.mascotReturn();
+	if(mascot){
+		mascot.isActive = !mascot.isActive;
+		if(!mascot.isActive) mascot.neutralLeave();
+		else mascot.mascotReturn();
+	}
 }
 
 function toggleMuteMascot(event){
@@ -1594,8 +1655,6 @@ function toggleMuteMascot(event){
 }
 
 function toggleUncensoredMascot(event){
-    console.log('Toggle uncensored mode');
-    console.log(event.target)
     if (mascot) mascot.uncensoredMode = !mascot.uncensoredMode;
 }
 
@@ -1635,6 +1694,21 @@ function toggleValue(paramName){
     doLog('Switching ' + paramName + ' from ' + this[paramName] + ' to ' + !this[paramName]);
     this[paramName] = !this[paramName];
 }
+
+// Button click handler
+function launchTypingGame() {
+	console.log('Launching Type Attack!')
+	typeAttackModal.showModal();
+
+	const typingGameWords = cards.map((obj) => obj.genericName);
+
+	typingGame.start(typingGameWords, {
+		displaySeconds: 4,   // N seconds to memorize
+		requiredCorrect: 2,  // X correct streak
+		roundSeconds: 15     // Y seconds per round
+	});
+}
+
 
 function resetHistory(){
     try{
@@ -1699,6 +1773,7 @@ function setServerPassword(password) {
 
 
 window.onload = function() {
-    serverConnectModal.registerModal("server-connect-modal");
-    serverConnectModal.showModal();
-};
+	setInitialButtonStates(); // <- lock down buttons first
+	serverConnectModal.registerModal("server-connect-modal");
+	serverConnectModal.showModal();
+};;

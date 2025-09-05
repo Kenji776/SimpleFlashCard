@@ -94,17 +94,19 @@ const Mascot = class {
 
 	speech = {};
 
-	constructor(constructorData, server, apiClient) {
+	constructor(constructorData, serverConnection) {
 		try {
 			if (!ui) {
 				console.error("UI Library not loaded. Cannot init Mascot");
 				return;
 			}
 
-			if(!apiClient){
-				console.warn('API Client Object Required for TTS and LLM Integration!')
-			}else this.apiClient = apiClient;
+			if(!serverConnection){
+				console.error("No server/client connection object passed in!");
+				return;
+			}
 
+			this.apiClient = serverConnection;
 			//set object properties
 			if (typeof constructorData === "object") {
 				for (var k in this)
@@ -113,17 +115,14 @@ const Mascot = class {
 			}
 
 			console.log("New instance of Mascot class initiated.");
-			this.initMascot(server);
+			this.initMascot();
 			console.log(this);
 		} catch (ex) {
-			console.error(
-				`Unable to register div with id ${modalId} as a modal!`
-			);
 			console.log(ex);
 		}
 	}
 
-	async initMascot(server) {
+	async initMascot() {
 		this.container = document.getElementById(this.containerName);
 		this.mascotDiv = this.createMascotImageContainer();
 		this.words = await this.loadMascotWords();
@@ -136,8 +135,6 @@ const Mascot = class {
 
 		this.setMood("happy");
 		this.sayRandom("greeting");
-
-		if (server) this.rootServerUrl = server;
 	}
 
 	async askQuestion(questionString) {
@@ -154,7 +151,7 @@ const Mascot = class {
 			function(scope) {
 				scope.setMood("happy");
 				scope.say(
-					chatGPTResponse.data.response.choices[0].message.content,
+					chatGPTResponse.data.choices[0].message.content,
 					true,
 					false,
 					false
@@ -588,8 +585,8 @@ const Mascot = class {
 			);
 			return null;
 		}
-		const basePath = `/mascot-media/${this.name}/${folderName}/${fileName}`;
-		return this.rootServerUrl
+		const basePath = `${this.apiClient.baseUrl}/mascot-media/${this.name}/${folderName}/${fileName}`;
+		return this.apiClient.baseUrl
 			? `${this.rootServerUrl}${basePath}`
 			: basePath;
 	}

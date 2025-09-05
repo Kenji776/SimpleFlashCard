@@ -22,7 +22,7 @@
 <script type="text/javascript" language="javascript" src="flashcardServerClient.js"></script>
 <script type="text/javascript" language="javascript" src="utils.js"></script>
 <script type="text/javascript" language="javascript" src="templateEngine.js"></script>
-
+<script type="text/javascript" language="javascript" src="typingGame.js"></script>
 <!-- Load Last -->
 <script type="text/javascript" language="javascript" src="scripts.js"></script> 
 
@@ -49,179 +49,24 @@
 				</div>
                 <div>
                     <label for="card-deck">Card Deck:</label><br/>
-                    <select name="card-deck" id="card-deck" onchange="handleSetSelectedDeck(this.value)">
+                    <select name="card-deck" id="card-deck" onchange="handleSetSelectedDeck(this.value)" disabled="disabled">
                         <option value="none" selected>Select A Card Deck</option>
                     </select>
-					<input type="button" onclick="handleLoadDeckSelect()" value="Load Deck" title="Load Deck"/>
-					<input type="button" onclick="handleShowHighScores()" value="High Scores" title="High Scores"/>
+					<input type="button" onclick="handleLoadDeckSelect()" value="Load Deck" title="Load Deck" disabled="disabled" id="load-deck-button"/>
+					<input type="button" onclick="handleShowHighScores()" value="High Scores" title="High Scores" id="high-scores-button" disabled="disabled"/>
+					<input type="button" onclick="launchTypingGame()" value="Type Attack!" title="Type Attack!" disabled="disabled" id="type-attack-button"/>
                 </div>
 
-				<div id="deck-controls">
-					<span class="sub-header-text">Options</span>
-					<div>
-						<input 
-							type="checkbox" 
-							onclick="toggleValue('autoLoadNextCardOnAnswer')" 
-							name="autoProgressOnAnswer" 
-							id="autoProgressOnAnswer" 
-							checked="true"
-							data-option-key="deckOptions.autoProgress"
-							data-persistent="true">
-						</input>
-						<label for="autoProgressOnAnswer">Auto Progress</label>
-					</div>
-					<div>
-						<input 
-							type="checkbox" 
-							onclick="setRandom()" 
-							name="randomize"
-							data-option-key="deckOptions.randomOrder"
-							data-persistent="true">
-						</input>				
-						<label for="randomize">Random Order</label>
-					</div>
-				</div>
-				<div class="misc-options">
 
-					<div>
-						<input 
-							type="checkbox" 
-							onclick="ui.toggleDisplay('#history-panel')" 
-							name="toggleHistory" 
-							id="toggleHistory"
-							data-option-key="deckOptions.hideHistory"
-							data-persistent="true">
-						</input>
-						<label for="toggleHistory">Hide History</label>
-					</div>
-        
-					<div>
-						<input 
-							type="checkbox" 
-							onclick="ui.toggleDisplay('#timer')" 
-							name="toggleTimer" 
-							id="toggleTimer"
-							data-option-key="deckOptions.hideTimer"
-							data-persistent="true">
-						</input>
-						<label for="toggleTimer">Hide Timer</label>
-					</div>
-
-					<div>
-						<input 
-							type="checkbox" 
-							onclick="ui.toggleDisplay('score-panel')" 
-							name="toggleScoreDisplay" 
-							id="toggleScoreDisplay"
-							data-option-key="deckOptions.hideScore"
-							data-persistent="true">
-						</input>
-						<label for="toggleScoreDisplay">Hide Score</label>
-					</div>
-
-					<div>
-						<input 
-							type="checkbox" 
-							onclick="toggleMascot(event)" 
-							name="toggleMascotDisplay" 
-							id="toggleMascotDisplay"
-							data-option-key="deckOptions.hideMascots"
-							data-persistent="true">
-						</input>
-						<label for="toggleMascotDisplay">Hide Mascots</label>
-					</div>
-					<div>
-						<input 
-							type="checkbox" 
-							onclick="toggleMuteMascot(event)" 
-							name="toggleMuteMascotDisplay" 
-							id="toggleMuteMascotDisplay"
-							data-option-key="deckOptions.muteMascot"
-							data-persistent="true">
-						</input>
-						<label for="toggleMuteMascotDisplay">Mute Mascots</label>
-					</div>
-					<div>
-						<input 
-							type="checkbox" 
-							onclick="toggleUncensoredMascot(event)" 
-							name="toggleUncensoredMascotDisplay" 
-							id="toggleUncensoredMascotDisplay"
-							data-option-key="deckOptions.uncensorMascot"
-							data-persistent="true">
-						</input>
-						<label for="toggleUncensoredMascotDisplay">Uncensored Mascot</label>
-					</div>
-					<!--
-						<input type="checkbox" onclick="setPreventDupes()" name="prevent-dupes"></input>
-						<label for="prevent-dupes">Prevent Duplicates</label><br>
-					-->
-
-
-					<div class="spacer"></div>
-					
-					<div id="deck-variants" class="connected-options">
-						<label for="prompt-key">Question Prompt:</label>
-						<select 
-							name="prompt-key" 
-							id="prompt-key" 
-							data-option-key="promptKey"
-							data-persistent="true"
-							onchange="setPromptKey(this.value)">
-						</select>
-					
-
-						<div class="spacer"></div>
-					
-					
-						<label for="load-variant-select">Load Variant Deck</label>
-						<select 
-							onchange="handleSetSelectedVariant(this.value)" 
-							name="load-variant-select" 
-							id="load-variant-select"
-							data-option-key="deckOptions.load-variant-select"
-							data-persistent="true">
-
-							<option value="none" selected>Default</option>
-
-						</select>
-						<input type="button" onclick="loadVariantDeck()" value="Load Variant Deck" title="Load Variant Deck"/>
-					</div>	
-					<div class="connected-options">
-						<label for="mascot-selector">Mascot Selector</label>
-						<select id="mascot-selector"></select>
-						<button onclick="loadSelectedMascot()">Load Mascot</button>
-						<button onclick="loadMascotOptions()">Get Mascots</button>
-					</div>
-                
-					<!--
-						<br/>
-						<label for="answerKey">Answer:</label>
-						<select name="answerKey" id="answerKey" onchange="setAnswerKey(this.value)"></select>
-					-->
-
-
-					
-				</div>
             </div>
 			
 			<div style="clear:both"></div>
+
+			<div class="bottom-bar">
+			<input type="button" onclick="optionsModal.showModal()" value="Options" title="Options"/>
+			</div>
  
         </div>
-
-		<!--
-		<span class="grade-output" data-grade="a">A</span>
-		<span class="grade-output" data-grade="b">B</span>
-		<span class="grade-output" data-grade="c">C</span>
-		<span class="grade-output" data-grade="d">D</span>
-		<span class="grade-output" data-grade="f">F</span>
-
-		
-
-
-		</span>
-		-->
-
 
         <div class="panel no-background" >
 			<div class="score panel" id="score-panel">
@@ -372,13 +217,13 @@
 			
 			<div id="controls">
 				<div id="button-container">
-					<input type="button" class="big-button" id="prev-button" onclick="loadPrev()" data-default-value="{previousButton}" value="{previousButton}"></input>
-					<input type="button" class="big-button" id="mnemonic-button" onclick="generateMnemonic()" value={generateMnemonic}></input>
-					<input type="button" class="big-button" id="clue-button" onclick="showClue()" value={hintButton}></input>
-					<img src="media/flip.png" onclick="showAnswer()" id="flip-button" class="flip-button" />
-					<input type="button" class="big-button" id="next-letter-button" onclick="performHintAction()" data-default-value={nextLetterButton} value={nextLetterButton}></input>
-					<input type="button" class="big-button" id="next-answer-button" onclick="performHintAction()" data-default-value={nextAnswerButton} value={nextAnswerButton}></input>
-					<input type="button" class="big-button" id="next-button" onclick="loadNext()" data-default-value={nextButton} value={nextButton}></input>
+					<input type="button" class="big-button" id="prev-button" onclick="loadPrev()" data-default-value="{previousButton}" value="{previousButton}" disabled="true"></input>
+					<input type="button" class="big-button" id="mnemonic-button" onclick="generateMnemonic()" value={generateMnemonic} disabled="true"></input>
+					<input type="button" class="big-button" id="clue-button" onclick="showClue()" value={hintButton} disabled="true"></input>
+					<img src="media/flip.png" onclick="showAnswer()" id="flip-button" class="flip-button" disabled="true"/>
+					<input type="button" class="big-button" id="next-letter-button" onclick="performHintAction()" data-default-value={nextLetterButton} value={nextLetterButton} disabled="true"></input>
+					<input type="button" class="big-button" id="next-answer-button" onclick="performHintAction()" data-default-value={nextAnswerButton} value={nextAnswerButton} disabled="true"></input>
+					<input type="button" class="big-button" id="next-button" onclick="loadNext()" data-default-value={nextButton} value={nextButton} disabled="true"></input>
 					
 				</div>
 				<div class="center">Use Arrow Keys To Navigate and Flip (&#8593;)</div>
@@ -482,6 +327,246 @@
 			
 			<div class="modal-body">
 				<div id="card-details-frame"></div>
+			</div>
+			
+			<div class="modal-footer">
+				<h3></h3>
+			</div>
+		</div>		
+	</div>
+
+	<!-- card details modal -->
+	<div id="type-attack-modal" class="modal">
+		  <!-- Modal content -->
+		  <div class="modal-content">
+			<div class="modal-header">
+				<span class="close-modal-button modal-close">&times;</span>
+				<center><h2 class="inline pulse sub-header-text-2" id="card-details-title">Type Attack!</h2></center>
+			</div>
+			
+			<div class="modal-body">
+				<div id="typing-game-description" class="tg-description">
+					<p>
+						You will be shown a word for a few seconds. Try to memorize it!  
+						When the timer ends, the word will be hidden and you’ll need to type it correctly.  
+						To clear the round, you must type the word <strong>X</strong> times in a row within the allotted <strong>Y</strong> seconds.  
+						If you make a mistake, your streak resets to zero.  
+						Use the <em>Retry</em> button if time runs out, or <em>Next Word</em> once you’ve met the requirement.
+					</p>
+				</div>
+
+				<div id="typing-game">
+				<div class="tg-row tg-top">
+					<div>
+					Word <span id="tg-word-idx">0</span>/<span id="tg-word-total">0</span>
+					</div>
+					<div>
+					<span>Show: <span id="tg-show-timer">-</span>s</span>
+					&nbsp;|&nbsp;
+					<span>Round: <span id="tg-round-timer">-</span>s</span>
+					</div>
+				</div>
+
+				<div class="tg-word" id="tg-current-word" aria-live="polite"></div>
+
+				<div class="tg-progress">
+					Correct streak: <span id="tg-correct">0</span>/<span id="tg-required">0</span>
+				</div>
+
+				<div class="tg-input-row">
+					<input id="tg-input" type="text" class="tg-input" placeholder="Type the word…" disabled />
+					<button id="tg-submit" class="tg-btn" disabled>Submit</button>
+				</div>
+
+				<div id="tg-feedback" class="tg-feedback" aria-live="polite"></div>
+
+				<div class="tg-ctrls">
+					<button id="tg-start" class="tg-btn">Start</button>
+					<button id="tg-next" class="tg-btn" disabled>Next Word</button>
+					<button id="tg-retry" class="tg-btn" disabled>Retry</button>
+				</div>
+				</div>
+
+			</div>
+			
+			<div class="modal-footer">
+				<h3></h3>
+			</div>
+		</div>	
+	</div>
+
+	<!-- options modal -->
+	<div id="options-modal" class="modal">
+		  <!-- Modal content -->
+		  <div class="modal-content">
+			<div class="modal-header">
+				<span class="close-modal-button modal-close">&times;</span>
+				<center><h2 class="inline pulse sub-header-text-2">Options</h2></center>
+			</div>
+			
+			<div class="modal-body">
+				<p>All options are saved immediatly when changed</p>
+				<div id="deck-controls">
+					<div>
+						<input 
+							type="checkbox" 
+							onclick="toggleValue('autoLoadNextCardOnAnswer')" 
+							name="autoProgressOnAnswer" 
+							id="autoProgressOnAnswer" 
+							checked="true"
+							data-option-key="deckOptions.autoProgress"
+							data-persistent="true"
+							data-tooltip="Automatically load the next card after answering.">
+						</input>
+						<label for="autoProgressOnAnswer">Auto Progress</label>
+					</div>
+					<div>
+						<input 
+							type="checkbox" 
+							onclick="setRandom()" 
+							name="randomize"
+							data-option-key="deckOptions.randomOrder"
+							data-persistent="true"
+							data-tooltip="Randomize the order the cards are presented in instead of going in defined sequence">
+						</input>				
+						<label for="randomize">Random Order</label>
+					</div>
+				</div>
+				<div class="misc-options">
+
+					<div>
+						<input 
+							type="checkbox" 
+							onclick="ui.toggleDisplay('#history-panel')" 
+							name="toggleHistory" 
+							id="toggleHistory"
+							data-option-key="deckOptions.hideHistory"
+							data-persistent="true"
+							data-tooltip="Toggle hiding or showing of the answered card history panel">
+						</input>
+						<label for="toggleHistory">Hide History</label>
+					</div>
+        
+					<div>
+						<input 
+							type="checkbox" 
+							onclick="ui.toggleDisplay('#timer')" 
+							name="toggleTimer" 
+							id="toggleTimer"
+							data-option-key="deckOptions.hideTimer"
+							data-persistent="true"
+							data-tooltip="Toggle hiding or showing of the answered timer panel">
+						</input>
+						<label for="toggleTimer">Hide Timer</label>
+					</div>
+
+					<div>
+						<input 
+							type="checkbox" 
+							onclick="ui.toggleDisplay('score-panel')" 
+							name="toggleScoreDisplay" 
+							id="toggleScoreDisplay"
+							data-option-key="deckOptions.hideScore"
+							data-persistent="true"
+							data-tooltip="Toggle hiding or showing of the players score">
+						</input>
+						<label for="toggleScoreDisplay">Hide Score</label>
+					</div>
+
+					<div>
+						<input 
+							type="checkbox" 
+							onclick="toggleMascot(event)" 
+							name="toggleMascotDisplay" 
+							id="toggleMascotDisplay"
+							data-option-key="deckOptions.hideMascots"
+							data-persistent="true"
+							data-tooltip="Toggle hiding or showing of the loaded mascot if one is loaded">
+						</input>
+						<label for="toggleMascotDisplay">Hide Mascots</label>
+					</div>
+					<div>
+						<input 
+							type="checkbox" 
+							onclick="toggleMuteMascot(event)" 
+							name="toggleMuteMascotDisplay" 
+							id="toggleMuteMascotDisplay"
+							data-option-key="deckOptions.muteMascot"
+							data-persistent="true"
+							data-tooltip="Mutes the mascot, preventing it from generating any audio">
+						</input>
+						<label for="toggleMuteMascotDisplay">Mute Mascots</label>
+					</div>
+					<div>
+						<input 
+							type="checkbox" 
+							onclick="toggleUncensoredMascot(event)" 
+							name="toggleUncensoredMascotDisplay" 
+							id="toggleUncensoredMascotDisplay"
+							data-option-key="deckOptions.uncensorMascot"
+							data-persistent="true"
+							data-tooltip="Toggle allowing the mascot to say uncensored phrases">
+						</input>
+						<label for="toggleUncensoredMascotDisplay">Uncensored Mascot</label>
+					</div>
+					<!--
+						<input type="checkbox" onclick="setPreventDupes()" name="prevent-dupes"></input>
+						<label for="prevent-dupes">Prevent Duplicates</label><br>
+					-->
+
+
+					<div class="spacer"></div>
+					<hr>
+					<div id="deck-variants" class="connected-options">
+						
+						<label for="prompt-key">Question Prompt:</label>
+						<p>The question prompt controls what value on the selected card is used to prompt you/ask the question you need to answer.</p>
+						<select 
+							name="prompt-key" 
+							id="prompt-key" 
+							data-option-key="promptKey"
+							data-persistent="true"
+							disabled="disabled"
+							onchange="setPromptKey(this.value)">
+						</select>
+					
+
+						<div class="spacer"></div>
+						<label for="load-variant-select">Load Variant Deck</label>
+						<p>Variant decks are automatically generated alternate ways to study your decks content. Currently the only supported variant type is multiple choice. The variant options available will depend on the configuration of the deck.</p>
+						
+						<select 
+							onchange="handleSetSelectedVariant(this.value)" 
+							name="load-variant-select" 
+							id="load-variant-select"
+							data-option-key="deckOptions.load-variant-select"
+							disabled="disabled"
+							data-persistent="true">
+
+							<option value="none" selected>Default</option>
+
+						</select>
+						<input type="button" onclick="loadVariantDeck()" value="Load Variant Deck" title="Load Variant Deck" disabled="disabled" id="load-variable-deck-button"/>
+					</div>	
+					<div class="spacer"></div>
+					<hr>
+					<div>
+						<label for="mascot-selector">Mascot Selector</label>
+						<select id="mascot-selector"></select>
+						<button onclick="loadSelectedMascot()">Load Mascot</button>
+						<button onclick="loadMascotOptions()">Get Mascots</button>
+					</div>
+					
+                
+					<!--
+						<br/>
+						<label for="answerKey">Answer:</label>
+						<select name="answerKey" id="answerKey" onchange="setAnswerKey(this.value)"></select>
+					-->
+
+
+					
+				</div>
 			</div>
 			
 			<div class="modal-footer">
