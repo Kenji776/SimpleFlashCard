@@ -144,6 +144,9 @@ async function connectToServer() {
 		const urlInput = getServerUrl();
 		const username = userName; // Make sure userName is defined in your context
         
+		const serverUrlInput = document.getElementById("server-url").value;
+		databaseUrl = serverUrlInput;
+		console.log('Connecting to server: ' + databaseUrl);
         flashCardClient = new FlashcardServerClient(
 			databaseUrl,
 			serverPassword
