@@ -18,6 +18,10 @@ const appState = {
         else ui.showElements(".connected-options");
 	},
 };
+// --- Local .cards support ---
+const LOCAL_UPLOAD_VALUE = "__upload_local_cards__";
+let usingLocalDeck = false;           // true when deck loaded from local .cards
+const LOCAL_PLAY_CATEGORY = "Local";  // label used in deckId generation
 
 var resultsModal = new Modal(); 
 var highScoresModal = new Modal();
@@ -250,24 +254,28 @@ async function loadCardLibrary(){
     if(selectedDeckCategory) setDeckOptions(cardLibrary);
 }
 
-async function sendScore(){
+async function sendScore() {
+	// NEW: never submit scores for local decks
+	if (usingLocalDeck) {
+		console.log("Local deck: high-score submission disabled.");
+		return;
+	}
 
-    if(userName.length > 0 && userName != 'Your Name Here'){
-        console.log('Sending Score!');
-
-        let createResult = await flashCardClient.submitScore({
-            deckId: utils.formatId(performance.deckId),
-            performanceRecordId: performance.performanceRecordId,
-            player: userName,
-            correctPercent: performance.correctPercent || 0,
-        });
-
-        console.log('Result of high score create');
-        console.log(createResult);
-    }else{
-        console.log('No username set. Not sending score.');
-    }
+	if (userName.length > 0 && userName != "Your Name Here") {
+		console.log("Sending Score!");
+		let createResult = await flashCardClient.submitScore({
+			deckId: utils.formatId(performance.deckId),
+			performanceRecordId: performance.performanceRecordId,
+			player: userName,
+			correctPercent: performance.correctPercent || 0,
+		});
+		console.log("Result of high score create");
+		console.log(createResult);
+	} else {
+		console.log("No username set. Not sending score.");
+	}
 }
+
 
 function registerKeyboardShortcuts(){
 	
@@ -425,21 +433,20 @@ function registerPersistantDataStorage(){
  * @param {} deckData 
  * @returns 
  */
-function setDeckCategories(deckData){
-    doLog('Getting categories from deckData');
-    doLog(deckData);
-    let optionsArray = [];
-	optionsArray.push({'value': null, 'label': '--Select One---'});
-    for(let categoryName in deckData.card_stacks.categories){
-        optionsArray.push({'value': categoryName, 'label': categoryName});
-    }
+function setDeckCategories(deckData) {
+	doLog("Getting categories from deckData");
+	doLog(deckData);
+	let optionsArray = [];
+	optionsArray.push({ value: null, label: "--Select One---" });
 
-    doLog('Writting options array');
-    doLog(optionsArray);
-    setSelectOptions('deck-category', optionsArray, null, false, true);
+	for (let categoryName in deckData.card_stacks.categories) {
+		optionsArray.push({ value: categoryName, label: categoryName });
+	}
 
-    
-    return categories;
+	doLog("Writting options array");
+	doLog(optionsArray);
+	setSelectOptions("deck-category", optionsArray, null, false, true);
+	return categories;
 }
 function setInitialButtonStates() {
 	// Hard-disable action buttons until the right app states happen
@@ -522,13 +529,21 @@ function setVariantDeckOptions(){
     
 }
 
-function setSelectedDeckCategory(categoryId){
-    if (categoryId) {
+function setSelectedDeckCategory(categoryId) {
+	// NEW: handle local upload "category"
+	if (categoryId === LOCAL_UPLOAD_VALUE) {
+		handleLocalDeckUploadStart();
+		// reset the visible select back to "none" so users can still pick server categories later
+		const sel = document.getElementById("deck-category");
+		if (sel) sel.value = "none";
+		return;
+	}
+
+	if (categoryId) {
 		selectedDeckCategory = categoryId;
 		setDeckOptions();
 		ui.enable("card-deck");
 		ui.enable("load-deck-button");
-		
 	}
 }
 
@@ -1128,7 +1143,6 @@ function generateMnemonic(){
 }
 
 function setControlsEnabled(enabled) {
-	// List all element IDs you want to toggle
 	const elements = [
 		"prev-button",
 		"mnemonic-button",
@@ -1142,7 +1156,13 @@ function setControlsEnabled(enabled) {
 	];
 
 	if (enabled) {
-		ui.enable(elements);
+		// NEW: in local mode, don't enable high-scores
+		if (usingLocalDeck) {
+			ui.enable(elements.filter((id) => id !== "high-scores-button"));
+			ui.disable("high-scores-button");
+		} else {
+			ui.enable(elements);
+		}
 	} else {
 		ui.disable(elements);
 	}
@@ -1645,6 +1665,80 @@ function setSelectOptions(selectId, optionsArray, defaultValue, includeRandom, c
     
 }
 
+// --- Local .cards upload flow ---
+
+function bindLocalDeckInput() {
+	const input = document.getElementById("local-deck-file");
+	if (input) input.addEventListener("change", onLocalDeckFileChosen);
+}
+
+function handleLocalDeckUploadStart() {
+	const input = document.getElementById("local-deck-file");
+	if (!input) {
+		alert("Upload control not found.");
+		return;
+	}
+	input.value = ""; // clear any previous selection
+	input.click(); // open OS file picker
+}
+
+async function onLocalDeckFileChosen(evt) {
+	try {
+		const file = evt.target.files && evt.target.files[0];
+		if (!file) return;
+
+		// Require .cards extension
+		if (!/\.cards$/i.test(file.name)) {
+			alert("Please select a .cards file.");
+			return;
+		}
+
+		// Parse JSON
+		let data;
+		try {
+			data = JSON.parse(await file.text());
+		} catch {
+			alert("That file is not valid JSON.");
+			return;
+		}
+
+		// Minimal schema check
+		if (
+			!data ||
+			typeof data !== "object" ||
+			!data.config ||
+			!Array.isArray(data.cards)
+		) {
+			alert('Deck must include "config" and "cards" properties.');
+			return;
+		}
+
+		// Mark as local mode (no server, no category/deck selectors)
+		usingLocalDeck = true;
+		selectedDeckCategory = LOCAL_PLAY_CATEGORY;
+
+		// Load deck via the same pipeline
+		await loadDeck(data);
+
+		// Keep the category/deck selectors hidden (we never set connectedToServer = true)
+		// Disable High Scores UI (server can't accept scores for local decks)
+		ui.disable("high-scores-button");
+
+		// Optional: clarify header
+		try {
+			const header = document.getElementById("content-header");
+			if (header)
+				header.innerText = `Card Stack: ${data.config.name} (Local) - ${data.cards.length} Cards`;
+		} catch {}
+
+		// Close the modal — we’re ready to play
+		serverConnectModal.hideModal();
+	} catch (err) {
+		console.error(err);
+		handleError(err, "Failed to load local .cards file.");
+	}
+}
+
 function toggleMascot(event){
 	if(mascot){
 		mascot.isActive = !mascot.isActive;
@@ -1776,7 +1870,20 @@ function setServerPassword(password) {
 
 
 window.onload = function() {
-	setInitialButtonStates(); // <- lock down buttons first
-	serverConnectModal.registerModal("server-connect-modal");
-	serverConnectModal.showModal();
-};;
+    setInitialButtonStates(); // <- lock down buttons first
+    serverConnectModal.registerModal(
+        "server-connect-modal"
+    );
+    serverConnectModal.showModal();
+
+    // NEW: wire up local play
+    const playLocalBtn = document.getElementById(
+        "play-local-button"
+    );
+    if (playLocalBtn)
+        playLocalBtn.addEventListener(
+            "click",
+            handleLocalDeckUploadStart
+        );
+    bindLocalDeckInput();
+};

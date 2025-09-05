@@ -52,6 +52,13 @@
                     <select name="card-deck" id="card-deck" onchange="handleSetSelectedDeck(this.value)" disabled="disabled">
                         <option value="none" selected>Select A Card Deck</option>
                     </select>
+					<!-- local file deck upload-->
+					<input
+						type="file"
+						id="local-deck-file"
+						accept=".cards,application/json"
+						style="display:none"
+					/>
 					<input type="button" onclick="handleLoadDeckSelect()" value="Load Deck" title="Load Deck" disabled="disabled" id="load-deck-button"/>
 					<input type="button" onclick="handleShowHighScores()" value="High Scores" title="High Scores" id="high-scores-button" disabled="disabled"/>
 					<input type="button" onclick="launchTypingGame()" value="Type Attack!" title="Type Attack!" disabled="disabled" id="type-attack-button"/>
@@ -169,7 +176,7 @@
 			Like this application? Consider donating to support it. Venmo: @Kenji776 | Square Cash: $Kenji776 | PayPal: <a href="https://www.paypal.com/donate?token=Az8L4GSlpcVGyj2FK-aXnXAVv7PXMS6YoALVc-3KJf-6GhakssojaEHhE1ukx_RRdqVSRYvEszDLgFE0" target="_blank">Donate</a>
 	
 			<div>
-				It's open source too! <a href="https://github.com/Kenji776/SimpleFlashCard">Github Repo</a>
+				It's open source too! <a href="https://github.com/Kenji776/SimpleFlashCard">Github Repo</a> Also you can <a href="https://drug-cards.kenji776-labs.org/" target="_blank">Generate a new deck from a PDF</a>
 			</div>
         </div>
 
@@ -285,7 +292,10 @@
 			</div>
 
 			<div class="modal-footer">
+				<button id="play-local-button" class="secondary">Play locally (Upload a deck)</button>
+				
 				<button id="connect-button" onclick="connectToServer()">
+					
 					<span id="connect-button-text">Connect</span>
 					<span id="connect-spinner" class="spinner" style="display:none;"></span>
 				</button>
@@ -407,6 +417,7 @@
 			<div class="modal-body">
 				<p>All options are saved immediatly when changed</p>
 				<div id="deck-controls">
+					<b>General Options</b>
 					<div>
 						<input 
 							type="checkbox" 
@@ -518,7 +529,8 @@
 					<div class="spacer"></div>
 					<hr>
 					<div id="deck-variants" class="connected-options">
-						
+						<b>Deck Specific Options<b>
+						<p>These options are specific to the currently loaded deck. Once you select  a deck you will be able to adjust them.</p>
 						<label for="prompt-key">Question Prompt:</label>
 						<p>The question prompt controls what value on the selected card is used to prompt you/ask the question you need to answer.</p>
 						<select 
@@ -551,6 +563,7 @@
 					<div class="spacer"></div>
 					<hr>
 					<div>
+						<b>Mascot Options<b>
 						<label for="mascot-selector">Mascot Selector</label>
 						<select id="mascot-selector"></select>
 						<button onclick="loadSelectedMascot()">Load Mascot</button>
