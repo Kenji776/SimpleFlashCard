@@ -25,6 +25,13 @@ const Mascot = class {
 		},
 	};
 	audio = [];
+
+	// --- TTS concurrency control ---
+	currentTTSAudio = null; // HTMLAudioElement for current TTS
+	currentTTSUrl = null; // Object URL for current TTS (so we can revoke)
+	currentTTSInterruptible = true; // Is the current TTS allowed to be interrupted?
+	currentSpeechBubbleId = null; // Bubble id associated with the current TTS (optional but handy)
+
 	chatGPTLoaded = false;
 	speechBubbleDiv;
 	useTTS = true;
@@ -101,7 +108,7 @@ const Mascot = class {
 				return;
 			}
 
-			if(!serverConnection){
+			if (!serverConnection) {
 				console.error("No server/client connection object passed in!");
 				return;
 			}
@@ -405,17 +412,20 @@ const Mascot = class {
 		interruptable = true,
 		autoFade = true
 	) {
+		if(!speechText){
+			console.warn("No text provided for TTS. Not sending");
+			return;
+		}
 		if (!this.isActive) {
 			console.warn("Mascot invactive. Not reading text");
 			return;
 		}
-		if (this.useTTS && !this.mute) {
-			this.tts(speechText, this.TTS.voice_id);
-		}
+
+		// If an uninterruptible message is currently displayed, do nothing (no bubble, no TTS).
 		if (this.uninterruptableMessageDisplayed) {
 			console.warn(
-				"Uninterruptable Message Displayed. Not showing message " +
-					speechText
+				"Uninterruptable message active; ignoring new speech:",
+				speechText
 			);
 			return;
 		}
@@ -424,10 +434,9 @@ const Mascot = class {
 			ui.getElements(".mascot-speech-bubble").forEach((e) => e.remove());
 		}
 
-		let divId = Math.floor(Math.random() * 101);
-
-		let speechBubbleDiv = document.createElement("div");
-		speechBubbleDiv.id = "speech-bubble-" + divId;
+		const divId = "speech-bubble-" + Math.floor(Math.random() * 101);
+		const speechBubbleDiv = document.createElement("div");
+		speechBubbleDiv.id = divId;
 
 		if (!interruptable) {
 			this.uninterruptableMessageDisplayed = true;
@@ -439,7 +448,21 @@ const Mascot = class {
 		speechBubbleDiv.innerHTML = speechText;
 		this.container.appendChild(speechBubbleDiv);
 
-		let numWords = speechText.split(" ").length;
+		// Track the bubble associated with this speech (so removing it can stop TTS).
+		this.currentSpeechBubbleId = speechBubbleDiv.id;
+
+		// Start TTS only after we’ve decided we’re allowed to speak.
+		if (this.useTTS && !this.mute) {
+			this.tts(
+				speechText,
+				this.TTS.voice_id,
+				interruptable,
+				speechBubbleDiv.id
+			);
+		}
+
+		// Compute fade timing roughly by words
+		const numWords = speechText.split(" ").length;
 		let speechDelay = 2.5 * numWords * 1000 * this.speechBubbleFadeDelay;
 		speechDelay =
 			speechDelay > 1500 && speechDelay < 10000 ? speechDelay : 3000;
@@ -449,33 +472,107 @@ const Mascot = class {
 		}
 	}
 
-	async tts(speechText, voice_id) {
-		console.log('Sending text for TTS: ' + speechText);
+	stopTTS() {
+		try {
+			if (this.currentTTSAudio) {
+				this.currentTTSAudio.pause();
+				// Clear src to stop downloads/buffering in some browsers
+				try {
+					this.currentTTSAudio.src = "";
+					this.currentTTSAudio.load?.();
+				} catch {}
+			}
+			if (this.currentTTSUrl) {
+				URL.revokeObjectURL(this.currentTTSUrl);
+			}
+		} catch (e) {
+			console.warn("Error while stopping TTS:", e);
+		} finally {
+			this.currentTTSAudio = null;
+			this.currentTTSUrl = null;
+			this.currentTTSInterruptible = true;
+		}
+	}
+
+	async tts(speechText, voice_id, interruptable = true, bubbleId = null) {
+		// If something is already playing:
+		if (this.currentTTSAudio) {
+			// If current is interruptible, stop it. If not, refuse to start a new one.
+			if (this.currentTTSInterruptible) {
+				this.stopTTS();
+			} else {
+				console.warn(
+					"Existing uninterruptible TTS is playing; ignoring new TTS."
+				);
+				return;
+			}
+		}
+
+		console.log("Sending text for TTS:", speechText);
+
+		// Fetch audio
 		const audioData = await this.apiClient.textToSpeech({
 			text: speechText,
 			voiceId: voice_id,
 		});
+
+		// Double-check again (race-safety): if something started while we were fetching…
+		if (this.currentTTSAudio) {
+			if (this.currentTTSInterruptible) this.stopTTS();
+			else return;
+		}
+
+		// Create audio + track it
 		const audioBlob = new Blob([audioData], { type: "audio/mpeg" });
 		const audioUrl = URL.createObjectURL(audioBlob);
 		const audio = new Audio(audioUrl);
-		audio.play();
+
+		this.currentTTSAudio = audio;
+		this.currentTTSUrl = audioUrl;
+		this.currentTTSInterruptible = !!interruptable;
+		this.currentSpeechBubbleId = bubbleId || this.currentSpeechBubbleId;
+
+		// Cleanup when finished
+		audio.addEventListener("ended", () => {
+			this.stopTTS();
+		});
+
+		// If playback fails (e.g., autoplay policy), just log and cleanup
+		audio.play().catch((err) => {
+			console.error("TTS play() failed:", err);
+			this.stopTTS();
+		});
 	}
 
 	removeSpeechBubble(bubbleId, speechDelay) {
-		if (this.uninterruptableMessageDisplayed)
-			this.uninterruptableMessageDisplayed = false;
+		// If we’re removing the bubble associated with the current TTS, stop it
+		const stopIfMatches = () => {
+			if (
+				this.currentSpeechBubbleId &&
+				bubbleId === this.currentSpeechBubbleId
+			) {
+				this.stopTTS();
+				this.currentSpeechBubbleId = null;
+			}
+			// If we’re closing an uninterruptible message, release the lock
+			if (this.uninterruptableMessageDisplayed) {
+				this.uninterruptableMessageDisplayed = false;
+			}
+		};
 
 		setTimeout(
-			function(bubbleId) {
-				ui.addClass([document.getElementById(bubbleId)], "fade-out");
+			(id) => {
+				const el = document.getElementById(id);
+				if (el) ui.addClass([el], "fade-out");
 
 				setTimeout(
-					function(bubbleId) {
-						const bubbleDiv = document.getElementById(bubbleId);
+					(id2) => {
+						const bubbleDiv = document.getElementById(id2);
 						if (bubbleDiv) bubbleDiv.remove();
+						stopIfMatches();
 					},
 					1900,
-					bubbleId
+					id
 				);
 			},
 			speechDelay,
@@ -741,6 +838,7 @@ const Mascot = class {
 		// Mark mascot as inactive
 		this.isActive = false;
 		this.canReactivate = false;
+		this.stopTTS();
 
 		// Stop timers
 		if (this.idleTimer) clearInterval(this.idleTimer);

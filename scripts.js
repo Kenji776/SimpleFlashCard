@@ -281,6 +281,8 @@ function registerKeyboardShortcuts(){
 	
  
 	document.onkeydown = function (e) {
+        const tag = (e.target && e.target.tagName) || "";
+		if (tag === "INPUT" || tag === "TEXTAREA" || isAnyModalOpen()) return;
 		e = e || window.event;
 		// use e.keyCode
 		
@@ -310,6 +312,10 @@ function registerKeyboardShortcuts(){
         
         //e.preventDefault();
 	};
+}
+
+function isAnyModalOpen() {
+	return !!document.querySelector('.modal.show, .modal[aria-hidden="false"]');
 }
 
 function savePerformance(){
@@ -550,11 +556,10 @@ function setSelectedDeckCategory(categoryId) {
 function handleSetSelectedDeck(value){
 	if(value){
 		doLog('Setting deck url to...' + value);
-		var select = document.getElementById("card-deck");
-		selectedIndex = select.selectedIndex;
-		var options = select.options;
-		var selectedValue = options[selectedIndex].value;
-		deckUrl = selectedValue;
+        const select = document.getElementById("card-deck");
+        const idx = select.selectedIndex;
+        const selectedValue = select.options[idx].value;
+        deckUrl = selectedValue;
 		doLog('Deck url is...' + deckUrl);
 		
 	}
@@ -683,7 +688,7 @@ function generateDeckFromData(shuffleConfig=new ShuffleDeckConfig()){
             }
 
             //if building a multiple choice deck...
-            if(shuffleConfig.options.deckType = 'multiple-choice'){
+            if(shuffleConfig.options.deckType === 'multiple-choice'){
                                 
                 for(let groupName in groups){
                     let thisGroupCorrectAnswers = [];
