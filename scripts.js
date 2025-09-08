@@ -29,13 +29,16 @@ var serverConnectModal = new Modal();
 var cardDetailsModal = new Modal();
 var typeAttackModal = new Modal();
 var optionsModal = new Modal();
+var deckUploadModal = new Modal();
+
 var mascot; //instance of Mascot
 var storedSettings = new LS(settingsName); //instance of LS (local storage) object
 var storedScores = new LS(scoresName); //instance of LS (local storage) object
 let flashCardClient;
-var utils = new Utils();
-var template = new Template();
-var labels = new Labels();
+const utils = new Utils();
+const template = new Template();
+const labels = new Labels();
+//const DeckUploader = new DeckUploader();
 var serverPassword = "";
 
 var showLogs = false;
@@ -63,9 +66,8 @@ var autoLoadNextCardOnAnswer = false;
 var selectedVariantDeck = '';
 var userName = 'Test User';
 var cardLabel = "Card Details";
-
-
 var mascotLeaveLimit = 15;
+
 
 
 //final score tally objects
@@ -103,6 +105,28 @@ var options = {
 
 const typingGame = new TypingMiniGame({ modalId: "type-attack-modal" });
 
+async function init() {
+	setInitialButtonStates(); // <- lock down buttons first
+	registerKeyboardShortcuts();
+	registerPersistantDataStorage();
+	resultsModal.registerModal("results-modal");
+	cardDetailsModal.registerModal("card-details-modal");
+	optionsModal.registerModal("options-modal");
+	deckUploadModal.registerModal("deck-upload-modal");
+	typeAttackModal.registerModal("type-attack-modal");
+
+	resultsModal.registerModalCloseHandler(() =>
+		ui.hideElements("confetti_outer")
+	);
+	highScoresModal.registerModal("high-scores-modal");
+
+	serverConnectModal.registerModal("server-connect-modal");
+	serverConnectModal.showModal();
+    window.addEventListener("resize", handleResize);
+
+    
+}
+
 function debounce(func, delay) {
     let timeoutId;
     return function() {
@@ -128,7 +152,7 @@ const handleResize = debounce(function(event) {
     console.log('Window resized to width: ' + newWidth + ', height: ' + newHeight);
 }, 200); // Adjust the delay as needed
 
-window.addEventListener('resize', handleResize);
+
 
 async function connectToServer() {
 	const {
@@ -148,8 +172,7 @@ async function connectToServer() {
 		const urlInput = getServerUrl();
 		const username = userName; // Make sure userName is defined in your context
         
-		const serverUrlInput = document.getElementById("server-url").value;
-		databaseUrl = serverUrlInput;
+		databaseUrl = urlInput;
 		console.log('Connecting to server: ' + databaseUrl);
         flashCardClient = new FlashcardServerClient(
 			databaseUrl,
@@ -206,7 +229,9 @@ function getServerUrl() {
 	if (!urlInput) {
 		throw new Error("Please enter a server URL.");
 	}
-	return databaseUrl;
+	return databaseUrl.endsWith("/")
+		? databaseUrl.slice(0, -1)
+		: databaseUrl;
 }
 
 async function announceToServer(url, username, statusElement) {
@@ -217,6 +242,8 @@ async function announceToServer(url, username, statusElement) {
     }
 }
 
+
+
 async function performPostConnectionSetup(statusElement) {
 	updateStatus(statusElement, "Loading card library...");
 	await loadCardLibrary();
@@ -225,17 +252,7 @@ async function performPostConnectionSetup(statusElement) {
 	loadMascotOptions();
 
 	updateStatus(statusElement, "Finalizing...");
-	registerKeyboardShortcuts();
-	resultsModal.registerModal("results-modal");
-    cardDetailsModal.registerModal("card-details-modal");
-	optionsModal.registerModal("options-modal");
-	typeAttackModal.registerModal("type-attack-modal");
 
-	resultsModal.registerModalCloseHandler(() =>
-		ui.hideElements("confetti_outer")
-	);
-	highScoresModal.registerModal("high-scores-modal");
-	registerPersistantDataStorage();
 
 	const settings = loadSettings();
 	if (settings?.config?.username) {
@@ -249,9 +266,14 @@ async function loadCardLibrary(){
     doLog('Loading card library');
     const result = await flashCardClient.listDecks();
     cardLibrary = result.data;
-    setDeckCategories(cardLibrary);
+    setDeckCategories(cardLibrary, "deck-category");
+    setDeckCategories(cardLibrary, "upload-existing-category");
 
-    if(selectedDeckCategory) setDeckOptions(cardLibrary);
+    console.log('Sending deck options');
+    console.log(cardLibrary);
+    console.log(selectedDeckCategory);
+    console.log(cardLibrary.card_stacks.categories[selectedDeckCategory]);
+    //if (selectedDeckCategory) setDeckOptions(cardLibrary.card_stacks.categories[selectedDeckCategory], 'card-deck');
 }
 
 async function sendScore() {
@@ -432,14 +454,12 @@ function registerPersistantDataStorage(){
     }
     
 }
-
-
 /**
  * @description sets all of the potential deck category options from the card library
  * @param {} deckData 
  * @returns 
  */
-function setDeckCategories(deckData) {
+function setDeckCategories(deckData, selectName) {
 	doLog("Getting categories from deckData");
 	doLog(deckData);
 	let optionsArray = [];
@@ -451,7 +471,7 @@ function setDeckCategories(deckData) {
 
 	doLog("Writting options array");
 	doLog(optionsArray);
-	setSelectOptions("deck-category", optionsArray, null, false, true);
+	setSelectOptions(selectName, optionsArray, null, false, true);
 	return categories;
 }
 function setInitialButtonStates() {
@@ -470,21 +490,18 @@ function setInitialButtonStates() {
 	]);
 }
 /*
-* @description Populates the 'card-deck' select with options from the selected deck category
+* @description Populates the provided select element with options from the selected deck category
 */
-function setDeckOptions() {
+function setDeckOptions(categoryOptions=[], selectName = "card-deck") {
+    //cardLibrary.card_stacks.categories;
+
 	let optionsArray = [];
 	doLog("Select deck options for selectedDeck " + selectedDeckCategory);
-	doLog(cardLibrary);
+	doLog(categoryOptions);
 
 	doLog("Selected category: " + selectedDeckCategory);
-	for (let deckIndex in cardLibrary.card_stacks.categories[
-		selectedDeckCategory
-	][0]) {
-		let deck =
-			cardLibrary.card_stacks.categories[selectedDeckCategory][0][
-				deckIndex
-			];
+	for (let deckIndex in categoryOptions[0]) {
+		let deck = categoryOptions[0][deckIndex];
 
 		doLog(deck);
 		optionsArray.push({
@@ -493,7 +510,7 @@ function setDeckOptions() {
 		});
 	}
 
-	setSelectOptions("card-deck", optionsArray, null, false, true);
+	setSelectOptions(selectName, optionsArray, null, false, true);
 
 	// Set default deck slug to first element in list
 	deckUrl = optionsArray[0].value;
@@ -501,6 +518,10 @@ function setDeckOptions() {
 
 async function loadMascotOptions() {
 	const response = await fetch(`${databaseUrl}/api/mascots?password=${encodeURIComponent(serverPassword)}`);
+
+    console.log(
+		`Trying to fetch mascots from ${databaseUrl}/api/mascots?password=${encodeURIComponent(serverPassword)}`
+	);
 	const data = await response.json();
 
 	const select = document.getElementById("mascot-selector");
@@ -536,18 +557,12 @@ function setVariantDeckOptions(){
 }
 
 function setSelectedDeckCategory(categoryId) {
-	// NEW: handle local upload "category"
-	if (categoryId === LOCAL_UPLOAD_VALUE) {
-		handleLocalDeckUploadStart();
-		// reset the visible select back to "none" so users can still pick server categories later
-		const sel = document.getElementById("deck-category");
-		if (sel) sel.value = "none";
-		return;
-	}
-
 	if (categoryId) {
 		selectedDeckCategory = categoryId;
-		setDeckOptions();
+		setDeckOptions(
+			cardLibrary.card_stacks.categories[selectedDeckCategory],
+			"card-deck"
+		);
 		ui.enable("card-deck");
 		ui.enable("load-deck-button");
 	}
@@ -569,6 +584,28 @@ function handleSetSelectedVariant(value){
     doLog('Setting deck url to...' + value);
 
     selectedVariantDeck = value;
+}
+
+async function handleUploadFile(){
+  try {
+    const res = await uploadDeckFromInputs({
+		uploader: flashCardClient,
+		overwrite: false,
+	});
+
+    if(!res || !res.success){
+        if(res.message) throw res.message;
+        else throw 'Uknown error uploading'
+    }
+    console.log("Upload successful:", res);
+    showToast("Deck uploaded successfully!", "Your deck has been successfully upload and is now available", "success");
+
+    loadCardLibrary();
+    // show a toast / refresh list etc.
+  } catch (err) {
+    console.error("Upload failed:", err);
+    handleError(err, err?.message ? err.message : err);
+  }
 }
 
 function loadVariantDeck(){
@@ -1856,12 +1893,16 @@ function resetHistory(){
 }
 
 function handleError(e, customMessage){
-    let message = customMessage ? customMessage : e.message;
-
-    console.error('Error in application!')
-    doLog(e.message);
     doLog(e);
-    if (mascot) mascot.say(message, "sad");
+    let message = customMessage ? customMessage : e.message;
+    console.error('Error in application!')
+
+    //if (mascot) mascot.say(message, "sad");
+    showToast(
+        "Error",
+        `Oops, looks like we hit a snag. ${message}`,
+        "error"
+	);
 }
 
 function doLog(logData){
@@ -1875,11 +1916,8 @@ function setServerPassword(password) {
 
 
 window.onload = function() {
-    setInitialButtonStates(); // <- lock down buttons first
-    serverConnectModal.registerModal(
-        "server-connect-modal"
-    );
-    serverConnectModal.showModal();
+    init();
+   
 
     // NEW: wire up local play
     const playLocalBtn = document.getElementById(

@@ -7,7 +7,7 @@
     overflow: auto;       /* fallback if content is huge */
     padding-top: 0;       /* <-- remove big top padding so we can center cleanly */
     inset: 0;             /* equivalent to left/top/width/height above */
-  display: none;
+    display: none;
     /* Enable scroll if needed */
      background-color: rgb(0,0,0);
     /* Fallback color */
@@ -69,6 +69,7 @@
  .modal-body {
     padding: 2px 16px;
     color:#333;
+    min-height:100px;
 }
  .modal-footer {
      padding: 2px 16px;
@@ -147,3 +148,26 @@
 .login-modal .modal-footer button:hover {
     background-color: #4cae4c;
 }
+
+
+/* ===== Alert Variants ===== */
+.modal--success .modal-header,
+.modal--success .modal-footer { background-color: #5cb85c; color: #fff; }
+.modal--error .modal-header,
+.modal--error .modal-footer   { background-color: #d9534f; color: #fff; }
+.modal--warning .modal-header,
+.modal--warning .modal-footer { background-color: #f0ad4e; color: #111; }
+.modal--info .modal-header,
+.modal--info .modal-footer    { background-color: #5bc0de; color: #fff; }
+
+/* Optional: accent the border to match */
+.modal--success .modal-content { border-color: #5cb85c; }
+.modal--error   .modal-content { border-color: #d9534f; }
+.modal--warning .modal-content { border-color: #f0ad4e; }
+.modal--info    .modal-content { border-color: #5bc0de; }
+
+/* Ensure close button has good contrast per variant */
+.modal--warning .modal-close { color: #111; }
+.modal--success .modal-close,
+.modal--error   .modal-close,
+.modal--info    .modal-close { color: #fff; }

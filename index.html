@@ -23,6 +23,7 @@
 <script type="text/javascript" language="javascript" src="utils.js"></script>
 <script type="text/javascript" language="javascript" src="templateEngine.js"></script>
 <script type="text/javascript" language="javascript" src="typingGame.js"></script>
+<script type="text/javascript" language="javascript" src="deckUpload.js"></script>
 <!-- Load Last -->
 <script type="text/javascript" language="javascript" src="scripts.js"></script> 
 
@@ -70,7 +71,8 @@
 			<div style="clear:both"></div>
 
 			<div class="bottom-bar">
-			<input type="button" onclick="optionsModal.showModal()" value="Options" title="Options"/>
+				<input type="button" onclick="optionsModal.showModal()" value="Options" title="Options"/>
+				<input type="button" onclick="deckUploadModal.showModal()" value="Upload Deck" title="Upload Deck"/>
 			</div>
  
         </div>
@@ -293,7 +295,7 @@
 
 			<div class="modal-footer">
 				<button id="play-local-button" class="secondary">Play locally (Upload a deck)</button>
-				
+
 				<button id="connect-button" onclick="connectToServer()">
 					
 					<span id="connect-button-text">Connect</span>
@@ -345,6 +347,50 @@
 		</div>		
 	</div>
 
+	<!-- deck upload modal -->
+	<div id="deck-upload-modal" class="modal">
+		<div class="modal-content">
+			<div class="modal-header">
+			<span class="close-modal-button modal-close" id="deck-upload-close">&times;</span>
+			<center><h2 class="inline pulse sub-header-text-2">Upload Deck</h2></center>
+			</div>
+
+			<div class="modal-body">
+			<form id="deck-upload-form" onsubmit="return false;">
+				<div class="field">
+				<label class="sub-header-text-2">Category</label>
+				<div style="margin:.5rem 0">
+					<label><input type="radio" name="catMode" value="existing" checked> Use existing</label>
+					&nbsp;&nbsp;
+					<label><input type="radio" name="catMode" value="new"> Create new</label>
+				</div>
+
+				<select id="upload-existing-category" style="width:100%;"></select>
+				<input type="text" id="upload-new-category" placeholder="New category name" style="display:none;width:100%;margin-top:.5rem;" />
+				</div>
+
+				<div class="field" style="margin-top:1rem;">
+				<label for="upload-deck-name" class="sub-header-text-2">Deck name</label>
+				<input type="text" id="upload-deck-name" placeholder="e.g., GroupE" required style="width:100%;" />
+				</div>
+
+				<div class="field" style="margin-top:1rem;">
+				<label for="upload-deck-file" class="sub-header-text-2">Deck file (.cards)</label>
+				<input type="file" id="upload-deck-file" accept=".cards" required style="width:100%;" />
+				<small id="upload-file-hint">Max 1 MB, plain text JSON.</small>
+				</div>
+
+				<div class="field" style="margin-top:1rem;">
+					<output id="deck-upload-status" role="status"></output>
+				</div>
+			</form>
+			</div>
+
+			<div class="modal-footer">
+				<button type="button" id="deck-upload-submit" class="btn-primary" onclick="handleUploadFile();">Upload</button>
+			</div>
+		</div>
+	</div>
 	<!-- card details modal -->
 	<div id="type-attack-modal" class="modal">
 		  <!-- Modal content -->

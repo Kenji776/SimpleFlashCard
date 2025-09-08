@@ -1,7 +1,12 @@
-const FlashcardServerClient = class{
-	constructor(baseUrl, password) {
+const FlashcardServerClient = class {
+	constructor(baseUrl, password, { uploadToken = null } = {}) {
 		this.baseUrl = baseUrl.replace(/\/$/, ""); // Remove trailing slash
 		this.password = password;
+		this.uploadToken = uploadToken; // optional default for uploads
+	}
+
+	setUploadToken(token) {
+		this.uploadToken = token || null;
 	}
 
 	_generateSecret() {
@@ -11,10 +16,15 @@ const FlashcardServerClient = class{
 			.join("");
 	}
 
+	_buildHeaders(custom = {}) {
+		// Default JSON, allow overrides/merges
+		return { "Content-Type": "application/json", ...custom };
+	}
+
 	async _request(
 		method,
 		path,
-		{ params = {}, body = null, responseType = "json" } = {}
+		{ params = {}, body = null, responseType = "json", headers = {} } = {}
 	) {
 		const secret = this._generateSecret();
 
@@ -27,18 +37,41 @@ const FlashcardServerClient = class{
 
 		const url = `${this.baseUrl}${path}?${query}`;
 
-		const fetchOptions = {
-			method,
-			headers: { "Content-Type": "application/json" },
-		};
-		if (body) fetchOptions.body = JSON.stringify(body);
+		// Merge headers and auto-inject upload token for the upload endpoint
+		const isUpload =
+			path === "/api/decks/upload" ||
+			path.startsWith("/api/decks/upload");
+		const finalHeaders = this._buildHeaders(headers);
 
-		console.log(body);
+		// If caller didn't explicitly provide an upload token header, attach the instance token
+		if (
+			isUpload &&
+			!(
+				"x-upload-token" in
+				Object.fromEntries(
+					Object.entries(finalHeaders).map(([k, v]) => [
+						k.toLowerCase(),
+						v,
+					])
+				)
+			) &&
+			this.uploadToken
+		) {
+			finalHeaders["x-upload-token"] = this.uploadToken;
+		}
+
+		const fetchOptions = { method, headers: finalHeaders };
+		if (body != null) fetchOptions.body = JSON.stringify(body);
 
 		const response = await fetch(url, fetchOptions);
 
 		if (!response.ok) {
-			const errorText = await response.text();
+			let errorText;
+			try {
+				errorText = await response.text();
+			} catch {
+				errorText = response.statusText;
+			}
 			throw new Error(`Request failed: ${response.status} ${errorText}`);
 		}
 
@@ -109,4 +142,66 @@ const FlashcardServerClient = class{
 			{ responseType: "arraybuffer" }
 		);
 	}
-}
+
+	/**
+	 * Upload a .cards deck file to the server.
+	 * @param {Object} opts
+	 * @param {string} opts.category - Category folder (e.g., "IntroToPharmacy1")
+	 * @param {string} opts.deckName - Deck base name without extension (e.g., "GroupE")
+	 * @param {string|Object} [opts.content] - Deck JSON as a string (plain text)
+	 * @param {Object} [opts.json] - If provided instead of content, will be JSON.stringified
+	 * @param {boolean} [opts.overwrite=false] - Overwrite an existing deck
+	 * @param {string} [opts.token] - Optional per-call shared secret for x-upload-token header (overrides instance token)
+	 */
+	uploadDeck({
+		category,
+		deckName,
+		content,
+		json,
+		overwrite = false,
+		token,
+	} = {}) {
+		if (!category || !deckName) {
+			throw new Error("uploadDeck requires category and deckName.");
+		}
+
+		// Accept either pre-stringified content or a JSON object
+		let payloadContent = content;
+		if (payloadContent == null) {
+			if (json == null)
+				throw new Error(
+					"Provide either content (string) or json (object)."
+				);
+			try {
+				payloadContent = JSON.stringify(json, null, 2);
+			} catch {
+				throw new Error("Failed to stringify provided json.");
+			}
+		}
+		if (typeof payloadContent !== "string") {
+			throw new Error("content must be a string after processing.");
+		}
+		// Quick client-side guard against binary-ish payloads
+		if (/\u0000/.test(payloadContent)) {
+			throw new Error(
+				"Deck content contains NUL characters; expected plain text JSON."
+			);
+		}
+
+		// If a one-off token is provided, pass it; otherwise _request will inject instance token automatically.
+		// This feature doesn't really do anything yet. Will probably be used in the future.
+		const headers = token
+			? { "x-upload-token": token }
+			: { "x-upload-token": this._generateSecret() };
+
+		return this._request("POST", "/api/decks/upload", {
+			body: {
+				category,
+				deckName,
+				content: payloadContent,
+				overwrite: !!overwrite,
+			},
+			headers,
+		});
+	}
+};
