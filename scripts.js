@@ -645,8 +645,7 @@ async function loadDeck(deckData){
     setHighScoresFrame(performance.deckId);
 
     if(!deckData) {
-        doLog('Deck data not provided. Aborting Load');
-        alert('Deck data not provided. Aborting Load');
+        handleError( new Error('Deck data not provided. Aborting Load'));
         return;
     }
 
@@ -931,8 +930,9 @@ function loadCard(cardId, forceIndex){
                 console.error(ex);
                 handleError(ex);
             }
-            selectedAnswerKeyText = config.answerKeys.find(x => x.value === answerVal).label;
-            selectedPromptKeyText = config.promptKeys.find(x => x.value === promptVal).label;
+            selectedAnswerKeyText = config.answerKeys.find((x) => x.value === answerVal)?.label ?? "Response";
+
+            selectedPromptKeyText = config.promptKeys.find((x) => x.value === promptVal)?.label ?? "Prompt";
         }
 
 
