@@ -172,6 +172,7 @@ async function connectToServer() {
 		const urlInput = getServerUrl();
 		const username = userName; // Make sure userName is defined in your context
         
+        console.log('Got server URL: ' + urlInput);
 		databaseUrl = urlInput;
 		console.log('Connecting to server: ' + databaseUrl);
         flashCardClient = new FlashcardServerClient(
@@ -225,13 +226,12 @@ function updateStatus(element, message) {
 }
 
 function getServerUrl() {
-	const urlInput = document.getElementById("server-url").value.trim();
-	if (!urlInput) {
+	databaseUrl = document.getElementById("server-url").value.trim();
+    databaseUrl = databaseUrl.endsWith("/") ? databaseUrl.slice(0, -1) : databaseUrl;
+	if (!databaseUrl) {
 		throw new Error("Please enter a server URL.");
 	}
-	return databaseUrl.endsWith("/")
-		? databaseUrl.slice(0, -1)
-		: databaseUrl;
+	return databaseUrl;
 }
 
 async function announceToServer(url, username, statusElement) {
