@@ -1,17 +1,21 @@
-databaseUrl = "https://pharmacy-flashcards-2027.lol/";
-const database = new Database(databaseUrl);
-const utils = new Utils();
 
+const utils = new Utils();
 var scoresInterval;
 var deckId;
 var refreshGlobalScoresIntervalMS = 10000;
+var databaseUrl = "https://fc.kenji776-labs.org/";
 
 
 
 
 async function init(){
     const urlParams = new URLSearchParams(window.location.search);
+    databaseUrl = urlParams.get('server-url');
     deckId = utils.formatId(urlParams.get('deck'));
+
+    if(!databaseUrl || !deckId){
+        console.warn("⚠️ No deckId or server-url passed into scores.js. Cannot fetch scores.");
+    }
     buildGlobalHighScoresTable(deckId, 'global-leaderboard-container')
     //registerGetScoresInterval(deckId)
     getScores(deckId);
@@ -29,7 +33,7 @@ async function getScores(deckId) {
 		return { success: false, message: "Missing deckId" };
 	}
 
-	const url = `${database.endpoint}/api/scores?deck=${encodeURIComponent(deckId)}`;
+	const url = `${databaseUrl}/api/scores?deck=${encodeURIComponent(deckId)}`;
 
 	console.log(`➡️ Fetching scores from: ${url}`);
 

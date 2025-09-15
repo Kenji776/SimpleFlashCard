@@ -685,7 +685,7 @@ async function loadDeck(deckData){
 }
 
 function setHighScoresFrame(deckId){
-    document.getElementById('scores-frame').src = `scores.html?deck=${utils.formatId(deckId)}`;
+    document.getElementById('scores-frame').src = `scores.html?deck=${utils.formatId(deckId)}&server-url=${databaseUrl}`;
 }
 
 function handleShowHighScores(){
