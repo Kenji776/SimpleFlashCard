@@ -980,7 +980,7 @@ function loadCard(cardId, forceIndex){
 
             ui.showElements('next-answer-button');
             ui.hideElements('next-letter-button');
-            ui.getElements('prompt-key')[0].setAttribute('disabled',true);
+            
         }else{
             doLog('current card is unknown type. Prompt text');
             currentAnswer = promptVal == config.defaultPrompt ? currentCard[config.defaultAnswer] : currentCard[config.defaultPrompt];
@@ -993,7 +993,6 @@ function loadCard(cardId, forceIndex){
 
             ui.showElements('answer-buttons');
 
-            ui.getElements('prompt-key')[0].setAttribute('disabled',false);
         }
 
         if(!currentAnswer || currentAnswer.length === 0){
@@ -1817,11 +1816,18 @@ function setUi(enableUi){
         //document.getElementById('deck-controls').style.visibility='visible';
         //document.getElementById('controls').style.visibility='visible';
         ui.showElements(['deck-controls','controls','deck-variants'])
+        ui.getElements("prompt-key")[0].setAttribute("disabled", false);
+        ui.getElements("load-variant-select")[0].setAttribute("disabled", false);
+        ui.getElements("load-variable-deck-button")[0].setAttribute("disabled", false);
+
     }else{
         doLog('Hiding ui')
         //document.getElementById('deck-controls').style.visibility='hidden';
         //document.getElementById('controls').style.visibility='hidden';
         ui.hideElements(['deck-controls','controls','deck-variants'])
+        ui.getElements("prompt-key")[0].setAttribute("disabled", true);
+		ui.getElements("load-variant-select")[0].setAttribute("disabled", true);
+		ui.getElements("load-variable-deck-button")[0].setAttribute("disabled", true);
     }   
 }
 
