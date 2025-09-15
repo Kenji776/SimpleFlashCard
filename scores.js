@@ -1,5 +1,4 @@
-//const databaseUrl = 'https://daj000002wi3eeas-dev-ed.develop.my.database-sites.com/services/apexrest/flashCard';
-databaseUrl = "http://localhost:3000";
+databaseUrl = "https://pharmacy-flashcards-2027.lol/";
 const database = new Database(databaseUrl);
 const utils = new Utils();
 
@@ -78,6 +77,8 @@ async function buildGlobalHighScoresTable(deckId, targetContainer){
 
     console.log('Parsing Scores');
     console.log(scores)
+
+    if(!scores) return;
     scores.forEach(function(score) {
         tr = document.createElement('tr'), 
         tr.setAttribute('class', 'sub-header-text-2');     

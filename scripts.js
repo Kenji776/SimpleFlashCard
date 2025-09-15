@@ -1816,9 +1816,9 @@ function setUi(enableUi){
         //document.getElementById('deck-controls').style.visibility='visible';
         //document.getElementById('controls').style.visibility='visible';
         ui.showElements(['deck-controls','controls','deck-variants'])
-        ui.getElements("prompt-key")[0].setAttribute("disabled", false);
-        ui.getElements("load-variant-select")[0].setAttribute("disabled", false);
-        ui.getElements("load-variable-deck-button")[0].setAttribute("disabled", false);
+        ui.getElements("prompt-key")[0].removeAttribute("disabled");
+        ui.getElements("load-variant-select")[0].removeAttribute("disabled");
+        ui.getElements("load-variable-deck-button")[0].removeAttribute("disabled");
 
     }else{
         doLog('Hiding ui')
