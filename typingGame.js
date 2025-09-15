@@ -41,23 +41,19 @@ class TypingMiniGame {
 			globalEnter: this._onGlobalEnter.bind(this), // NEW
 		};
 
-		console.log('Constructed instance of type attack mini game');
+		console.log("Constructed instance of type attack mini game");
 		console.log(this);
 	}
 
 	// ---------- Public ----------
 	start(words, overrides = {}) {
 		if (!Array.isArray(words) || words.length === 0) {
-			console.warn(
-				"TypingMiniGame.start: provide a non-empty array of words."
-			);
+			console.warn("TypingMiniGame.start: provide a non-empty array of words.");
 			return;
 		}
 		this.cfg = Object.assign({}, deckOptions.typingGame, overrides);
 
-		const list = this.cfg.shuffleWords
-			? this._shuffle([...words])
-			: [...words];
+		const list = this.cfg.shuffleWords ? this._shuffle([...words]) : [...words];
 		this.state.words = list;
 		this.state.wordIndex = 0;
 		this.state.currentWord = list[0];
@@ -95,10 +91,7 @@ class TypingMiniGame {
 
 		this._el("tg-start")?.addEventListener("click", this._handlers.start);
 		this._el("tg-submit")?.addEventListener("click", this._handlers.submit);
-		this._el("tg-input")?.addEventListener(
-			"keydown",
-			this._handlers.enterKey
-		);
+		this._el("tg-input")?.addEventListener("keydown", this._handlers.enterKey);
 		this._el("tg-next")?.addEventListener("click", this._handlers.next);
 		this._el("tg-retry")?.addEventListener("click", this._handlers.retry);
 
@@ -110,23 +103,11 @@ class TypingMiniGame {
 		if (!this.state.wired) return;
 		this.state.wired = false;
 
-		this._el("tg-start")?.removeEventListener(
-			"click",
-			this._handlers.start
-		);
-		this._el("tg-submit")?.removeEventListener(
-			"click",
-			this._handlers.submit
-		);
-		this._el("tg-input")?.removeEventListener(
-			"keydown",
-			this._handlers.enterKey
-		);
+		this._el("tg-start")?.removeEventListener("click", this._handlers.start);
+		this._el("tg-submit")?.removeEventListener("click", this._handlers.submit);
+		this._el("tg-input")?.removeEventListener("keydown", this._handlers.enterKey);
 		this._el("tg-next")?.removeEventListener("click", this._handlers.next);
-		this._el("tg-retry")?.removeEventListener(
-			"click",
-			this._handlers.retry
-		);
+		this._el("tg-retry")?.removeEventListener("click", this._handlers.retry);
 
 		document.removeEventListener("keydown", this._handlers.globalEnter);
 	}
@@ -173,17 +154,14 @@ class TypingMiniGame {
 	_startShowPhase() {
 		const displaySeconds = this.cfg.displaySeconds;
 
-		this._setText("tg-word-idx", this.state.wordIndex + 1);
 		this._setText("tg-show-timer", displaySeconds);
 		this._setText("tg-round-timer", "-");
 		ui.disable(["tg-input", "tg-submit", "tg-next", "tg-retry"]);
 		const input = this._el("tg-input");
 		if (input) input.value = "";
-		this.state.correctStreak = 0;
-		this._setText("tg-correct", 0);
 		this._feedback("Memorize the word…", null);
 
-		console.log("Setting visible word to: " + this.state.currentWord);
+		// show word now (unblurred)
 		this._setWordVisible(this.state.currentWord);
 
 		let remain = displaySeconds;
@@ -193,12 +171,12 @@ class TypingMiniGame {
 			if (remain <= 0) clearInterval(showTicker);
 		}, 1000);
 
+		// after N seconds → hide/blur word and start typing
 		this.state.timers.showTimeout = setTimeout(() => {
 			this._setWordHidden(this.state.currentWord);
 			this._startRoundPhase();
 		}, displaySeconds * 1000);
 	}
-
 	_startRoundPhase() {
 		const roundSeconds = this.cfg.roundSeconds;
 
@@ -231,21 +209,15 @@ class TypingMiniGame {
 		if (!attempt) return;
 
 		if (attempt === target) {
+			// increment streak and show feedback
 			this.state.correctStreak += 1;
 			this._setText("tg-correct", this.state.correctStreak);
 			this._feedback("Correct!", true);
 			input.value = "";
 
-			if (this.state.correctStreak >= this.cfg.requiredCorrect) {
-				this._clearTimers();
-				ui.disable(["tg-input", "tg-submit"]);
-				ui.enable("tg-next");
-				ui.disable("tg-retry");
-				this._feedback(
-					"Nice! Streak achieved. Proceed to next word.",
-					true
-				);
-			}
+			// Immediately advance: show next word unblurred & ready to type
+			this._nextWordOrFinish();
+			return;
 		} else {
 			this.state.correctStreak = 0;
 			this._setText("tg-correct", 0);
@@ -260,13 +232,34 @@ class TypingMiniGame {
 			this._finishGame();
 			return;
 		}
+
 		this.state.currentWord = this.state.words[this.state.wordIndex];
+		this._setText("tg-word-idx", this.state.wordIndex + 1);
+
+		// clear timers from previous round
+		this._clearTimers();
+
+		// reset streak display
+		this.state.correctStreak = 0;
+		this._setText("tg-correct", 0);
+
+		// 👉 Start the standard show phase (unblur → wait displaySeconds → blur → round phase)
 		this._startShowPhase();
 	}
 
 	_retryWord() {
 		this._clearTimers();
 		this._startShowPhase();
+	}
+
+	_forceWordVisible() {
+		const el = this._el("tg-current-word");
+		if (!el) return;
+		el.classList.remove("tg-hidden", "hidden", "tg-blur");
+		el.style.filter = "";
+		el.style.visibility = "visible";
+		el.style.opacity = "1";
+		el.textContent = this.state.currentWord;
 	}
 
 	_finishGame() {
@@ -354,9 +347,7 @@ class TypingMiniGame {
 			visible = ui.getVisibilityById(id);
 		} catch (e) {
 			// fallback: basic check
-			visible = !(
-				el.style.display === "none" || el.style.visibility === "hidden"
-			);
+			visible = !(el.style.display === "none" || el.style.visibility === "hidden");
 		}
 		return notDisabled && visible;
 	}
