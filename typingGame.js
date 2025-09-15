@@ -40,6 +40,9 @@ class TypingMiniGame {
 			retry: this._onRetryClick.bind(this),
 			globalEnter: this._onGlobalEnter.bind(this), // NEW
 		};
+
+		console.log('Constructed instance of type attack mini game');
+		console.log(this);
 	}
 
 	// ---------- Public ----------
@@ -180,6 +183,7 @@ class TypingMiniGame {
 		this._setText("tg-correct", 0);
 		this._feedback("Memorize the word…", null);
 
+		console.log("Setting visible word to: " + this.state.currentWord);
 		this._setWordVisible(this.state.currentWord);
 
 		let remain = displaySeconds;

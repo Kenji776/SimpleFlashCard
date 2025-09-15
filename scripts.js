@@ -1845,7 +1845,8 @@ function launchTypingGame() {
 	console.log('Launching Type Attack!')
 	typeAttackModal.showModal();
 
-	const typingGameWords = cards.map((obj) => obj.genericName);
+
+	const typingGameWords = cards.map((obj) => obj[config.defaultAnswer]);
 
 	typingGame.start(typingGameWords, {
 		displaySeconds: 4,   // N seconds to memorize
