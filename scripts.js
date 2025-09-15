@@ -1177,7 +1177,7 @@ function incorrectAnswerAlert(){
 function generateMnemonic(){
     console.log('Calling Chat GPT!');
     console.log(currentCard);
-    let question = 'Please give me a Mnemonic Device to remember the pharmacy drug brand name ' + currentCard.brandName + ' that has a generic name of ' + currentCard.genericName + ' that is of the class ' + currentCard.drugClassName + '. Please keep the description breif and only reply in plain text, do not use emoji or formatting of any kind';
+    let question = 'Please give me a Mnemonic Device to remember the pairing of ' +currentCard[config.defaultPrompt] + ' to ' + currentCard[config.defaultAnswer] + ' Please keep the description breif and only reply in plain text, do not use emoji or formatting of any kind';
     if (mascot) mascot.askQuestion(question);
 
 
@@ -1445,7 +1445,7 @@ function showNextAnswer(){
 function answerCorrect(event){
     doLog(currentCard);
     let pointsMod = currentCard.points ? currentCard.points : 1;
-    recordQuestionResponse(currentCard,currentCard.genericName,currentCard.genericName,pointsMod);
+    recordQuestionResponse(currentCard, currentCard[config.defaultPrompt], currentCard[config.defaultPrompt], pointsMod);
     updateUIWithPerformanceData(performance);
 
     doLog('Current score info');
@@ -1456,7 +1456,7 @@ function answerCorrect(event){
 
 function answerIncorrect(event){
     doLog(currentCard);
-    recordQuestionResponse(currentCard,currentCard.genericName,'miss',0);
+    recordQuestionResponse(currentCard, currentCard[config.defaultPrompt], "miss", 0);
     updateUIWithPerformanceData(performance);
 
     doLog('Current score info');
