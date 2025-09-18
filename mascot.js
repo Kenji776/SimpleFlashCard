@@ -1311,7 +1311,6 @@ const Mascot = class {
 
 		this._throwPointerId = e.pointerId;
 		this.container.setPointerCapture?.(e.pointerId);
-		this.container.style.cursor = "grabbing";
 
 		window.addEventListener("pointermove", this._onPointerMoveMain, { passive: true });
 		window.addEventListener("pointerup", this._onPointerUpMain, { passive: true });
@@ -1358,7 +1357,6 @@ const Mascot = class {
 		window.removeEventListener("pointermove", this._onPointerMoveMain);
 		window.removeEventListener("pointerup", this._onPointerUpMain);
 		window.removeEventListener("pointercancel", this._onPointerUpMain);
-		this.container.style.cursor = "grab";
 
 		const now = this._now();
 		const elapsed = now - this._pointerDownAt;
@@ -1419,7 +1417,6 @@ const Mascot = class {
 		this._dragging = true;
 		this._throwPointerId = e.pointerId;
 		this.container.setPointerCapture?.(e.pointerId);
-		this.container.style.cursor = "grabbing";
 
 		// zero out motion
 		this._vel.x = 0;
@@ -1470,7 +1467,6 @@ const Mascot = class {
 		this._dragging = false;
 		this._throwPointerId = null;
 		this.container.releasePointerCapture?.(e.pointerId);
-		this.container.style.cursor = "grab";
 
 		window.removeEventListener("pointermove", this._onPointerMove);
 		window.removeEventListener("pointerup", this._onPointerUp);
