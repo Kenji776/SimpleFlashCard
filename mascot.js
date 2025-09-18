@@ -1,6 +1,5 @@
 const Mascot = class {
 	// --- Config / state ---
-	rootServerUrl = "";
 	name = "Default Mascot";
 	containerName = "mascot-container";
 	defaultMascotClass = "happy";
@@ -146,8 +145,9 @@ const Mascot = class {
 	_painCooldownMs = 900; // min time between pain lines
 
 	// ---- TTS cache ----
-	ttsCache = new Map(); // key -> { url, voice_id, text, lastUsed, bytes }
-	ttsCacheMaxEntries = 50; // LRU cap; tune for your app
+	ttsCache = new Map(); // key -> { voice_id, text, blob, type, lastUsed }
+	ttsCacheMaxEntries = 40;
+	currentTTSAudio = null;
 	// ---- IndexedDB persistence for TTS ----
 	_ttsDB = null;
 
@@ -175,7 +175,7 @@ const Mascot = class {
 			}
 
 			console.log("New instance of Mascot class initiated.");
-			this.initMascot();
+			//this.initMascot();
 			console.log(this);
 		} catch (ex) {
 			console.log(ex);
@@ -200,7 +200,7 @@ const Mascot = class {
 		this.createHealthBar();
 		this.enableThrowPhysics(); // NEW: makes the mascot draggable + throwable
 		this.preloadSpeech(this.words.pain);
-		this.startOffscreenWatcher();  // NEW
+		this.startOffscreenWatcher(); // NEW
 	}
 
 	async askQuestion(questionString) {
@@ -210,9 +210,6 @@ const Mascot = class {
 		this.say("Alright.... gimme a second....");
 
 		let chatGPTResponse = await this.apiClient.chat(questionString);
-
-		console.log(chatGPTResponse);
-
 		setTimeout(
 			function(scope) {
 				scope.setMood("happy");
@@ -589,7 +586,6 @@ const Mascot = class {
 		}
 	}
 	_ttsNormalizeText(text) {
-		// strip HTML + collapse whitespace so caching is robust across same content
 		const plain = String(text).replace(/<[^>]*>/g, " ");
 		return plain.replace(/\s+/g, " ").trim();
 	}
@@ -597,53 +593,10 @@ const Mascot = class {
 		return `${voice_id}::${this._ttsNormalizeText(text)}`;
 	}
 	_ttsTouch(key) {
-		const entry = this.ttsCache.get(key);
-		if (entry) entry.lastUsed = performance.now();
+		const e = this.ttsCache.get(key);
+		if (e) e.lastUsed = this._now();
 	}
-	async _ttsInsertPersistent(key, entry) {
-		// LRU eviction (same as before)
-		if (!this.ttsCache.has(key) && this.ttsCache.size >= this.ttsCacheMaxEntries) {
-			let oldestKey = null,
-				oldestTs = Infinity;
-			for (const [k, v] of this.ttsCache.entries()) {
-				if (v.lastUsed < oldestTs) {
-					oldestTs = v.lastUsed;
-					oldestKey = k;
-				}
-			}
-			if (oldestKey) {
-				try {
-					URL.revokeObjectURL(this.ttsCache.get(oldestKey).url);
-				} catch {}
-				this.ttsCache.delete(oldestKey);
-				// also evict from DB
-				this._dbDelete(oldestKey).catch(() => {});
-			}
-		}
-		entry.lastUsed = performance.now();
-		this.ttsCache.set(key, entry);
-
-		// Persist Blob too (reconstruct Blob from object URL if needed)
-		try {
-			let blob = entry.blob;
-			if (!blob && entry.url) {
-				const res = await fetch(entry.url);
-				blob = await res.blob();
-			}
-			await this._dbSet({ key, voice_id: entry.voice_id, text: entry.text, blob });
-		} catch (e) {
-			console.warn("TTS DB persist failed:", e);
-		}
-	}
-
-	clearTtsCache() {
-		for (const v of this.ttsCache.values()) {
-			try {
-				URL.revokeObjectURL(v.url);
-			} catch {}
-		}
-		this.ttsCache.clear();
-	}
+	// --- LRU insert + persist (stores Blob + type; no object URLs) ---
 
 	stopTTS() {
 		try {
@@ -721,61 +674,221 @@ const Mascot = class {
 		}
 	}
 
-	async tts(speechText, voice_id, interruptable = true, bubbleId = null) {
-		// If something is already playing:
-		if (this.currentTTSAudio) {
-			if (this.currentTTSInterruptible) this.stopTTS();
-			else {
-				console.warn("Existing uninterruptible TTS is playing; ignoring new TTS.");
+	async tts(text, voice_id, interruptable = true, speechBubbleId = null) {
+		const normText = this._ttsNormalizeText(text);
+		const key = this._ttsKey(normText, voice_id);
+
+		// Try memory cache
+		let cached = this.ttsCache.get(key);
+
+		// Try DB
+		if (!cached) {
+			try {
+				const rec = await this._dbGet?.(key);
+				if (rec?.blob instanceof Blob) {
+					cached = {
+						voice_id: rec.voice_id || voice_id,
+						text: normText,
+						blob: rec.blob,
+						type: rec.type || rec.blob.type || "audio/mpeg",
+						lastUsed: this._now(),
+					};
+					this.ttsCache.set(key, cached);
+				}
+			} catch (e) {
+				console.debug("TTS DB get miss/error:", e);
+			}
+		}
+
+		// Fetch from server if needed
+		if (!cached) {
+			console.log("Trying to fetch audio from root server: " + this.apiClient.baseUrl);
+			const url = `${this.apiClient.baseUrl}/api/text-to-speech`;
+			const res = await fetch(url, {
+				method: "POST",
+				headers: { "content-type": "application/json" },
+				body: JSON.stringify({ text: normText, voiceId: voice_id }),
+			});
+			if (!res.ok) {
+				console.error("TTS fetch failed:", res.status, await res.text().catch(() => ""));
 				return;
 			}
+			const ct = res.headers.get("content-type") || "";
+			const ab = await res.arrayBuffer();
+			const blob = new Blob([ab], { type: ct || "audio/mpeg" });
+
+			if (!(await this.validateAudioBlob(blob))) {
+				console.warn("TTS blob invalid after fetch; aborting playback", { size: blob.size, type: blob.type });
+				return;
+			}
+
+			cached = { voice_id, text: normText, blob, type: blob.type, lastUsed: this._now() };
+			await this._ttsInsertPersistent(key, cached);
+		} else {
+			this._ttsTouch(key);
 		}
 
-		const norm = this._ttsNormalizeText(speechText);
-		const vid = voice_id || this.TTS.voice_id;
-		const key = this._ttsKey(norm, vid);
+		// Interrupt if requested
+		if (interruptable && this.currentTTSAudio) {
+			try {
+				this.currentTTSAudio.pause();
+			} catch {}
+			try {
+				this.currentTTSAudio.src = "";
+			} catch {}
+			this.currentTTSAudio = null;
+		}
 
-		let audioUrl = null;
-		let fromCache = false;
+		console.debug("[TTS] about to play", { key, size: cached.blob.size, type: cached.type });
 
-		// 1) Try cache
+		// Final pre-play guard to avoid the "index.html" situation:
+		if (!(cached.blob instanceof Blob) || cached.blob.size === 0) {
+			console.error("[TTS] Refusing to play: invalid blob at final gate", { hasBlob: !!cached.blob, size: cached.blob?.size });
+			return;
+		}
 
-		const cached = this.ttsCache.get(key);
-		if (cached) {
-			fromCache = true;
-			this._ttsTouch(key);
-			audioUrl = cached.url;
-		} else {
-			// 2) IndexedDB
-			const rec = await this._dbGet(key);
-			if (rec?.blob) {
-				const url = URL.createObjectURL(rec.blob);
-				await this._ttsInsertPersistent(key, { url, voice_id: vid, text: norm, bytes: rec.blob.size, blob: rec.blob });
-				audioUrl = url;
-				fromCache = true;
-			} else {
-				// 3) Network
-				const audioData = await this.apiClient.textToSpeech({ text: norm, voiceId: vid });
-				const audioBlob = new Blob([audioData], { type: "audio/mpeg" });
-				audioUrl = URL.createObjectURL(audioBlob);
-				await this._ttsInsertPersistent(key, { url: audioUrl, voice_id: vid, text: norm, bytes: audioBlob.size, blob: audioBlob });
-				fromCache = true;
+		this.currentTTSAudio = await this._playBlob(cached.blob, {
+			onEnd: (status) => {
+				// status can be undefined, 'error', 'invalid-blob', 'bad-currentSrc', etc.
+				if (status && status !== "error") {
+					console.debug("[TTS] onEnd status:", status);
+				}
+				this.stopTTS?.();
+				this.currentTTSAudio = null;
+			},
+		});
+	}
+
+	async _ttsInsertPersistent(key, entry) {
+		// Evict if needed
+		if (!this.ttsCache.has(key) && this.ttsCache.size >= this.ttsCacheMaxEntries) {
+			let oldestKey = null,
+				oldestTs = Infinity;
+			for (const [k, v] of this.ttsCache.entries()) {
+				if (v.lastUsed < oldestTs) {
+					oldestTs = v.lastUsed;
+					oldestKey = k;
+				}
+			}
+			if (oldestKey) {
+				this.ttsCache.delete(oldestKey);
+				try {
+					await this._dbDelete?.(oldestKey);
+				} catch {}
 			}
 		}
 
-		// Create audio + track it
-		const audio = new Audio(audioUrl);
-		this.currentTTSAudio = audio;
-		this.currentTTSUrl = audioUrl;
-		this.currentTTSEphemeral = !fromCache ? true : false; // if it's in cache, do NOT revoke in stop
-		this.currentTTSInterruptible = !!interruptable;
-		this.currentSpeechBubbleId = bubbleId || this.currentSpeechBubbleId;
+		const { blob } = entry;
+		if (!(blob instanceof Blob) || blob.size === 0) {
+			throw new Error("Refusing to cache invalid/empty blob");
+		}
+		if (!(await this.validateAudioBlob(blob))) {
+			throw new Error("Refusing to cache undecodable blob");
+		}
 
-		audio.addEventListener("ended", () => this.stopTTS());
-		audio.play().catch((err) => {
-			console.error("TTS play() failed:", err);
-			this.stopTTS();
+		const type = entry.type || blob.type || "audio/mpeg";
+		const normalized = { voice_id: entry.voice_id, text: entry.text, blob, type, lastUsed: this._now() };
+		this.ttsCache.set(key, normalized);
+
+		try {
+			await this._dbSet?.({ key, voice_id: entry.voice_id, text: entry.text, blob, type });
+		} catch (e) {
+			console.warn("TTS DB persist failed:", e);
+		}
+	}
+	// --- Safe audio playback with per-play object URL + cleanup ---
+	async _playBlob(blob, { onEnd } = {}) {
+		// Hard guards: don’t even create <audio> if blob is bad
+		if (!(blob instanceof Blob) || blob.size === 0) {
+			console.error("[TTS] _playBlob called with invalid blob", { hasBlob: !!blob, size: blob?.size });
+			onEnd?.("invalid-blob");
+			return null;
+		}
+
+		const audio = new Audio();
+
+		// Add listeners BEFORE we set src so we can capture early errors
+		const onError = () => {
+			// Log BEFORE cleanup so we see true currentSrc
+			this.logAudioState(audio, "error");
+			cleanup();
+			onEnd?.("error");
+		};
+		const onEnded = () => {
+			cleanup();
+			onEnd?.();
+		};
+
+		audio.addEventListener("error", onError);
+		audio.addEventListener("stalled", () => this.logAudioState(audio, "stalled"));
+		audio.addEventListener("abort", () => this.logAudioState(audio, "abort"));
+		audio.addEventListener("loadedmetadata", () => this.logAudioState(audio, "loadedmetadata"));
+		audio.addEventListener("canplaythrough", () => this.logAudioState(audio, "canplaythrough"));
+		audio.addEventListener("ended", onEnded);
+
+		let url;
+		try {
+			url = URL.createObjectURL(blob);
+		} catch (e) {
+			console.error("[TTS] createObjectURL failed", e);
+			onEnd?.("createObjectURL-failed");
+			return null;
+		}
+
+		const cleanup = () => {
+			try {
+				audio.pause();
+			} catch {}
+			// IMPORTANT: blank src AFTER we’re done logging
+			try {
+				audio.src = "";
+			} catch {}
+			try {
+				URL.revokeObjectURL(url);
+			} catch {}
+			audio.removeEventListener("error", onError);
+			audio.removeEventListener("ended", onEnded);
+			audio.remove();
+		};
+
+		audio.src = url;
+
+		// Sanity check: ensure currentSrc is blob: (not index.html)
+		// Some environments can reflect empty src as the document URL.
+		await new Promise((res) => setTimeout(res, 0)); // microtick flush
+		if (!(audio.currentSrc && audio.currentSrc.startsWith("blob:"))) {
+			this.logAudioState(audio, "bad-currentSrc", { note: "expected a blob: URL" });
+			cleanup();
+			onEnd?.("bad-currentSrc");
+			return null;
+		}
+
+		// Optional: small readiness wait (bounded)
+		await new Promise((res) => {
+			let done = false;
+			const finish = () => {
+				if (!done) {
+					done = true;
+					res();
+				}
+			};
+			audio.addEventListener("canplaythrough", finish, { once: true });
+			audio.addEventListener("loadedmetadata", finish, { once: true });
+			setTimeout(finish, 300);
 		});
+
+		try {
+			await audio.play();
+		} catch (err) {
+			// Log BEFORE cleanup to see real currentSrc (avoid blanking src first)
+			console.error("TTS play() failed:", err);
+			this.logAudioState(audio, "play-catch");
+			cleanup();
+			onEnd?.("playfail");
+			return null;
+		}
+
+		return audio;
 	}
 
 	removeSpeechBubble(bubbleId, speechDelay) {
@@ -888,13 +1001,10 @@ const Mascot = class {
 			return null;
 		}
 		const basePath = `${this.apiClient.baseUrl}/mascot-media/${this.name}/${folderName}/${fileName}`;
-		return this.apiClient.baseUrl ? `${this.rootServerUrl}${basePath}` : basePath;
+		return basePath;
 	}
 
 	setMascotImage(imageName) {
-		console.log("Trying to get image from node proxy url");
-		console.log(imageName);
-
 		const imageUrl = this.buildMascotMediaUrl(imageName, "img");
 		this.mascotDiv.style.backgroundImage = `url(${imageUrl})`;
 	}
@@ -1063,7 +1173,7 @@ const Mascot = class {
 
 		ui.hideElements([this.container]);
 
-		this.stopOffscreenWatcher();   // NEW
+		this.stopOffscreenWatcher(); // NEW
 	}
 
 	activate() {
@@ -1119,7 +1229,7 @@ const Mascot = class {
 		if (this.container) {
 			this.container.innerHTML = "";
 		}
-		 this.stopOffscreenWatcher();   // NEW
+		this.stopOffscreenWatcher(); // NEW
 	}
 
 	enableThrowPhysics() {
@@ -1129,20 +1239,46 @@ const Mascot = class {
 			this._origin = { x: this._pos.x, y: this._pos.y };
 			this._originCaptured = true;
 		}
-		// Put container into fixed viewport positioning so throwing uses screen coords
-		const rect = this.container.getBoundingClientRect();
-		/*
-		this.container.style.position = "fixed";
-		this.container.style.left = `${Math.max(0, rect.left)}px`;
-		this.container.style.top = `${Math.max(0, rect.top)}px`;
-		this.container.style.right = "";
-		this.container.style.bottom = "";
-		this.container.style.width = `${this._size.w || rect.width}px`;
-		this.container.style.height = `${this._size.h || rect.height}px`;
-		this.container.style.cursor = "grab";
-		this.container.style.willChange = "transform,left,top";
-		*/
 
+		// Viewport-based coordinates + fixed positioning
+		const el = this.container;
+		const rect = el.getBoundingClientRect();
+
+		// If any ancestor is transformed, a "fixed" element can get a weird containing block.
+		// Move the node to <body> first so it truly uses the viewport as its reference.
+		const hasTransformedAncestor = (node) => {
+			for (let n = node.parentElement; n && n !== document.body; n = n.parentElement) {
+				const cs = getComputedStyle(n);
+				if (cs.transform !== "none" || cs.perspective !== "none" || cs.filter !== "none") return true;
+			}
+			return false;
+		};
+
+		if (hasTransformedAncestor(el) && el.parentNode !== document.body) {
+			// (optional) keep a placeholder if you ever want to put it back
+			this._viewportPlaceholder ??= document.createComment("mascot-placeholder");
+			el.parentNode.insertBefore(this._viewportPlaceholder, el);
+			document.body.appendChild(el);
+		}
+
+		// Promote to fixed so left/top are viewport coords
+		const cs = getComputedStyle(el);
+		if (cs.position !== "fixed") {
+			el.style.position = "fixed";
+		}
+
+		// Set size so layout doesn’t jump when we change positioning
+		el.style.width = `${this._size?.w || rect.width}px`;
+		el.style.height = `${this._size?.h || rect.height}px`;
+
+		// Left/top in **viewport** pixels
+		el.style.left = `${rect.left}px`;
+		el.style.top = `${rect.top}px`;
+		el.style.right = "";
+		el.style.bottom = "";
+		el.style.willChange = "transform,left,top";
+
+		// Store physics position in viewport coords
 		this._pos.x = rect.left;
 		this._pos.y = rect.top;
 
@@ -1161,7 +1297,7 @@ const Mascot = class {
 		if (this._dragging || this._dragCandidate) return;
 
 		this._dragCandidate = true;
-		this._pointerDownAt = performance.now();
+		this._pointerDownAt = this._now();
 		this._downX = e.clientX;
 		this._downY = e.clientY;
 
@@ -1171,7 +1307,7 @@ const Mascot = class {
 		this._dragOffsetY = e.clientY - rect.top;
 
 		this._samples.length = 0;
-		this._samples.push({ t: performance.now(), x: e.clientX, y: e.clientY });
+		this._samples.push({ t: this._now(), x: e.clientX, y: e.clientY });
 
 		this._throwPointerId = e.pointerId;
 		this.container.setPointerCapture?.(e.pointerId);
@@ -1184,7 +1320,7 @@ const Mascot = class {
 
 	_pointerMove(e) {
 		if (e.pointerId !== this._throwPointerId) return;
-		const now = performance.now();
+		const now = this._now();
 
 		// sample for velocity + potential spin estimation
 		this._samples.push({ t: now, x: e.clientX, y: e.clientY });
@@ -1224,7 +1360,7 @@ const Mascot = class {
 		window.removeEventListener("pointercancel", this._onPointerUpMain);
 		this.container.style.cursor = "grab";
 
-		const now = performance.now();
+		const now = this._now();
 		const elapsed = now - this._pointerDownAt;
 		const moved = Math.hypot((e.clientX ?? this._downX) - this._downX, (e.clientY ?? this._downY) - this._downY);
 
@@ -1272,7 +1408,7 @@ const Mascot = class {
 	}
 
 	_startPhysics() {
-		this._lastPhysicsT = performance.now();
+		this._lastPhysicsT = this._now();
 		if (!this._throwRAF) this._throwRAF = requestAnimationFrame((t) => this._physicsStep(t));
 	}
 
@@ -1319,7 +1455,7 @@ const Mascot = class {
 		this._applyPos();
 
 		// sample recent movement for velocity estimate
-		const now = performance.now();
+		const now = this._now();
 		this._samples.push({ t: now, x: e.clientX, y: e.clientY });
 
 		// keep ~120ms of history
@@ -1352,7 +1488,7 @@ const Mascot = class {
 		}
 
 		// Start physics loop
-		this._lastPhysicsT = performance.now();
+		this._lastPhysicsT = this._now();
 		if (!this._throwRAF) this._throwRAF = requestAnimationFrame((t) => this._physicsStep(t));
 	}
 
@@ -1405,11 +1541,11 @@ const Mascot = class {
 			const vBefore = Math.abs(this._vel.x);
 			this._pos.x = W - this._size.w;
 			this._vel.x *= -this._restitution;
-			// add a bit of torque from horizontal smack
 			this._angVel += (Math.sign(this._vel.y) || 1) * (vBefore * 0.002);
 			impacted = true;
 			impactSpeed = Math.max(impactSpeed, vBefore);
 		}
+		// now 0..W and 0..H match your left/top coordinates
 		// Left wall
 		if (this._pos.x < 0) {
 			const vBefore = Math.abs(this._vel.x);
@@ -1446,7 +1582,7 @@ const Mascot = class {
 	}
 	_playImpactHit(impactSpeed = 0) {
 		if (!this.isActive || this.mute) return;
-		const now = performance.now();
+		const now = this._now();
 		if (now - this._lastImpactSfx < this._impactSfxCooldownMs) return; // debounce
 		this._lastImpactSfx = now;
 
@@ -1477,7 +1613,7 @@ const Mascot = class {
 
 	emitPain(impactSpeed = 0) {
 		if (!this.isActive || this._exploded) return;
-		const now = performance.now();
+		const now = this._now();
 		if (now - this._lastPainAt < this._painCooldownMs) return;
 		this._lastPainAt = now;
 
@@ -1577,22 +1713,26 @@ const Mascot = class {
 		const W = window.innerWidth;
 		const H = window.innerHeight;
 		const m = this._offscreenMargin;
-		const x = this._pos.x, y = this._pos.y;
-		const w = this._size.w, h = this._size.h;
+		const x = this._pos.x,
+			y = this._pos.y;
+		const w = this._size.w,
+			h = this._size.h;
 
 		// fully (or well) outside the viewport + margin?
-		const tooLeft   = (x + w) < -m;
-		const tooRight  = x > (W + m);
-		const tooAbove  = (y + h) < -m;
-		const tooBelow  = y > (H + m);
+		const tooLeft = x + w < -m;
+		const tooRight = x > W + m;
+		const tooAbove = y + h < -m;
+		const tooBelow = y > H + m;
 
-		return (tooLeft || tooRight || tooAbove || tooBelow);
+		return tooLeft || tooRight || tooAbove || tooBelow;
 	}
 
 	_resetToOrigin(animated = true) {
 		// kill motion
-		this._vel.x = 0; this._vel.y = 0;
-		this._angVel = 0; this._angle = 0;
+		this._vel.x = 0;
+		this._vel.y = 0;
+		this._angVel = 0;
+		this._angle = 0;
 
 		// snap back
 		this._pos.x = this._origin.x;
@@ -1607,9 +1747,59 @@ const Mascot = class {
 
 		// make sure physics loop isn’t stuck sleeping mid-air
 		if (!this._throwRAF) {
-			this._lastPhysicsT = performance.now();
+			this._lastPhysicsT = this._now();
 			this._throwRAF = requestAnimationFrame((t) => this._physicsStep(t));
 		}
+	}
+
+	// --- Safe time source (monotonic when available) ---
+	_now() {
+		try {
+			const p = globalThis && globalThis.performance;
+			if (p && typeof p.now === "function") return p.now();
+		} catch (_) {}
+		return Date.now(); // fallback; OK since we only compare within-session
+	}
+	async validateAudioBlob(blob) {
+		if (!(blob instanceof Blob)) return false;
+		if (blob.size < 128) return false;
+		try {
+			const AC = window.AudioContext || window.webkitAudioContext;
+			if (!AC) return true; // can’t validate, assume okay
+			const ac = new AC();
+			const buf = await blob.arrayBuffer();
+			await new Promise((res, rej) => {
+				const done = (b) => {
+					try {
+						ac.close();
+					} catch {}
+					res(b);
+				};
+				const fail = (e) => {
+					try {
+						ac.close();
+					} catch {}
+					rej(e);
+				};
+				const p = ac.decodeAudioData(buf.slice(0), done, fail);
+				if (p && typeof p.then === "function") p.then(done).catch(fail);
+			});
+			return true;
+		} catch {
+			return false;
+		}
+	}
+
+	// --- Debug helpers ---
+	logAudioState(audio, where) {
+		const err = audio.error;
+		console.debug(`[TTS][${where}]`, {
+			src: audio?.src,
+			readyState: audio?.readyState,
+			networkState: audio?.networkState,
+			errCode: err?.code,
+			errMsg: err?.message,
+		});
 	}
 };
 

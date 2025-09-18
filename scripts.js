@@ -411,9 +411,6 @@ async function loadSelectedMascot() {
 	try {
         const mascotData = await flashCardClient.getMascotSettings(selectedFile);
         if (mascot) mascot.destroy();
-
-		flashCardClient.textToSpeech('test');
-
         mascot = new Mascot(mascotData, flashCardClient);
         console.log("✅ Loaded mascot data", mascot);
         mascot.initMascot();
@@ -565,6 +562,9 @@ function setVariantDeckOptions(){
 function setSelectedDeckCategory(categoryId) {
 	if (categoryId) {
 		selectedDeckCategory = categoryId;
+
+        console.log('Getting decks for category: ' + categoryId);
+        console.log(cardLibrary);
 		setDeckOptions(
 			cardLibrary.card_stacks.categories[selectedDeckCategory],
 			"card-deck"
