@@ -1014,9 +1014,10 @@ function loadCard(cardId, forceIndex){
         
         
         document.getElementById("clue-text").innerHTML=currentCard[config.clueTextKey];
-
+        document.getElementById("clue-text-no-mascot").innerHTML = currentCard[config.clueTextKey];
         //document.getElementById('answer').style.visibility='hidden';
         document.getElementById('clue-text').style.visibility='hidden';
+        document.getElementById("clue-text-no-mascot").style.visibility = "hidden";
         document.getElementById('hint-text').style.visibility='hidden';
 
         document.getElementById("viewed-total").innerHTML = `${viewedCards.length} / ${cards.length}`;
@@ -1354,7 +1355,7 @@ function loadPrev(){
 }
 
 function showAnswer(){
-    
+    clearClues();
     console.log(currentCard);
     if (currentCard && currentCard.id != null) {
         const answerCard = document.getElementById("answer-card");
@@ -1375,6 +1376,16 @@ function showAnswer(){
             back.style.visibility = "hidden";
         }
     }
+    
+}
+
+function clearClues(){
+    ["hint-text", "clue-text", "hint-text-no-mascot", "clue-text-no-mascot"].forEach((id) => {
+		const el = document.getElementById(id);
+		if (!el) return;
+		el.textContent = "";
+		el.style.visibility = "hidden";
+	});
 }
 
 function setRandom(){
@@ -1382,8 +1393,13 @@ function setRandom(){
 }
 
 function showClue() {
-    document.getElementById('clue-text').style.visibility='visible';
-    if(mascot) mascot.say(document.getElementById('clue-text').innerHTML,'happy');
+    if (mascot){
+        document.getElementById("clue-text").style.visibility = "visible";
+        mascot.say(document.getElementById("clue-text").innerHTML, "happy");
+    }else{
+        document.getElementById("clue-text-no-mascot").style.visibility = "visible";
+		        
+    }
     
 }
 
@@ -1397,10 +1413,16 @@ function showNextHintLetter(){
     performance.lettersShown++;
     hintIndex++;
     var hintText = currentAnswer.substring(0, hintIndex);
-    document.getElementById("hint-text").innerHTML=hintText;
-    document.getElementById('hint-text').style.visibility='visible';   
+    if (mascot) {
+        document.getElementById("hint-text").innerHTML = hintText;
+        document.getElementById('hint-text').style.visibility='visible';   
     
-    if (mascot) mascot.say(hintText, "happy");
+        mascot.say(hintText, "happy");
+    }else{
+        document.getElementById("hint-text-no-mascot").innerHTML = hintText;
+        document.getElementById("hint-text-no-mascot").style.visibility = "visible";   
+        
+    }
 }
 
 function showNextAnswer(){
