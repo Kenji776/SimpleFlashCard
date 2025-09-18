@@ -330,8 +330,17 @@ function registerKeyboardShortcuts(){
 }
 
 function isAnyModalOpen() {
-	return !!document.querySelector('.modal.show, .modal[aria-hidden="false"]');
+	const isVisible = (el) => {
+		if (!el || el.hidden || el.getAttribute("aria-hidden") === "true") return false;
+		const cs = window.getComputedStyle(el);
+		if (cs.display === "none" || cs.visibility === "hidden" || cs.visibility === "collapse") return false;
+		// Has on-screen box (works for position:fixed too)
+		return el.getClientRects().length > 0;
+	};
+
+	return Array.from(document.querySelectorAll("div.modal")).some(isVisible);
 }
+
 
 function savePerformance(){
     if(!performance || !performance.hasOwnProperty('deckId') || !performance.deckId.length === 0) {
@@ -525,6 +534,10 @@ async function loadMascotOptions() {
 		option.textContent = fileName;
 		select.appendChild(option);
 	});
+
+    if(data.mascots && data.mascots.length > 0){
+        loadSelectedMascot();
+    }
 }
 
 function setVariantDeckOptions(){

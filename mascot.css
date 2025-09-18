@@ -23,12 +23,12 @@
 }
 
 /* Hover: ready */
-.mascot-container .mascot-image:hover{
+.mascot-container:hover{
   cursor: url("media/punch_1.png") 16 16, pointer;
 }
 
 /* Clicked state: swap cursor + immediate shove */
-.mascot-container .mascot-image:active{
+.mascot-container:active{
   cursor: url("media/punch_2.png") 16 16, grabbing;
   filter: contrast(1.15) brightness(1.05);
 }
