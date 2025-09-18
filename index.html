@@ -29,30 +29,30 @@
 
 
 <body>
-    <div class="container">
+	<div class="container">
 		<!---->
-        <div class="header panel center" >
-            <span class="header-text" id="content-header">Flash Cards.lol (V.3)!</span>
-        </div>    
+		<div class="header panel center" >
+			<span class="header-text" id="content-header">Flash Cards.lol (V.3)!</span>
+		</div>    
 
-        <div class="settings panel">
+		<div class="settings panel">
 			<div class="spacer"></div>
 
-            
-                
-            <div class="connected-options">
+			
+				
+			<div class="connected-options">
 				<span class="sub-header-text">Select Deck</span>
 				<div>
 					<label for="deck-category">Category</label><br/>
-                    <select name="deck-category" id="deck-category" onchange="setSelectedDeckCategory(this.value)">
-                        <option value="none" selected>Select A Category</option>
-                    </select>
+					<select name="deck-category" id="deck-category" onchange="setSelectedDeckCategory(this.value)">
+						<option value="none" selected>Select A Category</option>
+					</select>
 				</div>
-                <div>
-                    <label for="card-deck">Card Deck:</label><br/>
-                    <select name="card-deck" id="card-deck" onchange="handleSetSelectedDeck(this.value)" disabled="disabled">
-                        <option value="none" selected>Select A Card Deck</option>
-                    </select>
+				<div>
+					<label for="card-deck">Card Deck:</label><br/>
+					<select name="card-deck" id="card-deck" onchange="handleSetSelectedDeck(this.value)" disabled="disabled">
+						<option value="none" selected>Select A Card Deck</option>
+					</select>
 					<!-- local file deck upload-->
 					<input
 						type="file"
@@ -63,10 +63,10 @@
 					<input type="button" onclick="handleLoadDeckSelect()" value="Load Deck" title="Load Deck" disabled="disabled" id="load-deck-button"/>
 					<input type="button" onclick="handleShowHighScores()" value="High Scores" title="High Scores" id="high-scores-button" disabled="disabled"/>
 					<input type="button" onclick="launchTypingGame()" value="Type Attack!" title="Type Attack!" disabled="disabled" id="type-attack-button"/>
-                </div>
+				</div>
 
 
-            </div>
+			</div>
 			
 			<div style="clear:both"></div>
 
@@ -75,9 +75,9 @@
 				<input type="button" onclick="deckUploadModal.showModal()" value="Upload Deck" title="Upload Deck"/>
 			</div>
  
-        </div>
+		</div>
 
-        <div class="panel no-background" >
+		<div class="panel no-background" >
 			<div class="score panel" id="score-panel">
 				<div id="score" class="sub-header" >
 					<span class="sub-header-text">Score </span>
@@ -172,19 +172,19 @@
 				<div id="history-items"></div>
 			</div>
 	
-        </div>
+		</div>
 
-        <div class="footer center panel"> 
+		<div class="footer center panel"> 
 			Like this application? Consider donating to support it. Venmo: @Kenji776 | Square Cash: $Kenji776 | PayPal: <a href="https://www.paypal.com/donate?token=Az8L4GSlpcVGyj2FK-aXnXAVv7PXMS6YoALVc-3KJf-6GhakssojaEHhE1ukx_RRdqVSRYvEszDLgFE0" target="_blank">Donate</a>
 	
 			<div>
 				It's open source too! <a href="https://github.com/Kenji776/SimpleFlashCard">Github Repo</a> Also you can <a href="https://drug-cards.kenji776-labs.org/" target="_blank">Generate a new deck from a PDF</a>
 			</div>
-        </div>
+		</div>
 
-        <div class="content panel" id="center-view">   
-            <div class="flip-card" id="answer-card">
-                <div class="flip-card-inner">
+		<div class="content panel" id="center-view">   
+			<div class="flip-card" id="answer-card">
+				<div class="flip-card-inner">
 					<div class="flip-card-front">
 						<div id="prompt">
 							<div id="load-deck-message" class="bounce">
@@ -219,9 +219,9 @@
 						
 					</div>
 					
-                </div>
+				</div>
 				<div class="mascot-container" id="mascot-container"></div> 
-            </div>
+			</div>
 			
 			
 			<div id="controls">
@@ -247,8 +247,8 @@
 
 				<div class="spacer"></div>
 			</div>
-        </div>
-    </div>
+		</div>
+	</div>
 	
 	<!-- Server connect modal -->
 	<div id="server-connect-modal" class="modal login-modal">
@@ -391,64 +391,89 @@
 			</div>
 		</div>
 	</div>
-	<!-- card details modal -->
+	<!-- type attack modal -->
 	<div id="type-attack-modal" class="modal">
-		  <!-- Modal content -->
-		  <div class="modal-content">
+		<!-- Modal content -->
+		<div class="modal-content">
 			<div class="modal-header">
-				<span class="close-modal-button modal-close">&times;</span>
-				<center><h2 class="inline pulse sub-header-text-2" id="card-details-title">Type Attack!</h2></center>
+			<span class="close-modal-button modal-close">&times;</span>
+			<center><h2 class="inline pulse sub-header-text-2" id="card-details-title">Type Attack!</h2></center>
 			</div>
-			
+
 			<div class="modal-body">
+				<!-- Mode selection -->
+				<div class="tg-row tg-mode-row" style="display:flex;gap:12px;align-items:center;margin-bottom:12px;">
+					<label for="tg-mode" class="tg-label" style="min-width:100px;">Game mode:</label>
+					<select id="tg-mode" class="tg-select" aria-describedby="tg-mode-explainer">
+						<option value="match" selected>Match</option>
+						<option value="answer">Answer</option>
+					</select>
+					<label class="tg-toggle" style="display:inline-flex;gap:8px;align-items:center;">
+						<input id="tg-shuffle" type="checkbox" checked />
+						<span>Shuffle word order</span>
+					</label>
+					<span id="tg-mode-explainer" class="tg-hint" style="opacity:0.85;">
+					Type exactly what you saw on screen.
+					</span>
+				</div>
+
 				<div id="typing-game-description" class="tg-description">
 					<p>
-						You will be shown a word for a few seconds. Try to memorize it!  
-						When the timer ends, the word will be hidden and you’ll need to type it correctly.  
-						To clear the round, you must type the word <strong>X</strong> times in a row within the allotted <strong>Y</strong> seconds.  
-						If you make a mistake, your streak resets to zero.  
-						Use the <em>Retry</em> button if time runs out, or <em>Next Word</em> once you’ve met the requirement.
+					You will be shown a word for <strong><span id="typing-seconds-displayed">a few</span> seconds</strong>. Try to memorize it!
+					When the timer ends, the word will be hidden and you’ll need to type it correctly.
+					To clear the round, you must type the word <strong><span id="typing-num-correct-required">X</span></strong>
+					times in a row within the allotted <strong><span id="typing-round-seconds">Y</span></strong> seconds.
+					If you make a mistake, your streak resets to zero.
+					Use the <em>Retry</em> button if time runs out, or <em>Next Word</em> once you’ve met the requirement.
 					</p>
+
+					<!-- Mode-specific mini guide -->
+					<div class="tg-mode-guides" aria-live="polite">
+					<div id="tg-guide-match" class="tg-guide">
+						<strong>Match mode:</strong> Type <em>exactly</em> the text shown (spelling and spacing must match).
+					</div>
+					<div id="tg-guide-answer" class="tg-guide" style="display:none;">
+						<strong>Answer mode:</strong> Type the <em>associated correct answer</em> (e.g., definition, translation, or paired term).
+					</div>
+					</div>
 				</div>
 
 				<div id="typing-game">
-				<div class="tg-row tg-top">
+					<div class="tg-row tg-top">
+					<div>Word <span id="tg-word-idx">0</span>/<span id="tg-word-total">0</span></div>
 					<div>
-					Word <span id="tg-word-idx">0</span>/<span id="tg-word-total">0</span>
+						<span>Show: <span id="tg-show-timer">-</span>s</span>
+						&nbsp;|&nbsp;
+						<span>Round: <span id="tg-round-timer">-</span>s</span>
 					</div>
-					<div>
-					<span>Show: <span id="tg-show-timer">-</span>s</span>
-					&nbsp;|&nbsp;
-					<span>Round: <span id="tg-round-timer">-</span>s</span>
 					</div>
-				</div>
 
-				<div class="tg-word" id="tg-current-word" aria-live="polite"></div>
+					<div class="tg-word" id="tg-current-word" aria-live="polite"></div>
 
-				<div class="tg-progress">
+					<div class="tg-progress">
 					Correct streak: <span id="tg-correct">0</span>/<span id="tg-required">0</span>
-				</div>
+					</div>
 
-				<div class="tg-input-row">
-					<input id="tg-input" type="text" class="tg-input" placeholder="Type the word…" disabled />
-					<button id="tg-submit" class="tg-btn" disabled>Submit</button>
-				</div>
+					<div class="tg-input-row">
+						<input id="tg-input" type="text" class="tg-input" placeholder="Type here…" disabled />
+						<button id="tg-submit" class="tg-btn" disabled>Submit</button>
+					</div>
 
-				<div id="tg-feedback" class="tg-feedback" aria-live="polite"></div>
+					<div id="tg-feedback" class="tg-feedback" aria-live="polite"></div>
 
-				<div class="tg-ctrls">
-					<button id="tg-start" class="tg-btn">Start</button>
-					<button id="tg-next" class="tg-btn" disabled>Next Word</button>
-					<button id="tg-retry" class="tg-btn" disabled>Retry</button>
+					<div class="tg-ctrls">
+						<button id="tg-start" class="tg-btn">Start</button>
+						<button id="tg-next" class="tg-btn" disabled>Next Word</button>
+						<button id="tg-retry" class="tg-btn" disabled>Retry</button>
+						<button id="tg-reset" class="tg-btn" disabled>Reset Game</button>
+					</div>
 				</div>
-				</div>
-
 			</div>
-			
+
 			<div class="modal-footer">
 				<h3></h3>
 			</div>
-		</div>	
+		</div>
 	</div>
 
 	<!-- options modal -->
@@ -503,7 +528,7 @@
 						</input>
 						<label for="toggleHistory">Hide History</label>
 					</div>
-        
+		
 					<div>
 						<input 
 							type="checkbox" 
@@ -616,7 +641,7 @@
 						<button onclick="loadMascotOptions()">Get Mascots</button>
 					</div>
 					
-                
+				
 					<!--
 						<br/>
 						<label for="answerKey">Answer:</label>

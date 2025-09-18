@@ -37,8 +37,7 @@ var storedScores = new LS(scoresName); //instance of LS (local storage) object
 let flashCardClient;
 const utils = new Utils();
 const template = new Template();
-const labels = new Labels();
-//const DeckUploader = new DeckUploader();
+let labels = new Labels();
 var serverPassword = "";
 
 var showLogs = false;
@@ -268,12 +267,6 @@ async function loadCardLibrary(){
     cardLibrary = result.data;
     setDeckCategories(cardLibrary, "deck-category");
     setDeckCategories(cardLibrary, "upload-existing-category");
-
-    console.log('Sending deck options');
-    console.log(cardLibrary);
-    console.log(selectedDeckCategory);
-    console.log(cardLibrary.card_stacks.categories[selectedDeckCategory]);
-    //if (selectedDeckCategory) setDeckOptions(cardLibrary.card_stacks.categories[selectedDeckCategory], 'card-deck');
 }
 
 async function sendScore() {
@@ -1846,12 +1839,18 @@ function launchTypingGame() {
 	typeAttackModal.showModal();
 
 
-	const typingGameWords = cards.map((obj) => obj[config.defaultAnswer]);
+    const prompts = cards.map((obj) => obj[config.defaultPrompt]);
+	const responses = cards.map((obj) => obj[config.defaultAnswer]);
 
-	typingGame.start(typingGameWords, {
-		displaySeconds: 4,   // N seconds to memorize
-		requiredCorrect: 2,  // X correct streak
-		roundSeconds: 15     // Y seconds per round
+    console.log('Sending Responses to game');
+    console.log(responses);
+    
+
+	typingGame.start(prompts, {
+        responses: responses, //if playing 'answer' mode these are the corresponding values that have to be typed
+		displaySeconds: 4, // N seconds to memorize
+		requiredCorrect: 2, // X correct streak
+		roundSeconds: 15, // Y seconds per round
 	});
 }
 

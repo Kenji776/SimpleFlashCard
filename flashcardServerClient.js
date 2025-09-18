@@ -31,7 +31,6 @@ const FlashcardServerClient = class {
 		// Add password + secret to query params
 		const query = new URLSearchParams({
 			...params,
-			password: this.password,
 			secret,
 		}).toString();
 
