@@ -13,13 +13,6 @@
   width:150px;
   height:150px;
   z-index:1001;
-  cursor: url("media/punch_1.png") 16 16, grabbing;
-
-  /* for punch animation */
-  position:relative;
-  display:inline-block;
-  transform-origin:60% 40%;
-  transition: transform 90ms ease, filter 90ms ease;
 }
 
 /* Hover: ready */
@@ -30,7 +23,6 @@
 /* Clicked state: swap cursor + immediate shove */
 .mascot-container .mascot-image:active{
   cursor: url("media/punch_2.png") 16 16, grabbing;
-  filter: contrast(1.15) brightness(1.05);
 }
 
 /* Speedier, more obvious travel — applied via .punching class (JS below) */

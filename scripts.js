@@ -1884,8 +1884,8 @@ function launchTypingGame() {
 	typingGame.start(prompts, {
         responses: responses, //if playing 'answer' mode these are the corresponding values that have to be typed
 		displaySeconds: 4, // N seconds to memorize
-		requiredCorrect: 2, // X correct streak
-		roundSeconds: 15, // Y seconds per round
+		requiredCorrect: 1, // X correct streak
+		roundSeconds: 20, // Y seconds per round
 	});
 }
 
