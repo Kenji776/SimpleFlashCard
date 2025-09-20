@@ -297,10 +297,17 @@ function registerKeyboardShortcuts(){
  
 	document.onkeydown = function (e) {
         const tag = (e.target && e.target.tagName) || "";
-		if (tag === "INPUT" || tag === "TEXTAREA" || isAnyModalOpen()) return;
+        console.log('Keydown handler fired');
+        console.log(isAnyModalOpen());
+		if (tag === "INPUT" || tag === "TEXTAREA" || isAnyModalOpen()) {
+            // Stop ALL other keydown listeners from firing
+            e.stopImmediatePropagation();
+            return;
+        }
 		e = e || window.event;
 		// use e.keyCode
 		
+        console.log('Made it past')
         //up arrow
 		if (e.keyCode == "38") showAnswer();
 		//down arrow
@@ -325,7 +332,7 @@ function registerKeyboardShortcuts(){
 		else if (e.key == "p") getPastPerformanceData();
 		else if (e.key == "m") generateMnemonic();
         
-        //e.preventDefault();
+        e.preventDefault();
 	};
 }
 
