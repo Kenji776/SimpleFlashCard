@@ -1,4 +1,4 @@
-const Mascot = class {
+﻿const Mascot = class {
 	// --- Config / state ---
 	name = "Default Mascot";
 	containerName = "mascot-container";
@@ -90,7 +90,25 @@ const Mascot = class {
 	};
 
 	speech = {};
-
+	elements = {
+		snacks: [
+			{
+				image: "porkBelly.png", // goes in /mascot-media/<name>/img/
+				sound: "munch1.mp3", // goes in /mascot-media/<name>/sfx/
+				health: 12, // heals mascot by this amount
+			},
+			{
+				image: "ramen.png",
+				sound: "munch2.mp3",
+				health: 20,
+			},
+			{
+				image: "bone.png",
+				sound: "munch3.mp3",
+				health: 8,
+			},
+		],
+	};
 	// Combat / HP
 	maxHealth = 100;
 	health = 100;
@@ -349,6 +367,13 @@ const Mascot = class {
 					let prevSetting = this.mute;
 					this.mute = false;
 					this.fart();
+					this.mute = prevSetting;
+					e.preventDefault();
+				}
+				if (e.key && e.key.toLowerCase() === "s") {
+					let prevSetting = this.mute;
+					this.mute = false;
+					this.feed();
 					this.mute = prevSetting;
 					e.preventDefault();
 				}
@@ -1027,6 +1052,84 @@ const Mascot = class {
 
 	removeMascotAnimationEffect(animationName) {
 		ui.removeClass([this.mascotDiv], animationName);
+	}
+
+	feed(snack = null) {
+		const snacks = snack ? [snack] : this.elements?.snacks || [];
+		if (!snacks.length || !this.container || !this.mascotDiv) return;
+
+		// Pick snack
+		const pick = snacks[Math.floor(Math.random() * snacks.length)];
+		const imgUrl = this.buildMascotMediaUrl(pick.image, "img");
+		const sfxUrl = pick.sound ? this.buildMascotMediaUrl(pick.sound, "sfx") : null;
+		const healAmt = Number(pick.health || 0);
+
+		// Mascot geometry
+		const mrect = this.container.getBoundingClientRect();
+		const mcx = mrect.left + mrect.width / 2;
+		const mcy = mrect.top + mrect.height / 2;
+
+		// Snack sprite (100x100)
+		const snackDiv = document.createElement("div");
+		snackDiv.className = "mascot-snack";
+		Object.assign(snackDiv.style, {
+			position: "fixed",
+			width: "100px",
+			height: "100px",
+			backgroundImage: `url(${imgUrl})`,
+			backgroundSize: "contain",
+			backgroundRepeat: "no-repeat",
+			pointerEvents: "none",
+			left: `${mcx - 50}px`,
+			top: `${mrect.top - 150}px`, // 50px above mascot + snack height
+			zIndex: "2147483647",
+		});
+		document.body.appendChild(snackDiv);
+
+		// Compute end position (center of mascot)
+		const endTop = `${mcy - 50}px`;
+
+		const finish = () => {
+			// Play crunch sound
+			try {
+				if (!this.mute && sfxUrl) new Audio(sfxUrl).play().catch(() => {});
+			} catch {}
+
+			// Heal + happiness
+			this.health = Math.min(this.maxHealth, this.health + healAmt);
+			this.updateHealthBar?.();
+			this.showHealthBarTemporarily?.();
+
+			if (this.currentStatus?.mood) {
+				const cur = Number(this.currentStatus.mood.happiness || 0);
+				this.currentStatus.mood.happiness = Math.min(100, cur + 5);
+			}
+
+			// Set mood happy
+			this.setMood("happy");
+
+			// Friendly bounce effect
+			this.mascotDiv.classList.add("pop-in");
+			setTimeout(() => this.mascotDiv.classList.remove("pop-in"), 300);
+
+			// After 1 second, speak from "eat" category
+			setTimeout(() => {
+				if (this.isActive) this.sayRandom("eat");
+			}, 1000);
+
+			snackDiv.remove();
+		};
+
+		// Animate down
+		if (snackDiv.animate) {
+			const a = snackDiv.animate([{ transform: "translateY(0px)" }, { transform: `translateY(${mcy - 50 - (mrect.top - 150)}px)` }], { duration: 700, easing: "cubic-bezier(.22,.61,.36,1)" });
+			a.onfinish = finish;
+		} else {
+			snackDiv.style.transition = "top 0.7s cubic-bezier(.22,.61,.36,1)";
+			requestAnimationFrame(() => (snackDiv.style.top = endTop));
+			snackDiv.addEventListener("transitionend", finish, { once: true });
+			setTimeout(finish, 800);
+		}
 	}
 
 	// ---- Audio ----
