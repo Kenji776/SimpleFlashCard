@@ -13,18 +13,9 @@
   width:150px;
   height:150px;
   z-index:1001;
-    position:absolute;
-  bottom:-10px;
-  right:20px;
-  width:150px;
-  height:150px;
-  z-index:100;
-  isolation:isolate; /* new */
   background-size: contain;   /* scale the image down to fit */
   background-repeat: no-repeat;
   background-position: center; /* keep it centered */
-  
-  isolation: isolate; /* keep your stacking fix */
 }
 
 /* Hover: ready */
