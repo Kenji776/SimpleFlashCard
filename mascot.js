@@ -384,6 +384,13 @@
 					this.mute = prevSetting;
 					e.preventDefault();
 				}
+				if (e.key && e.key.toLowerCase() === "b") {
+					let prevSetting = this.mute;
+					this.mute = false;
+					this.summonBus();
+					this.mute = prevSetting;
+					e.preventDefault();
+				}
 			};
 			document.addEventListener("keydown", this._hotkeyHandler);
 		}
@@ -1351,6 +1358,124 @@
 			this.container.innerHTML = "";
 		}
 		this.stopOffscreenWatcher(); // NEW
+	}
+	// Inside Mascot class
+	/**
+	 * Summon a bus that slams into the mascot and transfers momentum.
+	 * Sounds: horn on spawn, yell immediately, crash on impact.
+	 * @param {{speed?:number, side?:"left"|"right", image?:string, width?:number, height?:number, sayPanic?:boolean}} opts
+	 */
+	summonBus(opts = {}) {
+		if (!this.container) return;
+
+		const speed = Math.max(600, Number(opts.speed ?? 1800)); // px/s
+		const side = opts.side || (Math.random() < 0.5 ? "left" : "right");
+		const imgName = opts.image || "bus.png"; // put in /mascot-media/<name>/img/
+		const W = window.innerWidth,
+			H = window.innerHeight;
+
+		// Mascot geometry (center)
+		const mrect = this.container.getBoundingClientRect();
+		const mcx = mrect.left + mrect.width / 2;
+		const mcy = mrect.top + mrect.height / 2;
+
+		// Bus sprite
+		const busW = 300;
+		const busH = 300;
+
+		const bus = document.createElement("div");
+		bus.className = "mascot-bus";
+		Object.assign(bus.style, {
+			position: "fixed",
+			width: `${busW}px`,
+			height: `${busH}px`,
+			backgroundImage: `url(${this.buildMascotMediaUrl(imgName, "img")})`,
+			backgroundSize: "contain",
+			backgroundRepeat: "no-repeat",
+			pointerEvents: "none",
+			zIndex: "2147483647",
+			top: `${mcy - busH / 2}px`,
+			left: side === "left" ? `${-busW - 20}px` : `${W + 20}px`,
+			transform: side === "right" ? "scaleX(-1)" : "none", // face toward mascot
+		});
+		document.body.appendChild(bus);
+
+		// 🔊 HORN + YELL right away
+		this.playRandomSound?.("horn");
+	
+		// optional speech reaction, if you have "panic" lines
+		setTimeout(() => this.sayRandom?.("scared"), 150);
+		
+
+		// Motion state (viewport coords)
+		let x = side === "left" ? -busW - 20 : W + 20;
+		const y = mcy - busH / 2;
+		const dir = side === "left" ? +1 : -1; // +1 => move right, -1 => move left
+		let last = this._now();
+		let hit = false;
+
+		const setPos = () => {
+			bus.style.left = `${x}px`;
+			bus.style.top = `${y}px`;
+		};
+		setPos();
+
+		const intersectsMascot = () => {
+			const b = bus.getBoundingClientRect();
+			const m = this.container.getBoundingClientRect();
+			return !(b.right < m.left || b.left > m.right || b.bottom < m.top || b.top > m.bottom);
+		};
+
+		const tick = () => {
+			if (!document.body.contains(bus)) return;
+
+			const now = this._now();
+			const dt = Math.min(0.05, (now - last) / 1000);
+			last = now;
+
+			// Move bus
+			x += dir * speed * dt;
+			setPos();
+
+			// Check impact
+			if (!hit && intersectsMascot()) {
+				hit = true;
+				this.setMood("angry");
+				// 💥 CRASH sound
+				this.playRandomSound?.("crash");
+
+				// Ensure physics is on
+				if (!this._phEnabled) this.enableThrowPhysics();
+
+				// Transfer momentum (shove + a bit of lift & spin)
+				this._vel.x = dir * speed * 0.95;
+				this._vel.y = -260;
+				this._angVel = dir * 6.5;
+
+				// Feedback
+				this.mascotDiv.classList.add("hitshake");
+				setTimeout(() => this.mascotDiv.classList.remove("hitshake"), 140);
+
+				// Kick physics loop
+				this._lastPhysicsT = this._now();
+				if (!this._throwRAF) this._throwRAF = requestAnimationFrame((t) => this._physicsStep(t));
+
+				// Let the bus continue then despawn
+				setTimeout(() => bus.remove(), 800);
+				requestAnimationFrame(tick);
+				return;
+			}
+
+			// Despawn when fully off-screen on far side
+			if ((dir === +1 && x > W + busW + 40) || (dir === -1 && x < -busW - 40)) {
+				bus.remove();
+				return;
+			}
+
+			requestAnimationFrame(tick);
+		};
+
+		requestAnimationFrame(tick);
 	}
 
 	enableThrowPhysics() {
