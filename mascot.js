@@ -377,6 +377,13 @@
 					this.mute = prevSetting;
 					e.preventDefault();
 				}
+				if (e.key && e.key.toLowerCase() === "=") {
+					let prevSetting = this.mute;
+					this.mute = false;
+					this.reportStats();
+					this.mute = prevSetting;
+					e.preventDefault();
+				}
 			};
 			document.addEventListener("keydown", this._hotkeyHandler);
 		}
@@ -1131,7 +1138,18 @@
 			setTimeout(finish, 800);
 		}
 	}
+	// Inside Mascot class
+	reportStats() {
+		if (!this.isActive) return;
 
+		const health = Math.round(this.health);
+		const happiness = Math.round(this.currentStatus?.mood?.happiness ?? 0);
+		const mood = this.currentStatus?.value || "neutral";
+
+		const line = `My health is ${health} out of ${this.maxHealth}, my happiness is ${happiness}, and I feel ${mood}.`;
+
+		this.say(line, true, true, true);
+	}
 	// ---- Audio ----
 	playRandomSound(category) {
 		if (!this.urls.sounds.hasOwnProperty(category)) {
