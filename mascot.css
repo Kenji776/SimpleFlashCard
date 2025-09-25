@@ -13,6 +13,18 @@
   width:150px;
   height:150px;
   z-index:1001;
+    position:absolute;
+  bottom:-10px;
+  right:20px;
+  width:150px;
+  height:150px;
+  z-index:100;
+  isolation:isolate; /* new */
+  background-size: contain;   /* scale the image down to fit */
+  background-repeat: no-repeat;
+  background-position: center; /* keep it centered */
+  
+  isolation: isolate; /* keep your stacking fix */
 }
 
 /* Hover: ready */
@@ -204,6 +216,10 @@
 @keyframes pop-in {
   0% { transform: scale(.85) rotate(0deg); opacity: .85; }
   100% { transform: scale(1) rotate(0deg); opacity: 1; }
+}
+
+.mascot-snack {
+  will-change: top;
 }
 
 .mascot-snack { will-change: transform, top; }
