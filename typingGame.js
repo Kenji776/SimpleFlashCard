@@ -9,6 +9,7 @@ window.deckOptions = window.deckOptions || {};
 deckOptions.typingGame = Object.assign(
 	{
 		displaySeconds: 3,
+		revealSeconds: 2,
 		requiredCorrect: 3,
 		roundSeconds: 20,
 		caseSensitive: false,
@@ -28,7 +29,7 @@ class TypingMiniGame {
 			wordIndex: 0,
 			currentWord: "",
 			correctStreak: 0,
-			timers: { showTimeout: null, roundTick: null },
+			timers: { showTimeout: null, roundTick: null, revealTimeout: null },
 			wired: false,
 			gameActive: false,
 		};
@@ -277,9 +278,32 @@ class TypingMiniGame {
 		} else {
 			this.state.correctStreak = 0;
 			this._setText("tg-correct", 0);
-			this._feedback("Wrong. Streak reset!", false);
+			this._feedback("Wrong. Streak reset! Watch the correct answer.", false);
+			this._revealTargetOnMiss({ mode, targetRaw });
 			input.select();
 		}
+	}
+
+	_revealTargetOnMiss({ mode, targetRaw } = {}) {
+		const secondsRaw = Number(this.cfg.revealSeconds ?? 0);
+		if (!Number.isFinite(secondsRaw) || secondsRaw <= 0) return;
+
+		const revealText = mode === "answer" ? targetRaw : this.state.currentWord;
+		if (revealText === null || typeof revealText === "undefined") return;
+
+		this._clearTimeout("revealTimeout");
+
+		const durationMs = Math.max(0, secondsRaw) * 1000;
+		const wordIndex = this.state.wordIndex;
+
+		// Briefly surface the expected text before hiding it again
+		this._setWordVisible(String(revealText));
+
+		this.state.timers.revealTimeout = setTimeout(() => {
+			if (this.state.wordIndex !== wordIndex) return;
+			this._setWordHidden(this.state.currentWord);
+			this.state.timers.revealTimeout = null;
+		}, durationMs);
 	}
 
 	_nextWordOrFinish() {
@@ -553,6 +577,7 @@ class TypingMiniGame {
 	_clearTimers() {
 		this._clearInterval("roundTick");
 		this._clearTimeout("showTimeout");
+		this._clearTimeout("revealTimeout");
 	}
 
 	_isEnabled(id) {
