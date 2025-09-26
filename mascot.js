@@ -18,7 +18,7 @@
 			fart: ["fart1.wav", "fart2.wav", "fart3.wav", "fart4.wav", "fart5.wav"],
 			bark: ["bark1.wav"],
 			hit: ["punch-1.mp3"],
-			explode: ["explode-1.mp3"], // added for KO
+			explode: ["explosion1.mp3", "explosion2.mp3", "explosion3.mp3"], // added for KO
 		},
 	};
 	audio = [];
@@ -93,9 +93,9 @@
 	elements = {
 		snacks: [
 			{
-				image: "porkBelly.png", // goes in /mascot-media/<name>/img/
-				sound: "munch1.mp3", // goes in /mascot-media/<name>/sfx/
-				health: 12, // heals mascot by this amount
+				image: "porkbelly.png",
+				sound: "munch1.mp3",
+				health: 12,
 			},
 			{
 				image: "ramen.png",
@@ -106,6 +106,56 @@
 				image: "bone.png",
 				sound: "munch3.mp3",
 				health: 8,
+			},
+			{
+				image: "kimchi.png",
+				sound: "munch1.mp3",
+				health: 10,
+			},
+			{
+				image: "bibimbap.png",
+				sound: "munch2.mp3",
+				health: 22,
+			},
+			{
+				image: "tteokbokki.png",
+				sound: "munch3.mp3",
+				health: 18,
+			},
+			{
+				image: "kimbap.png",
+				sound: "munch1.mp3",
+				health: 15,
+			},
+			{
+				image: "japchae.png",
+				sound: "munch2.mp3",
+				health: 16,
+			},
+			{
+				image: "sundubuJjigae.png",
+				sound: "munch3.mp3",
+				health: 20,
+			},
+			{
+				image: "pajeon.png",
+				sound: "munch1.mp3",
+				health: 14,
+			},
+			{
+				image: "samgyetang.png",
+				sound: "munch2.mp3",
+				health: 25,
+			},
+			{
+				image: "galbi.png",
+				sound: "munch3.mp3",
+				health: 24,
+			},
+			{
+				image: "hotteok.png",
+				sound: "munch1.mp3",
+				health: 12,
 			},
 		],
 	};
@@ -388,6 +438,13 @@
 					let prevSetting = this.mute;
 					this.mute = false;
 					this.summonBus();
+					this.mute = prevSetting;
+					e.preventDefault();
+				}
+				if (e.key && e.key.toLowerCase() === "n") {
+					let prevSetting = this.mute;
+					this.mute = false;
+					this.dropBomb();
 					this.mute = prevSetting;
 					e.preventDefault();
 				}
@@ -998,6 +1055,162 @@
 		);
 	}
 
+	feed() {
+		if (!this.isActive || this._exploded) return;
+
+		if (!this.container || !this.mascotDiv) return;
+
+		const snacks = this.elements?.snacks;
+
+		if (!Array.isArray(snacks) || snacks.length === 0) {
+			console.warn("Mascot.feed: no snacks configured.");
+
+			return;
+		}
+
+		const snack = snacks[Math.floor(Math.random() * snacks.length)];
+
+		if (!snack) return;
+
+		const containerRect = this.container.getBoundingClientRect();
+
+		const mascotRect = this.mascotDiv.getBoundingClientRect();
+
+		const snackDiv = document.createElement("div");
+
+		snackDiv.className = "mascot-snack";
+
+		const imageUrl = snack.image ? this.buildMascotMediaUrl(snack.image, "img") : null;
+
+		if (imageUrl) snackDiv.style.backgroundImage = `url(${imageUrl})`;
+
+		const defaultSize = 48;
+
+		const snackSize = Number(snack.size) > 0 ? Number(snack.size) : defaultSize;
+
+		snackDiv.style.width = `${snackSize}px`;
+
+		snackDiv.style.height = `${snackSize}px`;
+
+		snackDiv.style.position = "absolute";
+
+		snackDiv.style.pointerEvents = "none";
+
+		snackDiv.style.backgroundRepeat = "no-repeat";
+
+		snackDiv.style.backgroundSize = "contain";
+
+		snackDiv.style.transition = "left 260ms ease-out, top 260ms ease-out, opacity 140ms ease-in";
+
+		snackDiv.style.opacity = "1";
+
+		this.container.appendChild(snackDiv);
+
+		const mascotCenterX = mascotRect.left + mascotRect.width / 2;
+
+		const mascotCenterY = mascotRect.top + mascotRect.height / 2;
+
+		const angle = Math.random() * Math.PI * 2;
+
+		const radius = Math.max(20, Math.max(mascotRect.width, mascotRect.height) / 2 + 20);
+
+		const startX = mascotCenterX + Math.cos(angle) * radius;
+
+		const startY = mascotCenterY + Math.sin(angle) * radius;
+
+		const startLeft = startX - containerRect.left - snackSize / 2;
+
+		const startTop = startY - containerRect.top - snackSize / 2;
+
+		snackDiv.style.left = `${startLeft}px`;
+
+		snackDiv.style.top = `${startTop}px`;
+
+		const targetLeft = mascotCenterX - containerRect.left - snackSize / 2;
+
+		const targetTop = mascotCenterY - containerRect.top - snackSize / 2;
+
+		let consumed = false;
+
+		const consume = () => {
+			if (consumed) return;
+
+			consumed = true;
+
+			snackDiv.style.transition = "opacity 140ms ease-in";
+
+			snackDiv.style.opacity = "0";
+
+			setTimeout(() => snackDiv.remove(), 160);
+
+			this._applySnackRewards(snack);
+		};
+
+		const onTransitionEnd = (evt) => {
+			if (evt.propertyName !== "top") return;
+
+			snackDiv.removeEventListener("transitionend", onTransitionEnd);
+
+			consume();
+		};
+
+		snackDiv.addEventListener("transitionend", onTransitionEnd);
+
+		requestAnimationFrame(() => {
+			requestAnimationFrame(() => {
+				snackDiv.style.left = `${targetLeft}px`;
+
+				snackDiv.style.top = `${targetTop}px`;
+			});
+		});
+
+		setTimeout(() => {
+			if (!consumed && document.body.contains(snackDiv)) {
+				snackDiv.removeEventListener("transitionend", onTransitionEnd);
+
+				consume();
+			}
+		}, 450);
+	}
+
+	_applySnackRewards(snack) {
+		if (!snack || this._exploded) return;
+
+		const healAmount = Number(snack.health) || 0;
+
+		if (healAmount > 0) {
+			this.health = Math.min(this.maxHealth, this.health + healAmount);
+
+			if (!this._lifeBar) this.createHealthBar();
+
+			this.updateHealthBar();
+
+			this.showHealthBarTemporarily();
+		}
+
+		this.mood = Math.min(100, (Number(this.mood) || 0) + 5);
+
+		if (this.currentStatus?.mood) {
+			const prevHappy = Number(this.currentStatus.mood.happiness ?? this.mood ?? 0);
+
+			this.currentStatus.mood.happiness = Math.min(100, prevHappy + 5);
+		}
+
+		if (this.mute || !snack.sound) return;
+
+		const soundUrl = this.buildMascotMediaUrl(snack.sound, "sfx");
+
+		if (!soundUrl) return;
+
+		try {
+			const audio = new Audio(soundUrl);
+
+			audio.play?.().catch(() => {});
+		} catch (err) {
+			console.warn("Mascot.feed: failed to play snack sound", err);
+		}
+	}
+
 	// ---- Mascot visuals ----
 	setMood(moodName) {
 		if (!this.moodImages.hasOwnProperty(moodName)) {
@@ -1164,6 +1377,10 @@
 			return;
 		}
 		let thisSound = this.urls.sounds[category][Math.floor(Math.random() * this.urls.sounds[category].length)];
+
+		if (category == "explode") {
+			console.log("Playing sound " + thisSound);
+		}
 		this.playSound(category, thisSound);
 	}
 
@@ -1402,10 +1619,9 @@
 
 		// 🔊 HORN + YELL right away
 		this.playRandomSound?.("horn");
-	
+
 		// optional speech reaction, if you have "panic" lines
 		setTimeout(() => this.sayRandom?.("scared"), 150);
-		
 
 		// Motion state (viewport coords)
 		let x = side === "left" ? -busW - 20 : W + 20;
@@ -1475,6 +1691,121 @@
 			requestAnimationFrame(tick);
 		};
 
+		requestAnimationFrame(tick);
+	}
+	// Inside Mascot class
+	/**
+	 * Drop a bomb onto the mascot. Falls from above, explodes on contact,
+	 * flings mascot with physics, plays explosion sounds, shakes and whites out screen.
+	 */
+	// Inside Mascot class
+	dropBomb(opts = {}) {
+		if (!this.container || !this.mascotDiv) return;
+
+		const imgName = opts.image || "bomb.png";
+		const W = window.innerWidth,
+			H = window.innerHeight;
+
+		// Mascot geometry
+		const mrect = this.container.getBoundingClientRect();
+		const mcx = mrect.left + mrect.width / 2;
+		const mtop = mrect.top;
+
+		// Bomb sprite
+		const bombW = 302,
+			bombH = 400;
+		const bomb = document.createElement("div");
+		bomb.className = "mascot-bomb";
+		Object.assign(bomb.style, {
+			position: "fixed",
+			width: `${bombW}px`,
+			height: `${bombH}px`,
+			backgroundImage: `url(${this.buildMascotMediaUrl(imgName, "img")})`,
+			backgroundSize: "contain",
+			backgroundRepeat: "no-repeat",
+			pointerEvents: "none",
+			zIndex: "2147483647", // ensure on top
+			left: `${mcx - bombW / 2}px`,
+			top: `-${bombH + 20}px`,
+		});
+		document.body.appendChild(bomb);
+
+		// Panic line
+		this.sayRandom?.("scared");
+
+		let y = -bombH - 20;
+		let speed = Math.max(800, Number(opts.speed ?? 1200));
+		let last = this._now();
+		let exploded = false;
+
+		const setPos = () => (bomb.style.top = `${y}px`);
+
+		const tick = () => {
+			if (!document.body.contains(bomb)) return;
+
+			const now = this._now();
+			const dt = Math.min(0.05, (now - last) / 1000);
+			last = now;
+
+			// only move the bomb if it hasn't exploded
+			if (!exploded) {
+				y += speed * dt;
+				setPos();
+			}
+
+			// Trigger when bomb bottom reaches mascot top
+			if (!exploded && y + bombH >= mtop) {
+				exploded = true;
+
+				// Swap to explosion sprite
+				bomb.style.width = "500px";
+				bomb.style.height = "500px";
+				bomb.style.left = `${mcx - 250}px`; // center explosion
+				bomb.style.top = `${mtop - 250}px`; // expand over mascot
+				bomb.style.backgroundImage = `url(${this.buildMascotMediaUrl("explosion.gif", "img")})`;
+				bomb.style.zIndex = "2147483648"; // ensure in front
+
+				// 🔊 Explosion sound
+				this.playRandomSound?.("explode");
+				this.sayRandom("pain");
+
+				// Ensure physics is enabled
+				if (!this._phEnabled) this.enableThrowPhysics();
+
+				// Blast mascot upward + sideways
+				this._vel.x = (Math.random() - 0.5) * 9000; // wider, faster sideways blast
+				this._vel.y = -9000; // stronger upward launch
+				this._angVel = (Math.random() - 0.5) * 120; // more spin
+				this._lastPhysicsT = this._now();
+				if (!this._throwRAF) {
+					this._throwRAF = requestAnimationFrame((t) => this._physicsStep(t));
+				}
+
+				// Screen shake + whiteout
+				document.body.classList.add("screen-shake");
+				const whiteout = document.createElement("div");
+				whiteout.className = "whiteout-flash";
+				document.body.appendChild(whiteout);
+				setTimeout(() => whiteout.classList.add("fade-out"), 150);
+				setTimeout(() => {
+					document.body.classList.remove("screen-shake");
+					whiteout.remove();
+				}, 500);
+
+				// Remove explosion sprite after gif loop (~1.5s)
+				setTimeout(() => bomb.remove(), 1500);
+
+				return;
+			}
+
+			// Remove if it falls past screen (failsafe, should not happen if exploded correctly)
+			if (!exploded && y > H + bombH + 40) {
+				bomb.remove();
+				return;
+			}
+
+			requestAnimationFrame(tick);
+		};
 		requestAnimationFrame(tick);
 	}
 

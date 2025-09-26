@@ -1,4 +1,4 @@
-/* Keep container the same, but isolate stacking so z-index works cleanly */
+﻿/* Keep container the same, but isolate stacking so z-index works cleanly */
 .mascot-container{
   position:absolute;
   bottom:-10px;
@@ -219,4 +219,43 @@
   0% { transform: scale(0.82); }
   60% { transform: scale(1.08); }
   100% { transform: scale(1); }
+}
+
+/* Bomb + explosion sprite */
+.mascot-bomb {
+  background-size: contain;
+  background-repeat: no-repeat;
+  pointer-events: none;
+}
+
+/* Screen shake */
+@keyframes screen-shake {
+  0%   { transform: translate(0px, 0px) rotate(0deg); }
+  20%  { transform: translate(-10px, 5px) rotate(-2deg); }
+  40%  { transform: translate(8px, -8px) rotate(2deg); }
+  60%  { transform: translate(-5px, 5px) rotate(-1deg); }
+  80%  { transform: translate(5px, 0px) rotate(1deg); }
+  100% { transform: translate(0px, 0px) rotate(0deg); }
+}
+
+.screen-shake {
+  animation: screen-shake 0.5s ease-in-out 3; /* run 3 times (~1.5s) */
+}
+
+.whiteout-flash {
+  position: fixed;       /* lock to screen */
+  top: 0;
+  left: 0;
+  width: 100%;           /* full page width */
+  height: 100%;          /* full page height */
+  min-height: 100vh;     /* ensure at least one viewport tall */
+  background: #fff;
+  opacity: 0.9;
+  z-index: 2147483647 !important;
+  pointer-events: none;
+  transition: opacity 0.8s ease-out;
+}
+
+.whiteout-flash.fade-out {
+  opacity: 0;
 }
