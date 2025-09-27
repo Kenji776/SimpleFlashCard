@@ -158,6 +158,53 @@
 				health: 12,
 			},
 		],
+		vehicles: [
+			{
+				name: "bus",
+				image: "bus.png",
+				width: 100,
+				height: 100,
+				speed: 40,
+				horn: ["bus_horn1.mp3", "bus_horn2.mp3"],
+				damage: 30,
+			},
+			{
+				name: "bulldozer",
+				image: "bulldozer.png",
+				width: 100,
+				height: 100,
+				speed: 20,
+				horn: ["bus_horn1.mp3", "bus_horn2.mp3"],
+				damage: 60,
+			},
+			{
+				name: "train",
+				image: "train.png",
+				width: 100,
+				height: 100,
+				speed: 80,
+				horn: ["bus_horn1.mp3", "bus_horn2.mp3"],
+				damage: 100,
+			},
+			{
+				name: "semi truck",
+				image: "semi.png",
+				width: 100,
+				height: 100,
+				speed: 50,
+				horn: ["bus_horn1.mp3", "bus_horn2.mp3"],
+				damage: 70,
+			},
+			{
+				name: "fat man on a bike",
+				image: "fatbike.png",
+				width: 100,
+				height: 100,
+				speed: 15,
+				horn: ["jibberish.mp3"],
+				damage: 15,
+			},
+		],
 	};
 	// Combat / HP
 	maxHealth = 100;
@@ -219,6 +266,7 @@
 	// ---- IndexedDB persistence for TTS ----
 	_ttsDB = null;
 
+	_vehicleSpeedMultiplier = 20;
 	// ---- Off-screen watchdog ----
 	_origin = { x: 20, y: 20 }; // will be set from first on-screen position
 	_offscreenInterval = null;
@@ -363,7 +411,7 @@
 			// jolt the IMAGE (not the container) so it doesn't fight rotation transforms
 			this.mascotDiv.classList.add("hitshake");
 			// damage
-			this.takePunchDamage(10);
+			this.dealDamage(10);
 			// clear
 			clearTimeout(this._punchFXTimeout);
 			this._punchFXTimeout = setTimeout(() => {
@@ -437,7 +485,7 @@
 				if (e.key && e.key.toLowerCase() === "b") {
 					let prevSetting = this.mute;
 					this.mute = false;
-					this.summonBus();
+					this.summonVehicle();
 					this.mute = prevSetting;
 					e.preventDefault();
 				}
@@ -487,7 +535,7 @@
 		}, ms);
 	}
 
-	takePunchDamage(amount = 10) {
+	dealDamage(amount = 10) {
 		if (this._exploded) return;
 
 		if (!this._lifeBar) {
@@ -1378,7 +1426,7 @@
 		}
 		let thisSound = this.urls.sounds[category][Math.floor(Math.random() * this.urls.sounds[category].length)];
 
-		if (category == "explode") {
+		if (category == "silly") {
 			console.log("Playing sound " + thisSound);
 		}
 		this.playSound(category, thisSound);
@@ -1576,123 +1624,136 @@
 		}
 		this.stopOffscreenWatcher(); // NEW
 	}
-	// Inside Mascot class
+
 	/**
-	 * Summon a bus that slams into the mascot and transfers momentum.
+	 * Summon a vehicle that slams into the mascot and transfers momentum.
 	 * Sounds: horn on spawn, yell immediately, crash on impact.
 	 * @param {{speed?:number, side?:"left"|"right", image?:string, width?:number, height?:number, sayPanic?:boolean}} opts
 	 */
-	summonBus(opts = {}) {
-		if (!this.container) return;
+	summonVehicle(opts = {}) {
+		if (!this.container || !this.elements?.vehicles?.length) {
+			console.warn("[summonVehicle] No container or vehicles available.");
+			return;
+		}
 
-		const speed = Math.max(600, Number(opts.speed ?? 1800)); // px/s
+		// 🎲 Pick a random vehicle config
+		const vehicleCfg = opts.vehicle || this.elements.vehicles[Math.floor(Math.random() * this.elements.vehicles.length)];
+		console.log("[summonVehicle] Picked vehicle:", vehicleCfg);
+
 		const side = opts.side || (Math.random() < 0.5 ? "left" : "right");
-		const imgName = opts.image || "bus.png"; // put in /mascot-media/<name>/img/
-		const W = window.innerWidth,
-			H = window.innerHeight;
+		const imgName = vehicleCfg.image;
+		const W = window.innerWidth;
 
 		// Mascot geometry (center)
 		const mrect = this.container.getBoundingClientRect();
 		const mcx = mrect.left + mrect.width / 2;
 		const mcy = mrect.top + mrect.height / 2;
+		console.log("[summonVehicle] Mascot center:", { mcx, mcy });
 
-		// Bus sprite
-		const busW = 300;
-		const busH = 300;
+		// Vehicle sprite
+		const vW = vehicleCfg.width || 100;
+		const vH = vehicleCfg.height || 100;
 
-		const bus = document.createElement("div");
-		bus.className = "mascot-bus";
-		Object.assign(bus.style, {
+		const vehicle = document.createElement("div");
+		vehicle.className = `mascot-vehicle ${vehicleCfg.name.replace(/\s+/g, "-")}`;
+		Object.assign(vehicle.style, {
 			position: "fixed",
-			width: `${busW}px`,
-			height: `${busH}px`,
+			width: `${vW}px`,
+			height: `${vH}px`,
 			backgroundImage: `url(${this.buildMascotMediaUrl(imgName, "img")})`,
 			backgroundSize: "contain",
 			backgroundRepeat: "no-repeat",
 			pointerEvents: "none",
 			zIndex: "2147483647",
-			top: `${mcy - busH / 2}px`,
-			left: side === "left" ? `${-busW - 20}px` : `${W + 20}px`,
-			transform: side === "right" ? "scaleX(-1)" : "none", // face toward mascot
+			top: `${mcy - vH / 2}px`,
+			left: side === "left" ? `${-vW - 20}px` : `${W + 20}px`,
+			transform: side === "right" ? "scaleX(-1)" : "none",
 		});
-		document.body.appendChild(bus);
+		document.body.appendChild(vehicle);
 
-		// 🔊 HORN + YELL right away
-		this.playRandomSound?.("horn");
+		console.log("[summonVehicle] Spawned vehicle element:", vehicle);
 
-		// optional speech reaction, if you have "panic" lines
+		// 🔊 Play horn if available
+		if (vehicleCfg.horn?.length) {
+			console.log("[summonVehicle] Playing horn:", vehicleCfg.horn);
+			this.playRandomSound?.(vehicleCfg.horn);
+		}
+
+		// Optional panic line
 		setTimeout(() => this.sayRandom?.("scared"), 150);
 
-		// Motion state (viewport coords)
-		let x = side === "left" ? -busW - 20 : W + 20;
-		const y = mcy - busH / 2;
-		const dir = side === "left" ? +1 : -1; // +1 => move right, -1 => move left
+		// Motion state
+		let x = side === "left" ? -vW - 20 : W + 20;
+		const y = mcy - vH / 2;
+		const dir = side === "left" ? +1 : -1;
 		let last = this._now();
-		let hit = false;
+
+		// 🕑 Collision cooldown
+		const hitCooldownMs = 1000; // 1 second cooldown
+		let lastHitTime = 0;
 
 		const setPos = () => {
-			bus.style.left = `${x}px`;
-			bus.style.top = `${y}px`;
+			vehicle.style.left = `${x}px`;
+			vehicle.style.top = `${y}px`;
 		};
 		setPos();
 
 		const intersectsMascot = () => {
-			const b = bus.getBoundingClientRect();
+			const b = vehicle.getBoundingClientRect();
 			const m = this.container.getBoundingClientRect();
 			return !(b.right < m.left || b.left > m.right || b.bottom < m.top || b.top > m.bottom);
 		};
 
 		const tick = () => {
-			if (!document.body.contains(bus)) return;
+			if (!document.body.contains(vehicle)) {
+				console.log("[summonVehicle] Vehicle element removed, stopping tick.");
+				return;
+			}
 
 			const now = this._now();
 			const dt = Math.min(0.05, (now - last) / 1000);
 			last = now;
 
-			// Move bus
-			x += dir * speed * dt;
+			// Move vehicle
+			x += dir * vehicleCfg.speed * dt * this._vehicleSpeedMultiplier;
 			setPos();
 
-			// Check impact
-			if (!hit && intersectsMascot()) {
-				hit = true;
-				this.setMood("angry");
-				// 💥 CRASH sound
-				this.playRandomSound?.("crash");
+			// Collision check with cooldown
+			if (intersectsMascot() && now - lastHitTime > hitCooldownMs) {
+				lastHitTime = now;
+				console.log("[summonVehicle] Mascot hit by vehicle:", vehicleCfg.name);
 
-				// Ensure physics is on
+				this.setMood("angry");
+				this.playRandomSound?.("crash");
+				//this.dealDamage?.(vehicleCfg.damage);
+
 				if (!this._phEnabled) this.enableThrowPhysics();
 
-				// Transfer momentum (shove + a bit of lift & spin)
-				this._vel.x = dir * speed * 0.95;
+				this._vel.x = dir * vehicleCfg.speed * this._vehicleSpeedMultiplier * 0.95;
 				this._vel.y = -260;
 				this._angVel = dir * 6.5;
 
-				// Feedback
 				this.mascotDiv.classList.add("hitshake");
 				setTimeout(() => this.mascotDiv.classList.remove("hitshake"), 140);
 
-				// Kick physics loop
 				this._lastPhysicsT = this._now();
 				if (!this._throwRAF) this._throwRAF = requestAnimationFrame((t) => this._physicsStep(t));
-
-				// Let the bus continue then despawn
-				setTimeout(() => bus.remove(), 800);
-				requestAnimationFrame(tick);
-				return;
 			}
 
-			// Despawn when fully off-screen on far side
-			if ((dir === +1 && x > W + busW + 40) || (dir === -1 && x < -busW - 40)) {
-				bus.remove();
+			// Despawn when off-screen
+			if ((dir === +1 && x > W + vW + 40) || (dir === -1 && x < -vW - 40)) {
+				console.log("[summonVehicle] Vehicle exited screen:", vehicleCfg.name);
+				vehicle.remove();
 				return;
 			}
 
 			requestAnimationFrame(tick);
 		};
 
+		console.log("[summonVehicle] Starting tick loop.");
 		requestAnimationFrame(tick);
 	}
+
 	// Inside Mascot class
 	/**
 	 * Drop a bomb onto the mascot. Falls from above, explodes on contact,
@@ -2177,7 +2238,7 @@
 		// scale damage from speed over threshold
 		const dmg = Math.min(35, Math.round((impactSpeed - threshold) / 120));
 		if (dmg > 0) {
-			this.takePunchDamage(dmg);
+			this.dealDamage(dmg);
 			// optional: tiny screen jolt to sell the hit
 			this.container.classList.add("hitshake");
 			setTimeout(() => this.container.classList.remove("hitshake"), 120);
