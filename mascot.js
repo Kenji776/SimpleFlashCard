@@ -1854,7 +1854,7 @@
 				}, 500);
 
 				// Remove explosion sprite after gif loop (~1.5s)
-				setTimeout(() => bomb.remove(), 1500);
+				setTimeout(() => bomb.remove(), 1000);
 
 				return;
 			}
