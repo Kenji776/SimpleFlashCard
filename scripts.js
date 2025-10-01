@@ -270,26 +270,58 @@ async function loadCardLibrary(){
 }
 
 async function sendScore() {
-	// NEW: never submit scores for local decks
-	if (usingLocalDeck) {
-		console.log("Local deck: high-score submission disabled.");
-		return;
-	}
+	try {
+		// ✅ Guard against missing local deck flag
+		if (typeof usingLocalDeck !== "undefined" && usingLocalDeck) {
+			console.log("Local deck: high-score submission disabled.");
+			return;
+		}
 
-	if (userName.length > 0 && userName != "Your Name Here") {
+		// ✅ Validate userName
+		if (typeof userName !== "string" || userName.trim().length === 0 || userName === "Your Name Here") {
+			console.warn("No valid username set. Score will not be sent.");
+			return;
+		}
+
+		// ✅ Guard against missing performance object
+		if (typeof performance !== "object" || performance == null) {
+			console.warn("Performance object is missing or invalid. Cannot send score.");
+			return;
+		}
+
+		// ✅ Validate deckId
+		if (!Object.prototype.hasOwnProperty.call(performance, "deckId") || !performance.deckId || (typeof performance.deckId === "string" && performance.deckId.trim().length === 0)) {
+			console.warn("Performance deckId is missing or invalid. Cannot send score.");
+			return;
+		}
+
+		// ✅ Validate performanceRecordId
+		if (!performance.performanceRecordId) {
+			console.warn("Performance record ID is missing. Cannot send score.");
+			return;
+		}
+
 		console.log("Sending Score!");
+
+		// ✅ Safe call to flashCardClient
+		if (!flashCardClient || typeof flashCardClient.submitScore !== "function") {
+			console.error("flashCardClient or submitScore() is not available. Aborting send.");
+			return;
+		}
+
 		let createResult = await flashCardClient.submitScore({
-			deckId: utils.formatId(performance.deckId),
+			deckId: utils?.formatId ? utils.formatId(performance.deckId) : performance.deckId,
 			performanceRecordId: performance.performanceRecordId,
 			player: userName,
-			correctPercent: performance.correctPercent || 0,
+			correctPercent: typeof performance.correctPercent === "number" ? performance.correctPercent : 0,
 		});
-		console.log("Result of high score create");
-		console.log(createResult);
-	} else {
-		console.log("No username set. Not sending score.");
+
+		console.log("Result of high score create:", createResult);
+	} catch (err) {
+		console.error("❌ Error while sending score:", err);
 	}
 }
+
 
 
 function registerKeyboardShortcuts(){
@@ -349,30 +381,52 @@ function isAnyModalOpen() {
 }
 
 
-function savePerformance(){
-    if(!performance || !performance.hasOwnProperty('deckId') || !performance.deckId.length === 0) {
-        console.warn('No current performance information to save! Aborting.')
-        return;
-    }
-    let performanceHistory = storedScores.value;
+function savePerformance() {
+	try {
+		// ✅ Guard against missing performance object
+		if (typeof performance !== "object" || performance == null) {
+			console.warn("Performance object is missing or invalid. Aborting save.");
+			return;
+		}
 
-    if(performanceHistory == null) performanceHistory = [];
-    
-    let existingRecordPosition = performanceHistory.find(obj => {
-        return obj.performanceRecordId === performance.performanceRecordId;
-    });
+		// ✅ Guard against missing deckId
+		if (
+			!Object.prototype.hasOwnProperty.call(performance, "deckId") ||
+			!performance.deckId ||
+			(typeof performance.deckId === "string" && performance.deckId.trim().length === 0) ||
+			(Array.isArray(performance.deckId) && performance.deckId.length === 0)
+		) {
+			console.warn("No valid deckId found in performance. Aborting save.");
+			return;
+		}
 
-    if(existingRecordPosition){
-        performanceHistory[existingRecordPosition] = performance;
-    }else{
-        performanceHistory.push(performance);
-    }
+		// ✅ Ensure storedScores is valid
+		let performanceHistory = Array.isArray(storedScores?.value) ? [...storedScores.value] : [];
 
-    storedScores.value = performanceHistory;
+		// ✅ Check for a valid performanceRecordId
+		if (!performance.performanceRecordId) {
+			console.warn("No performanceRecordId found. Saving as a new record.");
+			performanceHistory.push(performance);
+		} else {
+			// ✅ Find index safely
+			let existingIndex = performanceHistory.findIndex((obj) => obj && typeof obj === "object" && obj.performanceRecordId === performance.performanceRecordId);
 
-    console.log('Saved Performance Data!');
-    console.log(storedScores.value);
+			if (existingIndex !== -1) {
+				performanceHistory[existingIndex] = performance;
+			} else {
+				performanceHistory.push(performance);
+			}
+		}
+
+		storedScores.value = performanceHistory;
+
+		console.log("✅ Saved Performance Data!");
+		console.log(storedScores.value);
+	} catch (err) {
+		console.error("❌ Error saving performance:", err);
+	}
 }
+
 
 function saveSettings(){
     let currentSettings = storedSettings.getPersistentValuesFromUI();
@@ -429,8 +483,10 @@ async function loadSelectedMascot() {
 }
 
 function getPastPerformanceData(){
-    let pastPerformances = performance.getPreviousResults(storedScores.value);
+    console.log(performance);
 
+    let pastPerformances = performance.getPreviousResults(storedScores.value);
+p
     console.log('All Previous Results for this deck');
     console.log(pastPerformances);
 
