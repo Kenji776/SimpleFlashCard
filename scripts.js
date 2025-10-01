@@ -486,7 +486,6 @@ function getPastPerformanceData(){
     console.log(performance);
 
     let pastPerformances = performance.getPreviousResults(storedScores.value);
-p
     console.log('All Previous Results for this deck');
     console.log(pastPerformances);
 
