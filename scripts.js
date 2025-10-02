@@ -301,7 +301,7 @@ async function sendScore() {
 			return;
 		}
 
-		console.log("Sending Score!");
+		console.log("Sending Score! with value: " + performance.runningTotalScore);
 
 		// ✅ Safe call to flashCardClient
 		if (!flashCardClient || typeof flashCardClient.submitScore !== "function") {
@@ -309,11 +309,12 @@ async function sendScore() {
 			return;
 		}
 
+
 		let createResult = await flashCardClient.submitScore({
 			deckId: utils?.formatId ? utils.formatId(performance.deckId) : performance.deckId,
 			performanceRecordId: performance.performanceRecordId,
 			player: userName,
-			correctPercent: typeof performance.correctPercent === "number" ? performance.correctPercent : 0,
+			score: typeof performance.runningTotalScore === "number" ? performance.runningTotalScore : 0,
 		});
 
 		console.log("Result of high score create:", createResult);

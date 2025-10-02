@@ -93,10 +93,11 @@ const FlashcardServerClient = class {
 		deckId,
 		performanceRecordId,
 		player = "Anonymous",
-		correctPercent = 0,
+		score = 0,
 	}) {
+		console.log('Flashcard server score entry: ' + score)
 		return this._request("POST", "/api/score", {
-			body: { deckId, performanceRecordId, player, correctPercent },
+			body: { deckId, performanceRecordId, player, score },
 		});
 	}
 

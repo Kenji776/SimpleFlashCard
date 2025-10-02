@@ -5,9 +5,6 @@ var deckId;
 var refreshGlobalScoresIntervalMS = 10000;
 var databaseUrl = "https://fc.kenji776-labs.org/";
 
-
-
-
 async function init(){
     const urlParams = new URLSearchParams(window.location.search);
     databaseUrl = urlParams.get('server-url');
@@ -17,7 +14,7 @@ async function init(){
         console.warn("⚠️ No deckId or server-url passed into scores.js. Cannot fetch scores.");
     }
     buildGlobalHighScoresTable(deckId, 'global-leaderboard-container')
-    //registerGetScoresInterval(deckId)
+    registerGetScoresInterval(deckId)
     getScores(deckId);
 }
 
