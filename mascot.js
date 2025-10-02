@@ -221,7 +221,9 @@
 	_punchFXTimeout = null;
 
 	// ---- Physics / Throwing ----
-	// ---- Physics / Throwing / Gestures ----
+	_maxVel = 2000; // px/sec, cap for linear velocity
+	_maxAngVel = 50; // rad/sec, cap for spin
+
 	_phEnabled = false;
 	_dragging = false;
 	_dragCandidate = false;
@@ -493,6 +495,13 @@
 					let prevSetting = this.mute;
 					this.mute = false;
 					this.dropBomb();
+					this.mute = prevSetting;
+					e.preventDefault();
+				}
+				if (e.key && e.key.toLowerCase() === "v") {
+					let prevSetting = this.mute;
+					this.mute = false;
+					this.dropThwomp();
 					this.mute = prevSetting;
 					e.preventDefault();
 				}
@@ -1442,7 +1451,9 @@
 			return;
 		}
 		if (this.urls.sounds[category].indexOf(soundName) === -1) {
-			console.error(`No sound named ${soundName} could be found in sound library. Valid sounds are: ${this.urls.sounds[category]}`);
+			console.log(this.urls.sounds[category]);
+			console.log(this.urls.sounds[category].indexOf(soundName));
+			console.error(`No sound named ${soundName} could be found in sound category ${category}. Valid sounds are: ${this.urls.sounds[category]}`);
 			return;
 		}
 
@@ -1754,7 +1765,101 @@
 		requestAnimationFrame(tick);
 	}
 
-	// Inside Mascot class
+	/**
+	 * Drop a Thwomp-style block from above that squishes the mascot.
+	 */
+	dropThwomp(opts = {}) {
+		if (!this.container || !this.mascotDiv) return;
+
+		const imgName = opts.image || "thwomp.png"; // <-- provide sprite in /img
+		const W = window.innerWidth;
+		const H = window.innerHeight;
+
+		// Mascot geometry
+		const mrect = this.container.getBoundingClientRect();
+		const mcx = mrect.left + mrect.width / 2;
+		const mtop = mrect.top;
+
+		// Thwomp sprite
+		const thwompW = opts.width || 200;
+		const thwompH = opts.height || 200;
+		const thwomp = document.createElement("div");
+		thwomp.className = "mascot-thwomp";
+		Object.assign(thwomp.style, {
+			position: "fixed",
+			width: `${thwompW}px`,
+			height: `${thwompH}px`,
+			backgroundImage: `url(${this.buildMascotMediaUrl(imgName, "img")})`,
+			backgroundSize: "contain",
+			backgroundRepeat: "no-repeat",
+			pointerEvents: "none",
+			zIndex: "2147483647",
+			left: `${mcx - thwompW / 2}px`,
+			top: `-${thwompH + 40}px`, // start above screen
+		});
+		document.body.appendChild(thwomp);
+
+		// Animate downwards
+		let y = -thwompH - 40;
+		let speed = opts.speed || 2000;
+		let last = this._now();
+		let squished = false;
+
+		const setPos = () => (thwomp.style.top = `${y}px`);
+
+		const tick = () => {
+			if (!document.body.contains(thwomp)) return;
+
+			const now = this._now();
+			const dt = Math.min(0.05, (now - last) / 1000);
+			last = now;
+
+			if (!squished) {
+				y += speed * dt;
+				setPos();
+			}
+
+			// Collision check
+			if (!squished && y + thwompH >= mtop) {
+				squished = true;
+
+				// Stop with Thwomp bottom exactly at mascot top
+				y = mrect.bottom - thwompH;
+				setPos();
+
+				// Mascot squish
+				this.mascotDiv.style.transition = "transform 0.12s ease";
+				this.mascotDiv.style.transformOrigin = "bottom center";
+				this.mascotDiv.style.transform = "scaleY(0.25) scaleX(1.25)";
+
+				// Pain sound + line
+				this.playRandomSound("hit");
+				this.sayRandom("pain");
+				this.playSound('misc','thwomp.mp3')
+				this.shakeScreen(200);
+
+				// After 2s, restore mascot + remove thwomp
+				setTimeout(() => {
+					if (this.mascotDiv) {
+						this.mascotDiv.style.transform = "scale(1,1)";
+						this.mascotDiv.style.transformOrigin = ""; // optional reset
+					}
+					thwomp.remove();
+				}, 2000);
+
+				return;
+			}
+
+			// Remove if it passes bottom (failsafe)
+			if (!squished && y > H + thwompH + 40) {
+				thwomp.remove();
+				return;
+			}
+
+			requestAnimationFrame(tick);
+		};
+		requestAnimationFrame(tick);
+	}
 	/**
 	 * Drop a bomb onto the mascot. Falls from above, explodes on contact,
 	 * flings mascot with physics, plays explosion sounds, shakes and whites out screen.
@@ -1843,15 +1948,12 @@
 				}
 
 				// Screen shake + whiteout
-				document.body.classList.add("screen-shake");
+				this.shakeScreen();
 				const whiteout = document.createElement("div");
 				whiteout.className = "whiteout-flash";
 				document.body.appendChild(whiteout);
 				setTimeout(() => whiteout.classList.add("fade-out"), 150);
-				setTimeout(() => {
-					document.body.classList.remove("screen-shake");
-					whiteout.remove();
-				}, 500);
+
 
 				// Remove explosion sprite after gif loop (~1.5s)
 				setTimeout(() => bomb.remove(), 1000);
@@ -1868,6 +1970,14 @@
 			requestAnimationFrame(tick);
 		};
 		requestAnimationFrame(tick);
+	}
+
+	shakeScreen(duration=500){
+		document.body.classList.add("screen-shake");
+		setTimeout(() => {
+			document.body.classList.remove("screen-shake");
+			whiteout.remove();
+		}, duration);
 	}
 
 	enableThrowPhysics() {
@@ -2138,18 +2248,26 @@
 		// Integrate linear
 		this._vel.x *= this._air;
 		this._vel.y = this._vel.y * this._air + this._acc.y * dt;
+
+		// 🔒 Clamp velocities to prevent insane speeds
+		this._vel.x = Math.max(-this._maxVel, Math.min(this._maxVel, this._vel.x));
+		this._vel.y = Math.max(-this._maxVel, Math.min(this._maxVel, this._vel.y));
+
 		this._pos.x += this._vel.x * dt;
 		this._pos.y += this._vel.y * dt;
 
 		// Integrate angular (tumble)
 		this._angVel *= this._angAir;
+
+		// 🔒 Clamp angular velocity too
+		this._angVel = Math.max(-this._maxAngVel, Math.min(this._maxAngVel, this._angVel));
+
 		this._angle += this._angVel * dt;
 
 		const W = window.innerWidth;
 		const H = window.innerHeight;
 		let impacted = false;
 		let impactSpeed = 0;
-
 		// Floor
 		if (this._pos.y + this._size.h > H) {
 			const vBefore = Math.abs(this._vel.y);

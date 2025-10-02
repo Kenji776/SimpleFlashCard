@@ -259,3 +259,7 @@
 .whiteout-flash.fade-out {
   opacity: 0;
 }
+
+.mascot-image {
+  transform-origin: bottom center; /* squish down into the floor */
+}
