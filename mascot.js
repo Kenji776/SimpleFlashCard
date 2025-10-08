@@ -1647,12 +1647,12 @@
 			return;
 		}
 
-		// 🎲 Pick a random vehicle config
+		// 🎲 Pick a random or specific vehicle
 		const vehicleCfg = opts.vehicle || this.elements.vehicles[Math.floor(Math.random() * this.elements.vehicles.length)];
 		console.log("[summonVehicle] Picked vehicle:", vehicleCfg);
 
 		const side = opts.side || (Math.random() < 0.5 ? "left" : "right");
-		const imgName = vehicleCfg.image;
+		const imgUrl = this.buildMascotMediaUrl(vehicleCfg.image, "img");
 		const W = window.innerWidth;
 
 		// Mascot geometry (center)
@@ -1661,108 +1661,126 @@
 		const mcy = mrect.top + mrect.height / 2;
 		console.log("[summonVehicle] Mascot center:", { mcx, mcy });
 
-		// Vehicle sprite
-		const vW = vehicleCfg.width || 100;
-		const vH = vehicleCfg.height || 100;
+		// Load the image to determine proportions
+		const img = new Image();
+		img.src = imgUrl;
 
-		const vehicle = document.createElement("div");
-		vehicle.className = `mascot-vehicle ${vehicleCfg.name.replace(/\s+/g, "-")}`;
-		Object.assign(vehicle.style, {
-			position: "fixed",
-			width: `${vW}px`,
-			height: `${vH}px`,
-			backgroundImage: `url(${this.buildMascotMediaUrl(imgName, "img")})`,
-			backgroundSize: "contain",
-			backgroundRepeat: "no-repeat",
-			pointerEvents: "none",
-			zIndex: "2147483647",
-			top: `${mcy - vH / 2}px`,
-			left: side === "left" ? `${-vW - 20}px` : `${W + 20}px`,
-			transform: side === "right" ? "scaleX(-1)" : "none",
-		});
-		document.body.appendChild(vehicle);
+		img.onload = () => {
+			const naturalW = img.naturalWidth || 100;
+			const naturalH = img.naturalHeight || 100;
 
-		console.log("[summonVehicle] Spawned vehicle element:", vehicle);
+			// Clamp to maximum height 400px, preserving aspect ratio
+			const maxH = 400;
+			let scale = naturalH > maxH ? maxH / naturalH : 1;
+			const vW = naturalW * scale;
+			const vH = naturalH * scale;
 
-		// 🔊 Play horn if available
-		if (vehicleCfg.horn?.length) {
-			console.log("[summonVehicle] Playing horn:", vehicleCfg.horn);
-			this.playRandomSound?.(vehicleCfg.horn);
-		}
+			// Vehicle element
+			const vehicle = document.createElement("div");
+			vehicle.className = `mascot-vehicle ${vehicleCfg.name.replace(/\s+/g, "-")}`;
+			Object.assign(vehicle.style, {
+				position: "fixed",
+				width: `${vW}px`,
+				height: `${vH}px`,
+				backgroundImage: `url(${imgUrl})`,
+				backgroundSize: "contain",
+				backgroundRepeat: "no-repeat",
+				pointerEvents: "none",
+				zIndex: "2147483647",
+				transform: side === "right" ? "scaleX(-1)" : "none",
+			});
+			document.body.appendChild(vehicle);
 
-		// Optional panic line
-		setTimeout(() => this.sayRandom?.("scared"), 150);
+			// Align along the bottom edge of the screen
+			const viewportH = window.innerHeight;
+			const bottomMargin = 10;
+			let y = viewportH - vH - bottomMargin;
 
-		// Motion state
-		let x = side === "left" ? -vW - 20 : W + 20;
-		const y = mcy - vH / 2;
-		const dir = side === "left" ? +1 : -1;
-		let last = this._now();
+			let x = side === "left" ? -vW - 20 : W + 20;
+			const dir = side === "left" ? +1 : -1;
+			let last = this._now();
 
-		// 🕑 Collision cooldown
-		const hitCooldownMs = 1000; // 1 second cooldown
-		let lastHitTime = 0;
+			// 🕑 Collision cooldown
+			const hitCooldownMs = 1000;
+			let lastHitTime = 0;
 
-		const setPos = () => {
-			vehicle.style.left = `${x}px`;
-			vehicle.style.top = `${y}px`;
-		};
-		setPos();
-
-		const intersectsMascot = () => {
-			const b = vehicle.getBoundingClientRect();
-			const m = this.container.getBoundingClientRect();
-			return !(b.right < m.left || b.left > m.right || b.bottom < m.top || b.top > m.bottom);
-		};
-
-		const tick = () => {
-			if (!document.body.contains(vehicle)) {
-				console.log("[summonVehicle] Vehicle element removed, stopping tick.");
-				return;
-			}
-
-			const now = this._now();
-			const dt = Math.min(0.05, (now - last) / 1000);
-			last = now;
-
-			// Move vehicle
-			x += dir * vehicleCfg.speed * dt * this._vehicleSpeedMultiplier;
+			const setPos = () => {
+				// Clamp y to ensure vehicle bottom never goes below the viewport
+				const clampedY = Math.min(y, window.innerHeight - vH - bottomMargin);
+				vehicle.style.left = `${x}px`;
+				vehicle.style.top = `${clampedY}px`;
+			};
 			setPos();
 
-			// Collision check with cooldown
-			if (intersectsMascot() && now - lastHitTime > hitCooldownMs) {
-				lastHitTime = now;
-				console.log("[summonVehicle] Mascot hit by vehicle:", vehicleCfg.name);
+			const intersectsMascot = () => {
+				const b = vehicle.getBoundingClientRect();
+				const m = this.container.getBoundingClientRect();
+				return !(b.right < m.left || b.left > m.right || b.bottom < m.top || b.top > m.bottom);
+			};
 
-				this.setMood("angry");
-				this.playRandomSound?.("crash");
-				//this.dealDamage?.(vehicleCfg.damage);
-
-				if (!this._phEnabled) this.enableThrowPhysics();
-
-				this._vel.x = dir * vehicleCfg.speed * this._vehicleSpeedMultiplier * 0.95;
-				this._vel.y = -260;
-				this._angVel = dir * 6.5;
-
-				this.mascotDiv.classList.add("hitshake");
-				setTimeout(() => this.mascotDiv.classList.remove("hitshake"), 140);
-
-				this._lastPhysicsT = this._now();
-				if (!this._throwRAF) this._throwRAF = requestAnimationFrame((t) => this._physicsStep(t));
+			// 🔊 Play horn if available
+			if (vehicleCfg.horn?.length) {
+				console.log("[summonVehicle] Playing horn:", vehicleCfg.horn);
+				this.playRandomSound?.(vehicleCfg.horn);
 			}
 
-			// Despawn when off-screen
-			if ((dir === +1 && x > W + vW + 40) || (dir === -1 && x < -vW - 40)) {
-				console.log("[summonVehicle] Vehicle exited screen:", vehicleCfg.name);
-				vehicle.remove();
-				return;
-			}
+			// Optional panic line
+			setTimeout(() => this.sayRandom?.("scared"), 150);
 
+			const tick = () => {
+				if (!document.body.contains(vehicle)) {
+					console.log("[summonVehicle] Vehicle element removed, stopping tick.");
+					return;
+				}
+
+				const now = this._now();
+				const dt = Math.min(0.05, (now - last) / 1000);
+				last = now;
+
+				// Move vehicle horizontally
+				x += dir * vehicleCfg.speed * dt * this._vehicleSpeedMultiplier;
+				setPos();
+
+				// Collision check with cooldown
+				if (intersectsMascot() && now - lastHitTime > hitCooldownMs) {
+					lastHitTime = now;
+					console.log("[summonVehicle] Mascot hit by vehicle:", vehicleCfg.name);
+
+					this.setMood("angry");
+					this.playRandomSound?.("crash");
+
+					if (!this._phEnabled) this.enableThrowPhysics();
+
+					this._vel.x = dir * vehicleCfg.speed * this._vehicleSpeedMultiplier * 0.95;
+					this._vel.y = -260;
+					this._angVel = dir * 6.5;
+
+					this.mascotDiv.classList.add("hitshake");
+					setTimeout(() => this.mascotDiv.classList.remove("hitshake"), 140);
+
+					this._lastPhysicsT = this._now();
+					if (!this._throwRAF) this._throwRAF = requestAnimationFrame((t) => this._physicsStep(t));
+				}
+
+				// Despawn when off-screen
+				if ((dir === +1 && x > W + vW + 40) || (dir === -1 && x < -vW - 40)) {
+					console.log("[summonVehicle] Vehicle exited screen:", vehicleCfg.name);
+					vehicle.remove();
+					return;
+				}
+
+				requestAnimationFrame(tick);
+			};
+
+			console.log("[summonVehicle] Starting tick loop.");
 			requestAnimationFrame(tick);
-		};
 
-		console.log("[summonVehicle] Starting tick loop.");
-		requestAnimationFrame(tick);
+			// Keep the car glued to the bottom when resizing the window
+			window.addEventListener("resize", () => {
+				const newY = window.innerHeight - vH - bottomMargin;
+				vehicle.style.top = `${newY}px`;
+			});
+		};
 	}
 
 	/**
