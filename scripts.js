@@ -242,12 +242,11 @@ function newGame(){
 		resetHistory(); // clear previous session
 
         if (cards && cards.length > 0) {
-            loadNext();
+            
+            handleLoadDeckSelect();
         } else {
             console.warn("⚠️ No cards available to load yet. Waiting for deck initialization.");
         }
-		// Restart
-		loadNext();
 	} catch (err) {
 		console.error("❌ Failed to start new game:", err);
 		handleError(err);
@@ -716,6 +715,20 @@ function loadVariantDeck(){
 async function handleLoadDeckSelect() {
 	doLog("handleLoadDeckSelect called with deckUrl: " + deckUrl);
 	let deckData = await fetchRemoteDeck(deckUrl);
+    const answerCard = document.getElementById("answer-card");
+
+    debugger;
+
+    if (answerCard) {
+        // Show/hide front and back manually
+        const front = answerCard.querySelector(".flip-card-front");
+        const back = answerCard.querySelector(".flip-card-back");
+
+        if (front && back) {
+            front.style.visibility = "visible";
+            back.style.visibility = "hidden";
+        }
+    }
 	loadDeck(deckData);
 }
 
@@ -1725,70 +1738,68 @@ function deckCompleteEvents(){
 
 function animateScoreTally(score) {
 	try {
-        if(scoreTally.isAnimating) return;
-        
+		if (scoreTally.isAnimating) {
+			console.warn("⏳ animateScoreTally: already running, skipping duplicate start.");
+			return;
+		}
+
 		const node = ui.getElements("#final-score-results")?.[0];
 		if (!node) {
 			console.warn("⚠️ animateScoreTally: target node not found — aborting animation.");
 			return;
 		}
 
-		// 🧹 Kill any existing intervals immediately
-		if (scoreTally.tallyAnimationInterval) {
-			clearInterval(scoreTally.tallyAnimationInterval);
-			scoreTally.tallyAnimationInterval = null;
-		}
+		// 🔧 Environment-safe timing and animation
+		const nowFn = typeof performance !== "undefined" && typeof performance.now === "function" ? performance.now.bind(performance) : Date.now;
+		const rafFn = typeof requestAnimationFrame === "function" ? requestAnimationFrame : (cb) => setTimeout(() => cb(nowFn()), 16);
+		const cancelRafFn = typeof cancelAnimationFrame === "function" ? cancelAnimationFrame : clearTimeout;
 
-		// 🧩 Prevent re-entry
-		if (scoreTally.isAnimating) {
-			console.warn("⏳ animateScoreTally: already running, skipping duplicate start.");
-			return;
-		}
+		// 🧹 Stop any previous animation
+		if (scoreTally._rafId) cancelRafFn(scoreTally._rafId);
+
 		scoreTally.isAnimating = true;
-
 		scoreTally.targetNode = node;
 		scoreTally.totalScore = Number(score) || 0;
 		scoreTally.currentTally = 0;
+		node.textContent = "0"; // ✅ always start clean
 
 		let increment = 10;
 		if (score > 100000) increment = 1000;
 		else if (score > 50000) increment = 500;
 		else if (score > 10000) increment = 50;
 
-		scoreTally.tallyAnimationInterval = setInterval(() => {
-			try {
-				// 💣 Stop if target missing or reset
-				if (!scoreTally || !scoreTally.targetNode || !(scoreTally.targetNode instanceof Element) || !document.body.contains(scoreTally.targetNode)) {
-					console.log("⏹️ Score tally stopped — invalid or missing target node.");
-					clearInterval(scoreTally.tallyAnimationInterval);
-					scoreTally.tallyAnimationInterval = null;
-					scoreTally.isAnimating = false;
-					return;
-				}
+		let startTime = null; // ✅ initialized on first frame
 
-				scoreTally.currentTally += increment;
-				if (scoreTally.currentTally >= scoreTally.totalScore) {
-					scoreTally.currentTally = scoreTally.totalScore;
-					scoreTally.targetNode.textContent = scoreTally.currentTally;
-
-					if (scoreTally.targetNode.classList) {
-						scoreTally.targetNode.classList.add("bounce");
-					}
-
-					clearInterval(scoreTally.tallyAnimationInterval);
-					scoreTally.tallyAnimationInterval = null;
-					scoreTally.isAnimating = false;
-					return;
-				}
-
-				scoreTally.targetNode.textContent = scoreTally.currentTally;
-			} catch (innerErr) {
-				console.warn("⚠️ Error in tally interval tick:", innerErr);
-				clearInterval(scoreTally.tallyAnimationInterval);
-				scoreTally.tallyAnimationInterval = null;
+		function step(timestamp) {
+			if (!scoreTally || !scoreTally.targetNode || !(scoreTally.targetNode instanceof Element) || !document.body.contains(scoreTally.targetNode)) {
+				console.log("⏹️ Score tally stopped — invalid or missing target node.");
 				scoreTally.isAnimating = false;
+				return;
 			}
-		}, scoreTally.tallyIntervalMS || 10);
+
+			if (startTime === null) {
+				startTime = timestamp; // first frame sets baseline
+			}
+
+			const elapsed = timestamp - startTime;
+
+			// 🔄 Simple smooth progression based on time
+			const progress = Math.min(elapsed / 1000, 1); // normalized progress (1s animation cap)
+			scoreTally.currentTally = Math.min(scoreTally.totalScore, Math.floor(scoreTally.totalScore * progress));
+
+			node.textContent = scoreTally.currentTally;
+
+			if (scoreTally.currentTally >= scoreTally.totalScore) {
+				node.textContent = scoreTally.totalScore;
+				node.classList?.add("bounce");
+				scoreTally.isAnimating = false;
+				return;
+			}
+
+			scoreTally._rafId = rafFn(step);
+		}
+
+		scoreTally._rafId = rafFn(step);
 	} catch (err) {
 		console.error("❌ Error in animateScoreTally:", err);
 		scoreTally.isAnimating = false;
@@ -2166,59 +2177,58 @@ function updateUiForState(state) {
 
 function resetHistory(){
     try{
-        updateUiForState("init");
+			updateUiForState("init");
 
-        historyEntryToWrite = null;
-        viewedCards = [];
-        availableCards = [];
-        cards = [];
-        cardIndex = -1;
-		cardLibrary = {};
-	    currentCard = {};
-		config = {};
-		hintIndex = 0;
-		currentAnswer = '';
+			historyEntryToWrite = null;
+			viewedCards = [];
+			availableCards = [];
+			cardIndex = -1;
+			cardLibrary = {};
+			currentCard = {};
+			config = {};
+			hintIndex = 0;
+			currentAnswer = "";
+
+			//final score tally objects
+			scoreTally = {
+				targetNode: {},
+				tallyAnimationInterval: {}, //interval timer
+				currentTally: 0, //current value of score tally
+				totalScore: 0, //score to reach to clear tally
+				tallyIntervalMS: 1, //how often to incriment the display
+			};
+
+			document.getElementById("hint-text").innerHTML = "";
+			document.getElementById("clue-text").innerHTML = "";
+			document.getElementById("history-items").innerHTML = "";
+			document.getElementById("viewed-total").innerHTML = `${viewedCards.length} / ${cards.length}`;
+			document.getElementById("hint-text").innerHTML = "";
+			document.getElementById("clue-text").innerHTML = "";
+			document.getElementById("prompt").innerHTML = "";
+			document.getElementById("answer").innerHTML = "";
 
 
-		//final score tally objects
-		scoreTally = {
-			targetNode: {},
-			tallyAnimationInterval: {}, //interval timer
-			currentTally: 0, //current value of score tally
-			totalScore: 0, //score to reach to clear tally
-			tallyIntervalMS: 1 //how often to incriment the display
-		}
+			timer.stopTimer();
+			timer.seconds = 0;
+			timer.tens = 0;
+			timer.mins = 0;
+			// Remove old history DOM items
+			const historyContainer = document.getElementById("history-items");
+			if (historyContainer) historyContainer.innerHTML = "";
 
-		
-		
-        document.getElementById("hint-text").innerHTML = '';
-        document.getElementById("clue-text").innerHTML = '';
-        document.getElementById('history-items').innerHTML = '';
-		document.getElementById("viewed-total").innerHTML = `${viewedCards.length} / ${cards.length}`;
-		
-		timer.stopTimer();
-		timer.seconds =0;
-		timer.tens = 0;
-		timer.mins = 0;
-        		// Remove old history DOM items
-		const historyContainer = document.getElementById("history-items");
-		if (historyContainer) historyContainer.innerHTML = "";
+			// Reset counters / globals
+			historyEntryToWrite = null;
+			cardIndex = -1;
+			viewedCards = [];
+			if (timer) timer.stopTimer();
+			ui.hideElements(["results-modal", "confetti_outer"]);
+			if (typeof scoreTally !== "undefined") clearInterval(scoreTally?.resultFactInterval);
+			updateUIWithPerformanceData(performance);
 
-		// Reset counters / globals
-		historyEntryToWrite = null;
-		cardIndex = -1;
-		viewedCards = [];
-		if (timer) timer.stopTimer();
-        ui.hideElements(["results-modal", "confetti_outer"]);
-		if (typeof scoreTally !== "undefined") clearInterval(scoreTally?.resultFactInterval);
-		updateUIWithPerformanceData(performance);
-
-        if (scoreTally?.tallyAnimationInterval) {
-            clearInterval(scoreTally.tallyAnimationInterval);
-            scoreTally.tallyAnimationInterval = null;
-        }
-        scoreTally.isAnimating = false;
-    }catch(ex){
+			if (scoreTally._rafId) cancelAnimationFrame(scoreTally._rafId);
+			scoreTally._rafId = null;
+			scoreTally.isAnimating = false;
+		}catch(ex){
         doLog('Error resetting history');
         console.error(ex);
         handleError(ex);
