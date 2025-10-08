@@ -32,8 +32,6 @@ async function getScores(deckId) {
 
 	const url = `${databaseUrl}/api/scores?deck=${encodeURIComponent(deckId)}`;
 
-	console.log(`➡️ Fetching scores from: ${url}`);
-
 	try {
 		const response = await fetch(url, {
 			method: "GET",
@@ -49,7 +47,6 @@ async function getScores(deckId) {
 			return { success: false, error: result };
 		}
 
-		console.log("✅ Scores fetched successfully:", result);
 		return result;
 	} catch (error) {
 		console.error("❌ Error fetching scores:", error);
@@ -75,9 +72,6 @@ async function buildGlobalHighScoresTable(deckId, targetContainer){
         th.appendChild(document.createTextNode(header));
         tr.appendChild(th);
     });
-
-    console.log('Parsing Scores');
-    console.log(scores)
 
     if(!scores) return;
     scores.forEach(function(score) {

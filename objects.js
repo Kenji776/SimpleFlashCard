@@ -243,7 +243,40 @@ class PerformanceRecord {
 			console.error("❌ Error in recalculateScore:", err);
 		}
 	}
+	reset() {
+		try {
+			console.log(`♻️ Resetting PerformanceRecord for deck: ${this.deckId}`);
 
+			this.currentPoints = 0;
+			this.possiblePoints = 0;
+			this.numberCorrect = 0;
+			this.numberOfQuestions = 0;
+			this.numberIncorrect = 0;
+			this.numberUnanswered = 0;
+			this.pointsScorePercent = 0;
+			this.correctPercent = 0;
+			this.pointsGrade = "-";
+			this.numberCorrectGrade = "-";
+			this.streak = 0;
+			this.longestStreak = 0;
+			this.runningTotalScore = 0;
+			this.missStreak = 0;
+			this.hintsUsed = 0;
+			this.answersRevelaed = 0;
+			this.lettersShown = 0;
+			this.answers = [];
+			this.dateTimeStart = Date.now();
+
+			// optional: new record id for each run
+			this.performanceRecordId =
+				Date.now().toString(36) + Math.random().toString(36).substr(2);
+
+			console.log("✅ PerformanceRecord reset complete.");
+		} catch (err) {
+			console.error("❌ Error in PerformanceRecord.reset:", err);
+		}
+	}
+	
 	getLetterGrade(numberGrade) {
 		try {
 			// ✅ Ensure we have a number

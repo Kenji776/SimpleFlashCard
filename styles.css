@@ -944,3 +944,54 @@ input[type="checkbox"]:checked::before {
 .tg-muted { color: #777; }
 .tg-hidden { filter: blur(6px); }
 .disabled { opacity: 0.6; pointer-events: none; }
+
+/* --- New Game Button --- */
+#new-game-button {
+    font-family: 'Rocher', sans-serif;
+    font-size: 1.4rem;
+    font-weight: bold;
+    color: #04AA6D;
+    background-color: transparent;
+    border: 3px solid #04AA6D;
+    border-radius: 10px;
+    padding: 10px 28px;
+    margin-top: 12px;
+    cursor: pointer;
+    transition: all 0.25s ease-in-out;
+    box-shadow: 0 0 10px rgba(4, 170, 109, 0.2);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+#new-game-button:hover {
+    background-color: #04AA6D;
+    color: #000;
+    box-shadow: 0 0 20px #04AA6D, 0 0 40px rgba(4,170,109,0.4);
+    transform: scale(1.05);
+    animation: gelatine 1s infinite ease-in-out alternate;
+}
+
+#new-game-button:active {
+    transform: scale(0.97);
+    background-color: #038b5a;
+    box-shadow: 0 0 10px #038b5a;
+}
+
+#new-game-button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    animation: none;
+    background-color: #333;
+    border-color: #666;
+    color: #888;
+}
+
+/* Optional subtle pulse effect when modal first opens */
+@keyframes newGamePulse {
+    0% { box-shadow: 0 0 0px rgba(4,170,109,0.0); }
+    50% { box-shadow: 0 0 25px rgba(4,170,109,0.6); }
+    100% { box-shadow: 0 0 0px rgba(4,170,109,0.0); }
+}
+#new-game-button.pulse {
+    animation: newGamePulse 1.5s infinite ease-in-out;
+}

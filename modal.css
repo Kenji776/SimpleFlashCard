@@ -1,18 +1,26 @@
 /* The Modal (background) */
  .modal {
    
-    position: fixed;
-    left: 0; top: 0; width: 100%; height: 100%;
-    /* change/keep */
-    overflow: auto;       /* fallback if content is huge */
-    padding-top: 0;       /* <-- remove big top padding so we can center cleanly */
-    inset: 0;             /* equivalent to left/top/width/height above */
-    display: none;
-    /* Enable scroll if needed */
-     background-color: rgb(0,0,0);
-    /* Fallback color */
-     background-color: rgba(0,0,0,0.4);
-    /* Black w/ opacity */
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	background-color: rgba(0, 0, 0, 0.4);
+	z-index: 1000;
+	display: none;
+	visibility: hidden;
+	opacity: 0;
+	transition: opacity 0.2s ease-in-out, visibility 0.2s;
+}
+.modal-fade-in {
+	opacity: 1 !important;
+	visibility: visible !important;
+}
+
+.modal-fade-out {
+	opacity: 0 !important;
+	visibility: hidden !important;
 }
 /* Modal Content */
 .modal-content {

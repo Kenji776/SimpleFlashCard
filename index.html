@@ -362,34 +362,29 @@
 			</div>
 
 			<div class="modal-body">
-			<form id="deck-upload-form" onsubmit="return false;">
-				<div class="field">
-				<label class="sub-header-text-2">Category</label>
-				<div style="margin:.5rem 0">
-					<label><input type="radio" name="catMode" value="existing" checked> Use existing</label>
-					&nbsp;&nbsp;
-					<label><input type="radio" name="catMode" value="new"> Create new</label>
-				</div>
+				<form id="deck-upload-form" onsubmit="return false;">
+					<div class="field">
+					<label class="sub-header-text-2">Category</label>
+					<div style="margin:.5rem 0">
+						<label><input type="radio" name="catMode" value="existing" checked> Use existing</label>
+						&nbsp;&nbsp;
+						<label><input type="radio" name="catMode" value="new"> Create new</label>
+					</div>
 
-				<select id="upload-existing-category" style="width:100%;"></select>
-				<input type="text" id="upload-new-category" placeholder="New category name" style="display:none;width:100%;margin-top:.5rem;" />
-				</div>
+					<select id="upload-existing-category" style="width:100%;"></select>
+					<input type="text" id="upload-new-category" placeholder="New category name" style="display:none;width:100%;margin-top:.5rem;" />
+					</div>
 
-				<div class="field" style="margin-top:1rem;">
-				<label for="upload-deck-name" class="sub-header-text-2">Deck name</label>
-				<input type="text" id="upload-deck-name" placeholder="e.g., GroupE" required style="width:100%;" />
-				</div>
+					<div class="field" style="margin-top:1rem;">
+					<label for="upload-deck-file" class="sub-header-text-2">Deck file (.cards)</label>
+					<input type="file" id="upload-deck-file" accept=".cards" required style="width:100%;" />
+					<small id="upload-file-hint">Max 1 MB, plain text JSON.</small>
+					</div>
 
-				<div class="field" style="margin-top:1rem;">
-				<label for="upload-deck-file" class="sub-header-text-2">Deck file (.cards)</label>
-				<input type="file" id="upload-deck-file" accept=".cards" required style="width:100%;" />
-				<small id="upload-file-hint">Max 1 MB, plain text JSON.</small>
-				</div>
-
-				<div class="field" style="margin-top:1rem;">
-					<output id="deck-upload-status" role="status"></output>
-				</div>
-			</form>
+					<div class="field" style="margin-top:1rem;">
+						<output id="deck-upload-status" role="status"></output>
+					</div>
+				</form>
 			</div>
 
 			<div class="modal-footer">
@@ -708,6 +703,11 @@
 			
 			<div class="modal-footer">
 				<h3>Play again soon!</h3>
+					<center>
+						<button id="new-game-button" class="primary-button" style="margin-top: 10px;" onclick="newGame()">
+							Start New Game
+						</button>
+					</center>
 			</div>
 		</div>
 	</div>

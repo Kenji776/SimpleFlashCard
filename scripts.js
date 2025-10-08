@@ -40,11 +40,11 @@ const template = new Template();
 let labels = new Labels();
 var serverPassword = "";
 
-var showLogs = false;
+var showLogs = true;
 var deckUrl;
 var cardLibrary = {};
 var currentCard = {};
-var cardIndex = 0;
+var cardIndex = -1;
 var promptKey = 'brandName';
 var answerKey = 'genericName';
 var cards = [];
@@ -67,7 +67,8 @@ var userName = 'Test User';
 var cardLabel = "Card Details";
 var mascotLeaveLimit = 15;
 
-
+//audio
+let fanfareAudio = null;
 
 //final score tally objects
 var scoreTally = {
@@ -105,7 +106,7 @@ var options = {
 const typingGame = new TypingMiniGame({ modalId: "type-attack-modal" });
 
 async function init() {
-	setInitialButtonStates(); // <- lock down buttons first
+	updateUiForState("init");
 	registerKeyboardShortcuts();
 	registerPersistantDataStorage();
 	resultsModal.registerModal("results-modal");
@@ -224,6 +225,34 @@ function updateStatus(element, message) {
 	element.textContent = message;
 }
 
+function newGame(){
+   	try {
+		console.log("🔁 Starting new game...");
+		resultsModal.hideModal();
+        // 🔇 Stop any fanfare still playing
+        if (fanfareAudio) {
+            try {
+                fanfareAudio.pause();
+                fanfareAudio.currentTime = 0;
+                console.log("🔇 Fanfare stopped.");
+            } catch (err) {
+                console.warn("⚠️ Could not stop fanfare:", err);
+            }
+        }
+		resetHistory(); // clear previous session
+
+        if (cards && cards.length > 0) {
+            loadNext();
+        } else {
+            console.warn("⚠️ No cards available to load yet. Waiting for deck initialization.");
+        }
+		// Restart
+		loadNext();
+	} catch (err) {
+		console.error("❌ Failed to start new game:", err);
+		handleError(err);
+	} 
+}
 function getServerUrl() {
 	databaseUrl = document.getElementById("server-url").value.trim();
     databaseUrl = databaseUrl.endsWith("/") ? databaseUrl.slice(0, -1) : databaseUrl;
@@ -258,7 +287,6 @@ async function performPostConnectionSetup(statusElement) {
 		setUsername(settings.config.username);
 	}
 
-	setUi(true);
 }
     
 async function loadCardLibrary(){
@@ -489,8 +517,6 @@ function getPastPerformanceData(){
     let pastPerformances = performance.getPreviousResults(storedScores.value);
     console.log('All Previous Results for this deck');
     console.log(pastPerformances);
-
-    deckCompleteEvents();
 }
 
 function setUsername(value){
@@ -719,37 +745,46 @@ async function loadDeck(deckData){
     }
 
     resetHistory();
-    cards = assignCardIds(deckData.cards);
+        cards = assignCardIds(deckData.cards);
 
-    availableCards = cards;
-    config = deckData.config;
+        availableCards = cards;
+        config = deckData.config;
+		// Reset indices & state
+		cardIndex = -1;
+		viewedCards = [];
+		availableCards = [...cards];
+		scoreTally = {};
+		performance.reset();
 
-    document.getElementById("content-header").innerHTML= `Card Stack: ${config.name} - ${cards.length} Cards`; 
-    document.title = config.name;
-    
-    setPromptKey(config.defaultPrompt);
-    
-    setSelectOptions('prompt-key', config.promptKeys, promptKey, true, true);
-    //setSelectOptions('answerKey', config.answerKeys, answerKey, true);
-    //loadCard(0);
+		// Reset UI
+		ui.showElements(["deck-controls", "controls"]);
+		ui.hideElements(["results-modal", "confetti_outer", "deck-complete-header", "new-high-score-alert"]);
+		updateUiForState("init");
+        document.getElementById("content-header").innerHTML= `Card Stack: ${config.name} - ${cards.length} Cards`; 
+        document.title = config.name;
+        
+        setPromptKey(config.defaultPrompt);
+        
+        setSelectOptions('prompt-key', config.promptKeys, promptKey, true, true);
+        //setSelectOptions('answerKey', config.answerKeys, answerKey, true);
+        //loadCard(0);
 
-    if(!config.isVariant) setVariantDeckOptions();
+        if(!config.isVariant) setVariantDeckOptions();
 
-    var clueBtn = document.getElementById("clue-button");
-    clueBtn.innerHTML  = config?.labels?.clueButtonName ? config.labels.clueButtonName : 'Clue';
+        var clueBtn = document.getElementById("clue-button");
+        clueBtn.innerHTML  = config?.labels?.clueButtonName ? config.labels.clueButtonName : 'Clue';
 
-    doLog('Set clue button name to: ' + clueBtn.innerHTML );
-    doLog(config.labels);
+        doLog('Set clue button name to: ' + clueBtn.innerHTML );
+        doLog(config.labels);
 
-    ui.hideElements('intro-slide-image');
-    ui.showElements('deck-loaded-image');
-    setUi(true);
+        ui.hideElements('intro-slide-image');
+        ui.showElements('deck-loaded-image');
 
-    setNavigationButtonStates(0,cards.length);
-	
-    document.getElementById("prompt").innerHTML= `${config.name} Loaded. Press Next To Begin`;
+        setNavigationButtonStates(0,cards.length);
+        
+        document.getElementById("prompt").innerHTML= `${config.name} Loaded. Press Next To Begin`;
 
-	setControlsEnabled(true);
+        updateUiForState("deckLoaded");
 
 }
 
@@ -927,13 +962,16 @@ function generateDeckFromData(shuffleConfig=new ShuffleDeckConfig()){
 * @param {Array} cards a array of card objects which to assign ids if they do not posses one.
 * @returns list of cards with set modified ids
 */
-function assignCardIds(cards){
-    for(card in cards){
-        if(!card.hasOwnProperty('id')){
-            cards[card].id = Date.now().toString(36) + Math.random().toString(36).substr(2);
-        }
-    }
-    return cards;
+function assignCardIds(cards) {
+	return cards.map((card) => ({
+		...card,
+		id:
+			card.id ||
+			Date.now().toString(36) +
+				Math.random()
+					.toString(36)
+					.substr(2),
+	}));
 }
 
 function getCardById(cardId){
@@ -1012,8 +1050,6 @@ function loadCard(cardId, forceIndex){
 			typeof currentCard.note !== "undefined" &&
 			String(currentCard.note).trim() !== ""
 		) {
-			console.log("Current card has details. Setting them now");
-			console.log(currentCard.note);
 			if (detailsFrame) {
 				document.getElementById(
 					"card-details-title"
@@ -1223,8 +1259,6 @@ function getIncorrectAnswerText(){
 
     wordsToUse = 'incorrectAnswerResponses';
 
-    doLog('------------------------------------------------- Getting saying for performance missStreak: ' + performance.missStreak);
-
     if(performance.missStreak >= mascotLeaveLimit){
         wordsToUse = 'leave'
     }
@@ -1253,121 +1287,128 @@ function generateMnemonic(){
 
 }
 
-function setControlsEnabled(enabled) {
-	const elements = [
-		"prev-button",
-		"mnemonic-button",
-		"clue-button",
-		"flip-button",
-		"next-letter-button",
-		"next-answer-button",
-		"next-button",
-		"type-attack-button",
-		"high-scores-button",
-	];
+function setControlsEnabled(state) {
+	const gameControls = ["prev-button", "next-button", "flip-button", "clue-button", "next-letter-button", "next-answer-button", "mnemonic-button", "type-attack-button"];
+	const scoreControls = ["high-scores-button"];
 
-	if (enabled) {
-		// NEW: in local mode, don't enable high-scores
-		if (usingLocalDeck) {
-			ui.enable(elements.filter((id) => id !== "high-scores-button"));
-			ui.disable("high-scores-button");
-		} else {
-			ui.enable(elements);
+	// Safety: ensure state is boolean
+	state = !!state;
+
+	if (!state) {
+		ui.disable([...gameControls, ...scoreControls]);
+		return;
+	}
+
+	// Enable main gameplay controls
+	ui.enable(gameControls);
+
+	// High-scores button only if connected to server and not using local deck
+	if (usingLocalDeck || !appState.connectedToServer) ui.disable(scoreControls);
+	else ui.enable(scoreControls);
+
+	console.log(`🎮 Controls ${state ? "enabled" : "disabled"} (local=${usingLocalDeck})`);
+}
+function enableGameplayUI() {
+	setControlsEnabled(true);
+}
+function disableGameplayUI() {
+	setControlsEnabled(false);
+}
+
+function setNavigationButtonStates(cardIndex, stackLength) {
+    if (cardIndex === 0) updateUiForState("first");
+	else if (cardIndex === stackLength - 1) updateUiForState("last");
+			else updateUiForState("middle");
+}
+
+function loadNext() {
+	try {
+		// 🧱 Prevent accidental triggers when deck is empty
+		if (!cards || cards.length === 0) {
+			console.warn("⚠️ loadNext called before deck initialized. Aborting.");
+			return;
 		}
-	} else {
-		ui.disable(elements);
+		// --- Compute the next index ---
+		let nextIndex = cardIndex + 1;
+		if (isNaN(nextIndex) || nextIndex < 0) nextIndex = 0;
+
+		// --- If we’ve gone past the end of the deck, finish it ---
+		if (nextIndex >= cards.length) {
+			doLog(`Reached end of deck (nextIndex=${nextIndex}, total=${cards.length}). Triggering completion.`);
+            deckCompleteEvents();
+			return;
+		}
+
+		doLog("---------------------------------- Loading next card.");
+		doLog(`Current index: ${cardIndex}, Next index: ${nextIndex}`);
+		doLog("Viewed cards so far:", viewedCards);
+
+		let cardToLoad = null;
+
+		// --- Reset visual state for next card ---
+		const answerCard = document.getElementById("answer-card");
+		if (answerCard) {
+			const front = answerCard.querySelector(".flip-card-front");
+			const back = answerCard.querySelector(".flip-card-back");
+			if (front && back) {
+				front.style.visibility = "visible";
+				back.style.visibility = "hidden";
+			}
+		}
+
+		// --- Start timer on first card ---
+		if (timer && timer.timerInterval && cardIndex <= 0) {
+			ui.hideElements("deck-loaded-image");
+			timer.startTimer();
+		}
+
+		// --- Append pending history entry ---
+		if (historyEntryToWrite != null) {
+			document.getElementById("history-items").appendChild(historyEntryToWrite);
+			historyEntryToWrite = null;
+		}
+
+		setHistoryItemStyles();
+
+		// --- Determine which card to load ---
+		if (viewedCards[nextIndex]) {
+			doLog(`Loading existing viewed card at index ${nextIndex}`);
+			cardToLoad = viewedCards[nextIndex];
+		} else if (useRandom) {
+			doLog(`Selecting random card (preventDuplicates=${preventDuplicates})`);
+			if (!preventDuplicates || availableCards.length === 0) {
+				cardToLoad = cards[Math.floor(Math.random() * cards.length)];
+			} else {
+				cardToLoad = availableCards[Math.floor(Math.random() * availableCards.length)];
+			}
+		} else {
+			doLog(`Loading sequential card at index ${nextIndex}`);
+			cardToLoad = cards[nextIndex];
+		}
+
+		// --- Safety fallback ---
+		if (!cardToLoad || !cardToLoad.id) {
+			console.warn(`⚠️ Invalid card at index ${nextIndex}, defaulting to last card`);
+			cardToLoad = cards[cards.length - 1];
+		}
+
+		// --- Load card and advance index ---
+		loadCard(cardToLoad.id);
+		cardIndex = nextIndex;
+
+		// --- Enable flip button and related controls after first card ---
+		ui.enable(["flip-button", "clue-button", "next-letter-button", "next-answer-button", "mnemonic-button"]);
+
+		// --- Update navigation state ---
+		setNavigationButtonStates(cardIndex, cards.length);
+
+		// --- Log success ---
+		doLog(`✅ Card loaded successfully: ${cardToLoad.prompt || "[No prompt key]"}`);
+	} catch (ex) {
+		handleError(ex);
 	}
 }
 
-function setNavigationButtonStates(cardIndex,stackLength){
-	
-	doLog('Setting button navigation states');
-	doLog('card index' + cardIndex + ' stack length ' + stackLength);
-	
-	//if we are the beginning of the deck
-	if(cardIndex == 0){
-		doLog('If block 1');
-		ui.disable(['prev-button','clue-button','next-letter-button','next-answer-button', 'mnemonic-button','flip-button']);
-		
-	}
-	
-	//if we are one away from the end of the stack
-	else if(cardIndex+1 == stackLength){
-		doLog('If block 2');
-		ui.getElements('next-button')[0].value = '{nextButtonFinish}';
-	}
-	//if we are somewhere in middle of the stack
-	else if(cardIndex < cards.length){
-		doLog('If block 3');
-		ui.enable(['next-button','prev-button','clue-button','next-letter-button','next-answer-button','mnemonic-button','flip-button']);
-		ui.getElements('next-button')[0].value = ui.getElements('next-button')[0].getAttribute('data-default-value');
-	}
-	//if we are at the very end of the stack
-	else if(cardIndex == cards.length){
-		doLog('If block 4');
-        if(timer) timer.stopTimer();
-        ui.disable('next-button');
-		deckCompleteEvents();
-    }
-}
-
-function loadNext(){
-    doLog('---------------------------------- Loading next card. Card Index: ' + cardIndex);
-
-    try{
-        doLog(viewedCards);
-        
-        //card object to load next
-        let cardToLoad;
-        const answerCard = document.getElementById("answer-card");
-        const front = answerCard.querySelector(".flip-card-front");
-        const back = answerCard.querySelector(".flip-card-back");
-
-        //undo firefox backface invisibility hack
-        front.style.visibility = "visible";
-        back.style.visibility = "hidden";
-        if(timer && timer.timerInterval && cardIndex == 0){
-            ui.hideElements('deck-loaded-image');
-            timer.startTimer();
-        }
-
-        if(historyEntryToWrite != null){
-            document.getElementById('history-items').appendChild(historyEntryToWrite);
-            historyEntryToWrite = null;
-        }
-
-        setHistoryItemStyles();
-
-        //if we are back in the stack, then instead just move up to the next card
-        if(viewedCards.length > cardIndex){
-            doLog('Exising card in stack. Loading card at index: ' + cardIndex);
-            cardIndex++;
-            loadCard(viewedCards[cardIndex].id);
-        }		
-        else {
-            if(!useRandom){
-                cardToLoad = cards[cardIndex];
-            }else{
-                
-                if(!preventDuplicates) cardToLoad = cards[Math.floor(Math.random()*cards.length)];	
-                else {
-                    doLog('Loading random card, preventing dupes');
-                    doLog(availableCards);
-                    cardToLoad = availableCards[Math.floor(Math.random()*availableCards.length)];	
-                }
-            }
-            
-            cardIndex++;
-            //document.getElementById("history-items").scrollIntoView({ behavior: 'smooth', block: 'end' });
-            
-            loadCard(cardToLoad.id);
-        }
-        
-        setNavigationButtonStates(cardIndex,cards.length);
-    }catch(ex){
-        handleError(ex);
-    }
-}
 
 
 function createHistoryEntry(cardData,navigationPosition,entryLabel){
@@ -1558,13 +1599,27 @@ function answerIncorrect(event){
 
 
 function deckCompleteEvents(){
-	
+	updateUiForState("complete");
+
 	ui.hideElements('.results-fact');
 	resultsModal.showModal();
 	
 	doLog('Performance Info');
 	doLog(performance);
-	
+    try {
+        if (fanfareAudio) {
+            fanfareAudio.pause();
+            fanfareAudio.currentTime = 0;
+        }
+        fanfareAudio = new Audio("media/sounds/fanfare.mp3");
+        fanfareAudio.volume = 0.8; // optional: 0.0–1.0
+        fanfareAudio
+            .play()
+            .then(() => console.log("🎉 Fanfare playing!"))
+            .catch((err) => console.warn("⚠️ Fanfare blocked or failed:", err));
+    } catch (err) {
+        console.error("❌ Could not play fanfare:", err);
+    }	
 	animateScoreTally(performance.runningTotalScore);
 	
 	//set the contents of the results divs
@@ -1574,9 +1629,6 @@ function deckCompleteEvents(){
 	ui.setContent('final-score-longest-streak',`${performance.longestStreak}`);
 
     let bestPreviousScore = performance.previousHighScore(storedScores.value);
-
-    console.log('Best Previous Score...');
-    console.log(bestPreviousScore);
 
     if(bestPreviousScore && bestPreviousScore.hasOwnProperty('currentPoints')){
         ui.setContent('best-previous-score', bestPreviousScore.runningTotalScore);
@@ -1603,49 +1655,147 @@ function deckCompleteEvents(){
         ui.showElements('deck-complete-header');
     }
 	
-	scoreTally.resultFactInterval = setInterval(function(scope){
-		scoreTally.resultFacts[scoreTally.resultFactIndex].classList.add('bounce-in-right');
-		scoreTally.resultFacts[scoreTally.resultFactIndex].style.visibility = 'visible';
-		scoreTally.resultFacts[scoreTally.resultFactIndex].style.display = 'inline-block';	
-		scoreTally.resultFactIndex++;
-		if(scoreTally.resultFactIndex == scoreTally.resultFacts.length) clearInterval(scoreTally.resultFactInterval);
-		
-		setTimeout(function(index){
-			doLog('Removing bounce style from ');
-			doLog(scoreTally.resultFacts[index]);
-			scoreTally.resultFacts[index].classList.remove('bounce-in-right');
-		},2000,scoreTally.resultFactIndex);
-		
-	},1000,this);
+    console.log(scoreTally);
+
+    if (scoreTally) {
+        // Stop any previous interval still running
+        if (scoreTally.resultFactInterval) {
+            clearInterval(scoreTally.resultFactInterval);
+            scoreTally.resultFactInterval = null;
+        }
+
+        // Defensive: validate resultFacts
+        if (
+            !scoreTally.resultFacts ||
+            !scoreTally.resultFacts.length ||
+            typeof scoreTally.resultFactIndex !== "number"
+        ) {
+            console.warn("⚠️ No valid result facts to animate; skipping animation.");
+            return;
+        }
+
+        scoreTally.resultFactInterval = setInterval(() => {
+            try {
+                // Bail out cleanly if facts were cleared (e.g. new game started)
+                if (
+                    !scoreTally ||
+                    !scoreTally.resultFacts ||
+                    scoreTally.resultFacts.length === 0 ||
+                    scoreTally.resultFactIndex >= scoreTally.resultFacts.length
+                ) {
+                    console.log("⏹️ Stopping score fact interval (no facts or deck reset).");
+                    clearInterval(scoreTally.resultFactInterval);
+                    scoreTally.resultFactInterval = null;
+                    return;
+                }
+
+                const fact = scoreTally.resultFacts[scoreTally.resultFactIndex];
+                if (!fact) {
+                    clearInterval(scoreTally.resultFactInterval);
+                    scoreTally.resultFactInterval = null;
+                    return;
+                }
+
+                fact.classList.add("bounce-in-right");
+                fact.style.visibility = "visible";
+                fact.style.display = "inline-block";
+
+                const index = scoreTally.resultFactIndex;
+                scoreTally.resultFactIndex++;
+
+                // Remove bounce effect after a short delay
+                setTimeout(() => {
+                    if (scoreTally?.resultFacts?.[index]) {
+                        scoreTally.resultFacts[index].classList.remove("bounce-in-right");
+                    }
+                }, 2000);
+            } catch (err) {
+                console.warn("⚠️ Error in score fact animation tick:", err);
+                clearInterval(scoreTally.resultFactInterval);
+                scoreTally.resultFactInterval = null;
+            }
+        }, 1000);
+    }
+
 	
     savePerformance();
 
     sendScore();
 }
 
-function animateScoreTally(score){
-	scoreTally.targetNode = ui.getElements('#final-score-results')[0];
-	scoreTally.totalScore = score;
-	
-	doLog(scoreTally);
-
-    let incriment = 10;
-    if(score > 100000) incriment = 1000;
-    else if(score > 50000) incriment = 500;
-    else if(score > 10000) incriment = 50;
-	
-	scoreTally.tallyAnimationInterval  = setInterval(function(scope){
-
-		scoreTally.currentTally = scoreTally.currentTally + incriment;
-		
-		if(scoreTally.currentTally >= scoreTally.totalScore) {
-			clearInterval(scoreTally.tallyAnimationInterval);
-			scoreTally.currentTally = scoreTally.totalScore;
-			scoreTally.targetNode.classList.add('bounce');
+function animateScoreTally(score) {
+	try {
+        if(scoreTally.isAnimating) return;
+        
+		const node = ui.getElements("#final-score-results")?.[0];
+		if (!node) {
+			console.warn("⚠️ animateScoreTally: target node not found — aborting animation.");
+			return;
 		}
-		scoreTally.targetNode.innerHTML = scoreTally.currentTally;
-	}, scoreTally.tallyIntervalMS, this);
+
+		// 🧹 Kill any existing intervals immediately
+		if (scoreTally.tallyAnimationInterval) {
+			clearInterval(scoreTally.tallyAnimationInterval);
+			scoreTally.tallyAnimationInterval = null;
+		}
+
+		// 🧩 Prevent re-entry
+		if (scoreTally.isAnimating) {
+			console.warn("⏳ animateScoreTally: already running, skipping duplicate start.");
+			return;
+		}
+		scoreTally.isAnimating = true;
+
+		scoreTally.targetNode = node;
+		scoreTally.totalScore = Number(score) || 0;
+		scoreTally.currentTally = 0;
+
+		let increment = 10;
+		if (score > 100000) increment = 1000;
+		else if (score > 50000) increment = 500;
+		else if (score > 10000) increment = 50;
+
+		scoreTally.tallyAnimationInterval = setInterval(() => {
+			try {
+				// 💣 Stop if target missing or reset
+				if (!scoreTally || !scoreTally.targetNode || !(scoreTally.targetNode instanceof Element) || !document.body.contains(scoreTally.targetNode)) {
+					console.log("⏹️ Score tally stopped — invalid or missing target node.");
+					clearInterval(scoreTally.tallyAnimationInterval);
+					scoreTally.tallyAnimationInterval = null;
+					scoreTally.isAnimating = false;
+					return;
+				}
+
+				scoreTally.currentTally += increment;
+				if (scoreTally.currentTally >= scoreTally.totalScore) {
+					scoreTally.currentTally = scoreTally.totalScore;
+					scoreTally.targetNode.textContent = scoreTally.currentTally;
+
+					if (scoreTally.targetNode.classList) {
+						scoreTally.targetNode.classList.add("bounce");
+					}
+
+					clearInterval(scoreTally.tallyAnimationInterval);
+					scoreTally.tallyAnimationInterval = null;
+					scoreTally.isAnimating = false;
+					return;
+				}
+
+				scoreTally.targetNode.textContent = scoreTally.currentTally;
+			} catch (innerErr) {
+				console.warn("⚠️ Error in tally interval tick:", innerErr);
+				clearInterval(scoreTally.tallyAnimationInterval);
+				scoreTally.tallyAnimationInterval = null;
+				scoreTally.isAnimating = false;
+			}
+		}, scoreTally.tallyIntervalMS || 10);
+	} catch (err) {
+		console.error("❌ Error in animateScoreTally:", err);
+		scoreTally.isAnimating = false;
+	}
 }
+
+
 
 function showPerformanceData(){
 
@@ -1951,15 +2101,78 @@ function launchTypingGame() {
 		roundSeconds: 20, // Y seconds per round
 	});
 }
+/**
+ * @description Centralized UI state handler for all deck/card navigation.
+ * Ensures consistent enable/disable of buttons based on where we are in the deck.
+ */
+function updateUiForState(state) {
+	const coreControls = ["prev-button", "next-button", "flip-button", "clue-button", "next-letter-button", "next-answer-button", "mnemonic-button", "type-attack-button"];
+	const scoreControls = ["high-scores-button"];
+
+	const enable = (ids) => ui.enable(ids);
+	const disable = (ids) => ui.disable(ids);
+	const show = (ids) => ui.showElements(ids);
+	const hide = (ids) => ui.hideElements(ids);
+
+	// Always reset next-button label
+	const nextBtn = ui.getElements("next-button")[0];
+	if (nextBtn) {
+		nextBtn.value = nextBtn.getAttribute("data-default-value") || "Next";
+	}
+
+	switch (state) {
+		case "init":
+			hide(["deck-controls", "controls", "deck-variants"]);
+			disable([...coreControls, ...scoreControls]);
+			enable("next-button");
+			break;
+
+		case "deckLoaded":
+			show(["deck-controls", "controls", "deck-variants"]);
+			enable(coreControls);
+			if (usingLocalDeck || !appState.connectedToServer) disable(scoreControls);
+			else enable(scoreControls);
+			break;
+
+		case "first":
+			enable(coreControls);
+			disable("prev-button");
+			break;
+
+		case "middle":
+			enable(coreControls);
+			break;
+
+		case "last":
+			enable(coreControls);
+			if (nextBtn) nextBtn.value = "{nextButtonFinish}";
+			break;
+
+		case "complete":
+			disable([...coreControls, ...scoreControls]);
+			//hide(["deck-controls", "controls", "deck-variants"]);
+			if (timer) timer.stopTimer();
+			break;
+
+		default:
+			console.warn(`⚠️ Unknown UI state: ${state}`);
+			break;
+	}
+
+	console.log(`🎮 UI updated for state: ${state} (local=${usingLocalDeck}, connected=${appState.connectedToServer})`);
+}
+
 
 
 function resetHistory(){
     try{
+        updateUiForState("init");
+
         historyEntryToWrite = null;
         viewedCards = [];
         availableCards = [];
         cards = [];
-        cardIndex = 0;
+        cardIndex = -1;
 		cardLibrary = {};
 	    currentCard = {};
 		config = {};
@@ -1987,7 +2200,24 @@ function resetHistory(){
 		timer.seconds =0;
 		timer.tens = 0;
 		timer.mins = 0;
+        		// Remove old history DOM items
+		const historyContainer = document.getElementById("history-items");
+		if (historyContainer) historyContainer.innerHTML = "";
+
+		// Reset counters / globals
+		historyEntryToWrite = null;
+		cardIndex = -1;
+		viewedCards = [];
+		if (timer) timer.stopTimer();
+        ui.hideElements(["results-modal", "confetti_outer"]);
+		if (typeof scoreTally !== "undefined") clearInterval(scoreTally?.resultFactInterval);
 		updateUIWithPerformanceData(performance);
+
+        if (scoreTally?.tallyAnimationInterval) {
+            clearInterval(scoreTally.tallyAnimationInterval);
+            scoreTally.tallyAnimationInterval = null;
+        }
+        scoreTally.isAnimating = false;
     }catch(ex){
         doLog('Error resetting history');
         console.error(ex);

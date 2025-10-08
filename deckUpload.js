@@ -22,11 +22,9 @@ async function uploadDeckFromInputs({
 	}
 
 	const fileInput = document.getElementById("upload-deck-file");
-	const nameInput = document.getElementById("upload-deck-name");
 	const categorySel = document.getElementById("upload-existing-category");
 
 	if (!fileInput) throw new Error("#upload-deck-file not found.");
-	if (!nameInput) throw new Error("#upload-deck-name not found.");
 	if (!categorySel) throw new Error("#upload-existing-category not found.");
 
 	const file = fileInput.files && fileInput.files[0];
@@ -81,14 +79,12 @@ async function uploadDeckFromInputs({
 	}
 
 	// Collect form values
-	const rawDeckName = (nameInput.value || "").trim();
 	const category = (categorySel.value || "").trim();
+	const deckName = sanitizeDeckName(parsed.config.name);
 
-	if (!rawDeckName) throw new Error("Please enter a deck name.");
 	if (!category) throw new Error("Please choose a category.");
 
 	// Sanitize deck name: strip extension, collapse spaces, allow [A-Za-z0-9_-]
-	const deckName = sanitizeDeckName(rawDeckName);
 	if (!deckName) {
 		throw new Error("Deck name is invalid after sanitization.");
 	}
