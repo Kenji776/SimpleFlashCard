@@ -1835,7 +1835,7 @@
 				// Pain sound + line
 				this.playRandomSound("hit");
 				this.sayRandom("pain");
-				this.playSound('misc','thwomp.mp3')
+				this.playSound("misc", "thwomp.mp3");
 				this.shakeScreen(200);
 
 				// After 2s, restore mascot + remove thwomp
@@ -1954,7 +1954,6 @@
 				document.body.appendChild(whiteout);
 				setTimeout(() => whiteout.classList.add("fade-out"), 150);
 
-
 				// Remove explosion sprite after gif loop (~1.5s)
 				setTimeout(() => bomb.remove(), 1000);
 
@@ -1972,7 +1971,7 @@
 		requestAnimationFrame(tick);
 	}
 
-	shakeScreen(duration=500){
+	shakeScreen(duration = 500) {
 		document.body.classList.add("screen-shake");
 		setTimeout(() => {
 			document.body.classList.remove("screen-shake");
@@ -2436,24 +2435,43 @@
 		});
 	}
 	startOffscreenWatcher() {
-		/*
 		if (this._offscreenInterval) return;
 
-		// Also handle window resizes (can push him off-screen)
+		let offscreenSince = null;
+		const delayMs = 2000; // ⏱ Must remain offscreen this long to trigger reset
+
+		// Handle window resizes (can push off-screen)
 		this._onResizeClamp = () => {
-			if (this._isOffscreen()) this._resetToOrigin(true);
+			if (this._isOffscreen()) {
+				if (!offscreenSince) offscreenSince = performance.now();
+			} else {
+				offscreenSince = null;
+			}
 		};
+
 		window.addEventListener("resize", this._onResizeClamp, { passive: true });
 
 		this._offscreenInterval = setInterval(() => {
 			if (!this.isActive || this._exploded) return;
-			if (this._isOffscreen()) this._resetToOrigin(true);
+
+			const now = performance.now();
+			if (this._isOffscreen()) {
+				if (!offscreenSince) {
+					// First detected offscreen time
+					offscreenSince = now;
+				} else if (now - offscreenSince >= delayMs) {
+					// Still offscreen after delay → reset
+					this._resetToOrigin(true);
+					offscreenSince = null; // reset timer after correction
+				}
+			} else {
+				// Back onscreen → clear timer
+				offscreenSince = null;
+			}
 		}, this._offscreenCheckMs);
-		*/
 	}
 
 	stopOffscreenWatcher() {
-		/*
 		if (this._offscreenInterval) {
 			clearInterval(this._offscreenInterval);
 			this._offscreenInterval = null;
@@ -2461,7 +2479,7 @@
 		if (this._onResizeClamp) {
 			window.removeEventListener("resize", this._onResizeClamp);
 			this._onResizeClamp = null;
-		}*/
+		}
 	}
 
 	_isOffscreen() {
