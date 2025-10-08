@@ -259,7 +259,7 @@
 
 	// ---- Pain reactions ----
 	_lastPainAt = 0;
-	_painCooldownMs = 900; // min time between pain lines
+	_painCooldownMs = 2000; // min time between pain lines
 
 	// ---- TTS cache ----
 	ttsCache = new Map(); // key -> { voice_id, text, blob, type, lastUsed }
@@ -274,6 +274,10 @@
 	_offscreenInterval = null;
 	_offscreenCheckMs = 3000; // check every 3s; tweak as you like
 	_offscreenMargin = 64; // allow some slack beyond the edges
+
+	// Initialize this somewhere in your constructor or setup:
+	ttsCorruptKeys = new Set();
+
 	constructor(constructorData, serverConnection) {
 		try {
 			if (!ui) {
@@ -901,9 +905,11 @@
 		}
 
 		this.currentTTSAudio = await this._playBlob(cached.blob, {
-			onEnd: (status) => {
-				// status can be undefined, 'error', 'invalid-blob', 'bad-currentSrc', etc.
-				if (status && status !== "error") {
+			onEnd: async (status) => {
+				if (status && ["error", "invalid-blob", "bad-currentSrc", "createObjectURL-failed", "playfail"].includes(status)) {
+					console.warn("[TTS] Detected failed playback; marking corrupt", { key, status });
+					await this._handleCorruptTTS(key);
+				} else if (status) {
 					console.debug("[TTS] onEnd status:", status);
 				}
 				this.stopTTS?.();
@@ -912,6 +918,27 @@
 		});
 	}
 
+	// --- new helper to handle corrupt TTS entries ---
+	async _handleCorruptTTS(key) {
+		try {
+			// Remove from memory cache
+			this.ttsCache.delete(key);
+			// Remove from persistent cache
+			await this._dbDelete?.(key);
+			// Record it for regeneration request
+			this.ttsCorruptKeys.add(key);
+
+			await fetch(`${this.apiClient.baseUrl}/api/report-corrupt-tts`, {
+				method: "POST",
+				headers: { "content-type": "application/json" },
+				body: JSON.stringify({ corruptKeys: [key] }),
+			});
+
+			console.info("[TTS] Removed corrupt entry and marked for regeneration:", key);
+		} catch (err) {
+			console.error("[TTS] Failed to clean corrupt entry:", err);
+		}
+	}
 	async _ttsInsertPersistent(key, entry) {
 		// Evict if needed
 		if (!this.ttsCache.has(key) && this.ttsCache.size >= this.ttsCacheMaxEntries) {
