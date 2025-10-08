@@ -747,7 +747,20 @@
 		return plain.replace(/\s+/g, " ").trim();
 	}
 	_ttsKey(text, voice_id) {
-		return `${voice_id}::${this._ttsNormalizeText(text)}`;
+		// Must match server-side buildCacheKey() logic exactly
+		const model_id = "eleven_turbo_v2";
+		const voice_settings = { stability: 0.5, similarity_boost: 0.75 };
+
+		const normalized = text.replace(/\s+/g, " ").trim();
+		const payload = JSON.stringify({ voiceId: voice_id, text: normalized, model_id, voice_settings });
+
+		// Browser-side SHA256 (returns hex string)
+		const encoder = new TextEncoder();
+		const data = encoder.encode(payload);
+		return crypto.subtle.digest("SHA-256", data).then((hashBuffer) => {
+			const hashArray = Array.from(new Uint8Array(hashBuffer));
+			return hashArray.map((b) => b.toString(16).padStart(2, "0")).join("");
+		});
 	}
 	_ttsTouch(key) {
 		const e = this.ttsCache.get(key);
@@ -833,7 +846,7 @@
 
 	async tts(text, voice_id, interruptable = true, speechBubbleId = null) {
 		const normText = this._ttsNormalizeText(text);
-		const key = this._ttsKey(normText, voice_id);
+		const key = await this._ttsKey(normText, voice_id); // now returns Promise
 
 		// Try memory cache
 		let cached = this.ttsCache.get(key);
@@ -921,11 +934,8 @@
 	// --- new helper to handle corrupt TTS entries ---
 	async _handleCorruptTTS(key) {
 		try {
-			// Remove from memory cache
 			this.ttsCache.delete(key);
-			// Remove from persistent cache
 			await this._dbDelete?.(key);
-			// Record it for regeneration request
 			this.ttsCorruptKeys.add(key);
 
 			await fetch(`${this.apiClient.baseUrl}/api/report-corrupt-tts`, {
