@@ -2436,6 +2436,7 @@
 		});
 	}
 	startOffscreenWatcher() {
+		/*
 		if (this._offscreenInterval) return;
 
 		// Also handle window resizes (can push him off-screen)
@@ -2448,9 +2449,11 @@
 			if (!this.isActive || this._exploded) return;
 			if (this._isOffscreen()) this._resetToOrigin(true);
 		}, this._offscreenCheckMs);
+		*/
 	}
 
 	stopOffscreenWatcher() {
+		/*
 		if (this._offscreenInterval) {
 			clearInterval(this._offscreenInterval);
 			this._offscreenInterval = null;
@@ -2458,7 +2461,7 @@
 		if (this._onResizeClamp) {
 			window.removeEventListener("resize", this._onResizeClamp);
 			this._onResizeClamp = null;
-		}
+		}*/
 	}
 
 	_isOffscreen() {
