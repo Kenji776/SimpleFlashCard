@@ -846,89 +846,113 @@
 
 	async tts(text, voice_id, interruptable = true, speechBubbleId = null) {
 		const normText = this._ttsNormalizeText(text);
-		const key = await this._ttsKey(normText, voice_id); // now returns Promise
+		const key = await this._ttsKey(normText, voice_id);
+		if (!this._ttsInflight) this._ttsInflight = new Map();
 
-		// Try memory cache
-		let cached = this.ttsCache.get(key);
+		// Prevent duplicate concurrent fetches
+		if (this._ttsInflight.has(key)) {
+			console.debug("[TTS] Waiting for inflight fetch:", key);
+			return this._ttsInflight.get(key);
+		}
 
-		// Try DB
-		if (!cached) {
-			try {
-				const rec = await this._dbGet?.(key);
-				if (rec?.blob instanceof Blob) {
-					cached = {
-						voice_id: rec.voice_id || voice_id,
-						text: normText,
-						blob: rec.blob,
-						type: rec.type || rec.blob.type || "audio/mpeg",
-						lastUsed: this._now(),
-					};
-					this.ttsCache.set(key, cached);
+		const promise = (async () => {
+			let cached = this.ttsCache.get(key);
+
+			// Try DB cache
+			if (!cached) {
+				try {
+					const rec = await this._dbGet?.(key);
+					if (rec?.blob instanceof Blob) {
+						cached = {
+							voice_id: rec.voice_id || voice_id,
+							text: normText,
+							blob: rec.blob,
+							type: rec.type || rec.blob.type || "audio/mpeg",
+							lastUsed: this._now(),
+						};
+						this.ttsCache.set(key, cached);
+					}
+				} catch (e) {
+					console.debug("TTS DB get miss/error:", e);
 				}
-			} catch (e) {
-				console.debug("TTS DB get miss/error:", e);
-			}
-		}
-
-		// Fetch from server if needed
-		if (!cached) {
-			console.log("Trying to fetch audio from root server: " + this.apiClient.baseUrl);
-			const url = `${this.apiClient.baseUrl}/api/text-to-speech`;
-			const res = await fetch(url, {
-				method: "POST",
-				headers: { "content-type": "application/json" },
-				body: JSON.stringify({ text: normText, voiceId: voice_id }),
-			});
-			if (!res.ok) {
-				console.error("TTS fetch failed:", res.status, await res.text().catch(() => ""));
-				return;
-			}
-			const ct = res.headers.get("content-type") || "";
-			const ab = await res.arrayBuffer();
-			const blob = new Blob([ab], { type: ct || "audio/mpeg" });
-
-			if (!(await this.validateAudioBlob(blob))) {
-				console.warn("TTS blob invalid after fetch; aborting playback", { size: blob.size, type: blob.type });
-				return;
 			}
 
-			cached = { voice_id, text: normText, blob, type: blob.type, lastUsed: this._now() };
-			await this._ttsInsertPersistent(key, cached);
-		} else {
-			this._ttsTouch(key);
-		}
+			// Fetch from server if not cached
+			if (!cached) {
+				console.log("🎧 [TTS] Fetching from server:", this.apiClient.baseUrl);
+				const url = `${this.apiClient.baseUrl}/api/text-to-speech`;
+				const res = await fetch(url, {
+					method: "POST",
+					headers: { "content-type": "application/json" },
+					body: JSON.stringify({ text: normText, voiceId: voice_id }),
+				});
 
-		// Interrupt if requested
-		if (interruptable && this.currentTTSAudio) {
-			try {
-				this.currentTTSAudio.pause();
-			} catch {}
-			try {
-				this.currentTTSAudio.src = "";
-			} catch {}
-			this.currentTTSAudio = null;
-		}
-
-		console.debug("[TTS] about to play", { key, size: cached.blob.size, type: cached.type });
-
-		// Final pre-play guard to avoid the "index.html" situation:
-		if (!(cached.blob instanceof Blob) || cached.blob.size === 0) {
-			console.error("[TTS] Refusing to play: invalid blob at final gate", { hasBlob: !!cached.blob, size: cached.blob?.size });
-			return;
-		}
-
-		this.currentTTSAudio = await this._playBlob(cached.blob, {
-			onEnd: async (status) => {
-				if (status && ["error", "invalid-blob", "bad-currentSrc", "createObjectURL-failed", "playfail"].includes(status)) {
-					console.warn("[TTS] Detected failed playback; marking corrupt", { key, status });
-					await this._handleCorruptTTS(key);
-				} else if (status) {
-					console.debug("[TTS] onEnd status:", status);
+				if (!res.ok) {
+					console.error("TTS fetch failed:", res.status, await res.text().catch(() => ""));
+					return;
 				}
-				this.stopTTS?.();
+
+				const ct = res.headers.get("content-type") || "";
+				if (!ct.startsWith("audio/")) {
+					console.error("[TTS] Invalid content-type from server:", ct);
+					return;
+				}
+
+				const ab = await res.arrayBuffer();
+				const blob = new Blob([ab], { type: ct || "audio/mpeg" });
+
+				// sanity check before caching
+				if (blob.size < 1000) {
+					console.warn("[TTS] Refusing to cache tiny blob", blob.size);
+					return;
+				}
+
+				cached = { voice_id, text: normText, blob, type: blob.type, lastUsed: this._now() };
+				await this._ttsInsertPersistent(key, cached);
+			} else {
+				this._ttsTouch(key);
+			}
+
+			// Interrupt existing audio
+			if (interruptable && this.currentTTSAudio) {
+				try {
+					this.currentTTSAudio.pause();
+				} catch {}
+				try {
+					this.currentTTSAudio.src = "";
+				} catch {}
 				this.currentTTSAudio = null;
-			},
-		});
+			}
+
+			console.debug("[TTS] about to play", { key, size: cached.blob.size, type: cached.type });
+
+			// Final guard
+			if (!(cached.blob instanceof Blob) || cached.blob.size === 0) {
+				console.error("[TTS] Invalid blob at final gate", { hasBlob: !!cached.blob, size: cached.blob?.size });
+				await this._handleCorruptTTS(key);
+				return;
+			}
+
+			this.currentTTSAudio = await this._playBlob(cached.blob, {
+				onEnd: async (status) => {
+					if (status && ["error", "invalid-blob", "bad-currentSrc", "createObjectURL-failed", "playfail"].includes(status)) {
+						console.warn("[TTS] Playback failed; marking corrupt", { key, status });
+						await this._handleCorruptTTS(key);
+					} else if (status) {
+						console.debug("[TTS] onEnd:", status);
+					}
+					this.stopTTS?.();
+					this.currentTTSAudio = null;
+				},
+			});
+		})();
+
+		this._ttsInflight.set(key, promise);
+		try {
+			return await promise;
+		} finally {
+			this._ttsInflight.delete(key);
+		}
 	}
 
 	// --- new helper to handle corrupt TTS entries ---
@@ -971,9 +995,6 @@
 		const { blob } = entry;
 		if (!(blob instanceof Blob) || blob.size === 0) {
 			throw new Error("Refusing to cache invalid/empty blob");
-		}
-		if (!(await this.validateAudioBlob(blob))) {
-			throw new Error("Refusing to cache undecodable blob");
 		}
 
 		const type = entry.type || blob.type || "audio/mpeg";
@@ -2587,35 +2608,6 @@
 			if (p && typeof p.now === "function") return p.now();
 		} catch (_) {}
 		return Date.now(); // fallback; OK since we only compare within-session
-	}
-	async validateAudioBlob(blob) {
-		if (!(blob instanceof Blob)) return false;
-		if (blob.size < 128) return false;
-		try {
-			const AC = window.AudioContext || window.webkitAudioContext;
-			if (!AC) return true; // can’t validate, assume okay
-			const ac = new AC();
-			const buf = await blob.arrayBuffer();
-			await new Promise((res, rej) => {
-				const done = (b) => {
-					try {
-						ac.close();
-					} catch {}
-					res(b);
-				};
-				const fail = (e) => {
-					try {
-						ac.close();
-					} catch {}
-					rej(e);
-				};
-				const p = ac.decodeAudioData(buf.slice(0), done, fail);
-				if (p && typeof p.then === "function") p.then(done).catch(fail);
-			});
-			return true;
-		} catch {
-			return false;
-		}
 	}
 
 	// --- Debug helpers ---
