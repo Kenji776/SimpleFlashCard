@@ -2510,6 +2510,17 @@
 			r.onerror = () => reject(r.error);
 		});
 	}
+ 	rightNow() {
+		// Uses high-resolution timer if available; falls back to Date.now()
+		if (typeof performance !== "undefined" && typeof performance.now === "function") {
+			return performance.now();
+		}
+		// Date.now() gives milliseconds since epoch
+		// For similar behavior to performance.now(), normalize it to start at 0 on first call
+		if (!now._offset) now._offset = Date.now();
+		return Date.now() - now._offset;
+	}
+
 	startOffscreenWatcher() {
 		if (this._offscreenInterval) return;
 
@@ -2519,7 +2530,7 @@
 		// Handle window resizes (can push off-screen)
 		this._onResizeClamp = () => {
 			if (this._isOffscreen()) {
-				if (!offscreenSince) offscreenSince = performance.now();
+				if (!offscreenSince) offscreenSince = rightNow();
 			} else {
 				offscreenSince = null;
 			}
@@ -2528,9 +2539,10 @@
 		window.addEventListener("resize", this._onResizeClamp, { passive: true });
 
 		this._offscreenInterval = setInterval(() => {
+			const now = (Date.now() - ((this._timeOffset ??= Date.now())));
+
 			if (!this.isActive || this._exploded) return;
 
-			const now = performance.now();
 			if (this._isOffscreen()) {
 				if (!offscreenSince) {
 					// First detected offscreen time
