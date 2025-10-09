@@ -79,9 +79,9 @@ async function uploadDeckFromInputs({
 	}
 
 	// Collect form values
-	const category = (categorySel.value || "").trim();
-	const deckName = sanitizeDeckName(parsed.config.name);
-
+	const rawCategory = (categorySel.value || "").trim();
+	const category = normalizeCategoryName(rawCategory);
+	
 	if (!category) throw new Error("Please choose a category.");
 
 	// Sanitize deck name: strip extension, collapse spaces, allow [A-Za-z0-9_-]
@@ -109,4 +109,13 @@ function sanitizeDeckName(name) {
 	// Prevent leading/trailing separators
 	n = n.replace(/^[-_]+|[-_]+$/g, "");
 	return n;
+}
+
+function normalizeCategoryName(name) {
+	return name
+		.trim()
+		.toLowerCase()
+		.replace(/\s+/g, "_") // replace spaces with underscores
+		.replace(/[^a-z0-9_-]/g, "") // remove anything not alphanumeric, dash, underscore
+		.replace(/^_+|_+$/g, ""); // trim leading/trailing underscores
 }

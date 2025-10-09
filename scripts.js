@@ -641,7 +641,6 @@ function setVariantDeckOptions(){
 
     if(optionsArray.length == 0 ) {
         doLog('No variants found?');
-        debugger;
         selectedVariantDeck = optionsArray[0].value;
     }
     
@@ -716,9 +715,6 @@ async function handleLoadDeckSelect() {
 	doLog("handleLoadDeckSelect called with deckUrl: " + deckUrl);
 	let deckData = await fetchRemoteDeck(deckUrl);
     const answerCard = document.getElementById("answer-card");
-
-    debugger;
-
     if (answerCard) {
         // Show/hide front and back manually
         const front = answerCard.querySelector(".flip-card-front");
