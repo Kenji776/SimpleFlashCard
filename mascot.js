@@ -884,7 +884,7 @@
 				const res = await fetch(url, {
 					method: "POST",
 					headers: { "content-type": "application/json" },
-					body: JSON.stringify({ text: normText, voiceId: voice_id }),
+					body: JSON.stringify({ text: normText, voiceId: voice_id, mascotName: this.name }),
 				});
 
 				if (!res.ok) {
