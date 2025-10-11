@@ -509,6 +509,13 @@
 					this.mute = prevSetting;
 					e.preventDefault();
 				}
+				if (e.key && e.key.toLowerCase() === "c") {
+					let prevSetting = this.mute;
+					this.mute = false;
+					this.summonVehicle("megabus");
+					this.mute = prevSetting;
+					e.preventDefault();
+				}
 			};
 			document.addEventListener("keydown", this._hotkeyHandler);
 		}
@@ -929,7 +936,7 @@
 			// Final guard
 			if (!(cached.blob instanceof Blob) || cached.blob.size === 0) {
 				console.error("[TTS] Invalid blob at final gate", { hasBlob: !!cached.blob, size: cached.blob?.size });
-				await this._handleCorruptTTS(key);
+				//await this._handleCorruptTTS(key);
 				return;
 			}
 
@@ -937,7 +944,7 @@
 				onEnd: async (status) => {
 					if (status && ["error", "invalid-blob", "bad-currentSrc", "createObjectURL-failed", "playfail"].includes(status)) {
 						console.warn("[TTS] Playback failed; marking corrupt", { key, status });
-						await this._handleCorruptTTS(key);
+						//await this._handleCorruptTTS(key);
 					} else if (status) {
 						console.debug("[TTS] onEnd:", status);
 					}
@@ -1168,124 +1175,6 @@
 			2800,
 			fartDiv
 		);
-	}
-
-	feed() {
-		if (!this.isActive || this._exploded) return;
-
-		if (!this.container || !this.mascotDiv) return;
-
-		const snacks = this.elements?.snacks;
-
-		if (!Array.isArray(snacks) || snacks.length === 0) {
-			console.warn("Mascot.feed: no snacks configured.");
-
-			return;
-		}
-
-		const snack = snacks[Math.floor(Math.random() * snacks.length)];
-
-		if (!snack) return;
-
-		const containerRect = this.container.getBoundingClientRect();
-
-		const mascotRect = this.mascotDiv.getBoundingClientRect();
-
-		const snackDiv = document.createElement("div");
-
-		snackDiv.className = "mascot-snack";
-
-		const imageUrl = snack.image ? this.buildMascotMediaUrl(snack.image, "img") : null;
-
-		if (imageUrl) snackDiv.style.backgroundImage = `url(${imageUrl})`;
-
-		const defaultSize = 48;
-
-		const snackSize = Number(snack.size) > 0 ? Number(snack.size) : defaultSize;
-
-		snackDiv.style.width = `${snackSize}px`;
-
-		snackDiv.style.height = `${snackSize}px`;
-
-		snackDiv.style.position = "absolute";
-
-		snackDiv.style.pointerEvents = "none";
-
-		snackDiv.style.backgroundRepeat = "no-repeat";
-
-		snackDiv.style.backgroundSize = "contain";
-
-		snackDiv.style.transition = "left 260ms ease-out, top 260ms ease-out, opacity 140ms ease-in";
-
-		snackDiv.style.opacity = "1";
-
-		this.container.appendChild(snackDiv);
-
-		const mascotCenterX = mascotRect.left + mascotRect.width / 2;
-
-		const mascotCenterY = mascotRect.top + mascotRect.height / 2;
-
-		const angle = Math.random() * Math.PI * 2;
-
-		const radius = Math.max(20, Math.max(mascotRect.width, mascotRect.height) / 2 + 20);
-
-		const startX = mascotCenterX + Math.cos(angle) * radius;
-
-		const startY = mascotCenterY + Math.sin(angle) * radius;
-
-		const startLeft = startX - containerRect.left - snackSize / 2;
-
-		const startTop = startY - containerRect.top - snackSize / 2;
-
-		snackDiv.style.left = `${startLeft}px`;
-
-		snackDiv.style.top = `${startTop}px`;
-
-		const targetLeft = mascotCenterX - containerRect.left - snackSize / 2;
-
-		const targetTop = mascotCenterY - containerRect.top - snackSize / 2;
-
-		let consumed = false;
-
-		const consume = () => {
-			if (consumed) return;
-
-			consumed = true;
-
-			snackDiv.style.transition = "opacity 140ms ease-in";
-
-			snackDiv.style.opacity = "0";
-
-			setTimeout(() => snackDiv.remove(), 160);
-
-			this._applySnackRewards(snack);
-		};
-
-		const onTransitionEnd = (evt) => {
-			if (evt.propertyName !== "top") return;
-
-			snackDiv.removeEventListener("transitionend", onTransitionEnd);
-
-			consume();
-		};
-
-		snackDiv.addEventListener("transitionend", onTransitionEnd);
-
-		requestAnimationFrame(() => {
-			requestAnimationFrame(() => {
-				snackDiv.style.left = `${targetLeft}px`;
-
-				snackDiv.style.top = `${targetTop}px`;
-			});
-		});
-
-		setTimeout(() => {
-			if (!consumed && document.body.contains(snackDiv)) {
-				snackDiv.removeEventListener("transitionend", onTransitionEnd);
-
-				consume();
-			}
-		}, 450);
 	}
 
 	_applySnackRewards(snack) {
@@ -1699,14 +1588,25 @@
 	 * Sounds: horn on spawn, yell immediately, crash on impact.
 	 * @param {{speed?:number, side?:"left"|"right", image?:string, width?:number, height?:number, sayPanic?:boolean}} opts
 	 */
-	summonVehicle(opts = {}) {
+	summonVehicle(vehicleName = null, opts = {}) {
 		if (!this.container || !this.elements?.vehicles?.length) {
 			console.warn("[summonVehicle] No container or vehicles available.");
 			return;
 		}
 
-		// 🎲 Pick a random or specific vehicle
-		const vehicleCfg = opts.vehicle || this.elements.vehicles[Math.floor(Math.random() * this.elements.vehicles.length)];
+		let vehicleCfg;
+
+		if (vehicleName) {
+			vehicleCfg = this.elements.vehicles.find((obj) => obj.name === vehicleName);
+		} else {
+			vehicleCfg = opts.vehicle || this.elements.vehicles[Math.floor(Math.random() * this.elements.vehicles.length)];
+		}
+
+		if (!vehicleCfg) {
+			console.error("No vehicle was found with given params.");
+			return;
+		}
+
 		console.log("[summonVehicle] Picked vehicle:", vehicleCfg);
 
 		const side = opts.side || (Math.random() < 0.5 ? "left" : "right");
@@ -1724,6 +1624,8 @@
 		img.src = imgUrl;
 
 		img.onload = () => {
+			this._callEffects(vehicleCfg.effects, "spawn");
+
 			const naturalW = img.naturalWidth || 100;
 			const naturalH = img.naturalHeight || 100;
 
@@ -1816,8 +1718,10 @@
 					this.mascotDiv.classList.add("hitshake");
 					setTimeout(() => this.mascotDiv.classList.remove("hitshake"), 140);
 
+					console.log("[summonVehicle] calling physics with effects");
+					console.log(vehicle.effects);
 					this._lastPhysicsT = this._now();
-					if (!this._throwRAF) this._throwRAF = requestAnimationFrame((t) => this._physicsStep(t));
+					if (!this._throwRAF) this._throwRAF = requestAnimationFrame((t) => this._physicsStep(t, vehicleCfg.effects));
 				}
 
 				// Despawn when off-screen
@@ -1839,6 +1743,111 @@
 				vehicle.style.top = `${newY}px`;
 			});
 		};
+	}
+	// 🔮 Generic effect dispatcher
+	_callEffects(effects, trigger) {
+		console.groupCollapsed(`[effects] 🔔 Trigger received: '${trigger}'`);
+		console.log("Incoming effects object:", effects);
+
+		if (!effects) {
+			console.warn("[effects] No effects object provided.");
+			console.groupEnd();
+			return;
+		}
+
+		const effectList = effects[trigger];
+		if (!effectList) {
+			console.warn(`[effects] No effects defined for trigger '${trigger}'.`);
+			console.groupEnd();
+			return;
+		}
+
+		if (!Array.isArray(effectList)) {
+			console.warn(`[effects] Expected an array for trigger '${trigger}', got:`, typeof effectList);
+			console.groupEnd();
+			return;
+		}
+
+		console.log(`[effects] Found ${effectList.length} function(s) for trigger '${trigger}':`, effectList);
+
+		for (const fnName of effectList) {
+			console.group(`[effects] Checking function '${fnName}'`);
+
+			let fn = null;
+			let source = null;
+
+			if (typeof this[fnName] === "function") {
+				fn = this[fnName];
+				source = "instance";
+			} else if (typeof window[fnName] === "function") {
+				fn = window[fnName];
+				source = "global";
+			}
+
+			if (fn) {
+				try {
+					console.log(`[effects] ✅ Found function '${fnName}' on ${source}. Executing now...`);
+					fn.call(this);
+					console.log(`[effects] 🎉 Successfully executed '${fnName}'`);
+				} catch (e) {
+					console.error(`[effects] 💥 Error executing '${fnName}':`, e);
+				}
+			} else {
+				console.warn(`[effects] ⚠️ Function '${fnName}' not found on instance or window.`);
+			}
+
+			console.groupEnd();
+		}
+
+		console.groupEnd();
+	}
+
+	raveEffect(durationMs = 10000) {
+		const start = performance.now();
+
+		// Create a full-screen overlay for flashing colors
+		const overlay = document.createElement("div");
+		Object.assign(overlay.style, {
+			position: "fixed",
+			top: 0,
+			left: 0,
+			width: "100vw",
+			height: "100vh",
+			zIndex: 9999,
+			pointerEvents: "none",
+			mixBlendMode: "screen",
+			transition: "background-color 0.05s linear",
+		});
+		document.body.appendChild(overlay);
+
+		// Save original transform so we can restore it
+		const originalTransform = document.body.style.transform;
+
+		const shake = () => {
+			const elapsed = performance.now() - start;
+			if (elapsed > durationMs) {
+				// Cleanup
+				document.body.style.transform = originalTransform;
+				document.body.style.transition = "";
+				overlay.remove();
+				return;
+			}
+
+			// Random shake
+			const intensity = 10; // px
+			const x = (Math.random() - 0.5) * intensity * 2;
+			const y = (Math.random() - 0.5) * intensity * 2;
+			document.body.style.transform = `translate(${x}px, ${y}px)`;
+
+			// Random color flash
+			overlay.style.backgroundColor = `rgba(${rand(255)}, ${rand(255)}, ${rand(255)}, ${Math.random() * 0.8})`;
+
+			requestAnimationFrame(shake);
+		};
+
+		const rand = (max) => Math.floor(Math.random() * (max + 1));
+
+		shake();
 	}
 
 	/**
@@ -1940,7 +1949,6 @@
 	 * Drop a bomb onto the mascot. Falls from above, explodes on contact,
 	 * flings mascot with physics, plays explosion sounds, shakes and whites out screen.
 	 */
-	// Inside Mascot class
 	dropBomb(opts = {}) {
 		if (!this.container || !this.mascotDiv) return;
 
@@ -1966,7 +1974,7 @@
 			backgroundSize: "contain",
 			backgroundRepeat: "no-repeat",
 			pointerEvents: "none",
-			zIndex: "2147483647", // ensure on top
+			zIndex: "2147483647",
 			left: `${mcx - bombW / 2}px`,
 			top: `-${bombH + 20}px`,
 		});
@@ -1989,54 +1997,26 @@
 			const dt = Math.min(0.05, (now - last) / 1000);
 			last = now;
 
-			// only move the bomb if it hasn't exploded
 			if (!exploded) {
 				y += speed * dt;
 				setPos();
 			}
 
-			// Trigger when bomb bottom reaches mascot top
+			// 🎯 Trigger when bomb bottom reaches mascot top
 			if (!exploded && y + bombH >= mtop) {
 				exploded = true;
 
-				// Swap to explosion sprite
-				bomb.style.width = "500px";
-				bomb.style.height = "500px";
-				bomb.style.left = `${mcx - 250}px`; // center explosion
-				bomb.style.top = `${mtop - 250}px`; // expand over mascot
-				bomb.style.backgroundImage = `url(${this.buildMascotMediaUrl("explosion.gif", "img")})`;
-				bomb.style.zIndex = "2147483648"; // ensure in front
+				// 💥 Trigger explosion effect at mascot center
+				this.explodeEffect({
+					x: mcx,
+					y: mtop,
+					element: bomb, // reuse the bomb div
+				});
 
-				// 🔊 Explosion sound
-				this.playRandomSound?.("explode");
-				this.sayRandom("pain");
-
-				// Ensure physics is enabled
-				if (!this._phEnabled) this.enableThrowPhysics();
-
-				// Blast mascot upward + sideways
-				this._vel.x = (Math.random() - 0.5) * 9000; // wider, faster sideways blast
-				this._vel.y = -9000; // stronger upward launch
-				this._angVel = (Math.random() - 0.5) * 120; // more spin
-				this._lastPhysicsT = this._now();
-				if (!this._throwRAF) {
-					this._throwRAF = requestAnimationFrame((t) => this._physicsStep(t));
-				}
-
-				// Screen shake + whiteout
-				this.shakeScreen();
-				const whiteout = document.createElement("div");
-				whiteout.className = "whiteout-flash";
-				document.body.appendChild(whiteout);
-				setTimeout(() => whiteout.classList.add("fade-out"), 150);
-
-				// Remove explosion sprite after gif loop (~1.5s)
-				setTimeout(() => bomb.remove(), 1000);
-
-				return;
+				return; // stop further movement
 			}
 
-			// Remove if it falls past screen (failsafe, should not happen if exploded correctly)
+			// Remove if it falls past screen (failsafe)
 			if (!exploded && y > H + bombH + 40) {
 				bomb.remove();
 				return;
@@ -2045,6 +2025,76 @@
 			requestAnimationFrame(tick);
 		};
 		requestAnimationFrame(tick);
+	}
+
+	explodeEffect(opts = {}) {
+		const x = opts.x ?? window.innerWidth / 2;
+		const y = opts.y ?? window.innerHeight / 2;
+		const target = opts.element; // optional element to reuse
+		const explosionSize = opts.size ?? 500;
+
+		// If reusing an element, convert it to explosion sprite
+		let explosion;
+		if (target && target instanceof HTMLElement) {
+			explosion = target;
+		} else {
+			explosion = document.createElement("div");
+			explosion.className = "explosion-effect";
+			document.body.appendChild(explosion);
+		}
+
+		Object.assign(explosion.style, {
+			position: "fixed",
+			width: `${explosionSize}px`,
+			height: `${explosionSize}px`,
+			left: `${x - explosionSize / 2}px`,
+			top: `${y - explosionSize / 2}px`,
+			backgroundImage: `url(${this.buildMascotMediaUrl("explosion.gif", "img")})`,
+			backgroundSize: "contain",
+			backgroundRepeat: "no-repeat",
+			zIndex: "2147483648",
+			pointerEvents: "none",
+		});
+
+		// 🔊 Explosion sound
+		this.playRandomSound?.("explode");
+		this.sayRandom?.("pain");
+
+		// 🧠 Enable physics if off
+		if (!this._phEnabled) this.enableThrowPhysics();
+
+		// 💨 Blast mascot away
+		this._vel.x = (Math.random() - 0.5) * 9000;
+		this._vel.y = -9000;
+		this._angVel = (Math.random() - 0.5) * 120;
+		this._lastPhysicsT = this._now();
+		if (!this._throwRAF) {
+			this._throwRAF = requestAnimationFrame((t) => this._physicsStep(t));
+		}
+
+		// 💥 Screen shake
+		this.shakeScreen?.();
+
+		// 💡 Whiteout flash
+		const whiteout = document.createElement("div");
+		Object.assign(whiteout.style, {
+			position: "fixed",
+			top: "0",
+			left: "0",
+			width: "100vw",
+			height: "100vh",
+			backgroundColor: "white",
+			zIndex: "2147483649",
+			opacity: "1",
+			transition: "opacity 0.5s ease-out",
+			pointerEvents: "none",
+		});
+		document.body.appendChild(whiteout);
+		setTimeout(() => (whiteout.style.opacity = 0), 150);
+		setTimeout(() => whiteout.remove(), 600);
+
+		// Remove explosion sprite after gif loop (~1s)
+		setTimeout(() => explosion.remove(), opts.removeDelay ?? 1000);
 	}
 
 	shakeScreen(duration = 500) {
@@ -2311,7 +2361,7 @@
 		if (!this._throwRAF) this._throwRAF = requestAnimationFrame((t) => this._physicsStep(t));
 	}
 
-	_physicsStep(tNow) {
+	_physicsStep(tNow, effects = null) {
 		if (!this.isActive || this._exploded) {
 			this._throwRAF = null;
 			return;
@@ -2343,6 +2393,7 @@
 		const H = window.innerHeight;
 		let impacted = false;
 		let impactSpeed = 0;
+
 		// Floor
 		if (this._pos.y + this._size.h > H) {
 			const vBefore = Math.abs(this._vel.y);
@@ -2372,7 +2423,6 @@
 			impacted = true;
 			impactSpeed = Math.max(impactSpeed, vBefore);
 		}
-		// now 0..W and 0..H match your left/top coordinates
 		// Left wall
 		if (this._pos.x < 0) {
 			const vBefore = Math.abs(this._vel.x);
@@ -2386,16 +2436,15 @@
 		// Apply position & rotation
 		this._applyPos();
 
-		// Impact damage + SFX + jolt on image
+		// 💥 Trigger impact reactions if collision happened
 		if (impacted) {
 			this.emitPain(impactSpeed);
-			this._playImpactHit(impactSpeed); // <<< add this line
-			//this._impactDamage(impactSpeed);
+			this._playImpactHit(impactSpeed, effects); // <-- only addition
 			this.mascotDiv.classList.add("hitshake");
 			setTimeout(() => this.mascotDiv.classList.remove("hitshake"), 120);
 		}
 
-		// Sleep if settled on floor
+		// 💤 Sleep if settled on floor
 		const speed = Math.hypot(this._vel.x, this._vel.y);
 		const atFloor = Math.abs(this._pos.y + this._size.h - H) < 1;
 		if (speed < 20 && Math.abs(this._angVel) < 0.2 && atFloor) {
@@ -2405,18 +2454,58 @@
 			return;
 		}
 
-		this._throwRAF = requestAnimationFrame((tt) => this._physicsStep(tt));
+		// Continue animation loop
+		this._throwRAF = requestAnimationFrame((tt) => this._physicsStep(tt, effects));
 	}
-	_playImpactHit(impactSpeed = 0) {
-		if (!this.isActive || this.mute) return;
+	_playImpactHit(impactSpeed = 0, effects = null) {
+		console.groupCollapsed(`[impact] 💥 _playImpactHit called`);
+		console.log(`[impact] impactSpeed: ${impactSpeed}`);
+		console.log(`[impact] effects:`, effects);
+
+		if (!this.isActive || this.mute) {
+			console.warn("[impact] Skipped — inactive or muted.");
+			console.groupEnd();
+			return;
+		}
+
 		const now = this._now();
-		if (now - this._lastImpactSfx < this._impactSfxCooldownMs) return; // debounce
+		if (now - this._lastImpactSfx < this._impactSfxCooldownMs) {
+			console.warn("[impact] Skipped — within sound cooldown.");
+			console.groupEnd();
+			return;
+		}
 		this._lastImpactSfx = now;
 
-		// If you want to vary volume by impact speed, you could tweak your playSound
-		// to accept a volume. For now, just play the standard hit.
+		console.log("[impact] 🔊 Playing default impact sound: 'hit'");
 		this.playRandomSound("hit");
+
+		// 💣 Guard: only trigger once per effects object
+		if (!effects) {
+			console.warn("[impact] No effects object, skipping callEffects.");
+			console.groupEnd();
+			return;
+		}
+
+		if (effects._impactPlayed) {
+			console.log("[impact] Skipped — impact effects already played for this object.");
+			console.groupEnd();
+			return;
+		}
+
+		effects._impactPlayed = true;
+		console.log("[impact] ✅ Marked effects._impactPlayed = true");
+
+		try {
+			console.log("[impact] ⚡ Triggering _callEffects('impact')...");
+			this._callEffects(effects, "impact");
+			console.log("[impact] 🎉 Successfully executed impact effects");
+		} catch (err) {
+			console.error("[impact] 💥 Error running impact effects:", err);
+		}
+
+		console.groupEnd();
 	}
+
 	_applyPos() {
 		this.container.style.left = `${this._pos.x}px`;
 		this.container.style.top = `${this._pos.y}px`;
@@ -2510,7 +2599,7 @@
 			r.onerror = () => reject(r.error);
 		});
 	}
- 	rightNow() {
+	rightNow() {
 		// Uses high-resolution timer if available; falls back to Date.now()
 		if (typeof performance !== "undefined" && typeof performance.now === "function") {
 			return performance.now();
@@ -2539,7 +2628,7 @@
 		window.addEventListener("resize", this._onResizeClamp, { passive: true });
 
 		this._offscreenInterval = setInterval(() => {
-			const now = (Date.now() - ((this._timeOffset ??= Date.now())));
+			const now = Date.now() - (this._timeOffset ??= Date.now());
 
 			if (!this.isActive || this._exploded) return;
 
