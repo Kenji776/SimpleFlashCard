@@ -1589,6 +1589,35 @@ function answerCorrect(event){
     recordQuestionResponse(currentCard, currentCard[config.defaultPrompt], currentCard[config.defaultPrompt], pointsMod);
     updateUIWithPerformanceData(performance);
 
+    let streak = performance.streak;
+
+    console.log('Answer is correct. Checking steak logic');
+    console.log(mascot);
+    console.log(mascot.events)
+	// 🟢 Check mascot event triggers
+	if (mascot && mascot?.events?.streak) {
+		const streakEvents = mascot.events.streak;
+
+		// Convert to string since JSON keys like "5" are strings
+		const streakKey = String(streak);
+
+		if (streakEvents[streakKey]) {
+			const fnName = streakEvents[streakKey];
+			const fn = mascot[fnName];
+
+			if (typeof fn === "function") {
+				try {
+					doLog(`🎉 Triggering mascot event: ${fnName} (streak ${streak})`);
+					fn.call(mascot);
+				} catch (err) {
+					console.error(`Error executing mascot event function '${fnName}':`, err);
+				}
+			} else {
+				console.warn(`Mascot function '${fnName}' not found or not callable.`);
+			}
+		}
+	}
+
     doLog('Current score info');
     doLog(performance);
 

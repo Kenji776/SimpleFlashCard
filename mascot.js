@@ -278,6 +278,10 @@
 	// Initialize this somewhere in your constructor or setup:
 	ttsCorruptKeys = new Set();
 
+	events = {
+		steak: {},
+	};
+
 	constructor(constructorData, serverConnection) {
 		try {
 			if (!ui) {
@@ -572,6 +576,10 @@
 		}
 	}
 
+	megabus() {
+		this.summonVehicle("megabus");
+	}
+
 	explode() {
 		if (this._exploded) return;
 		this._exploded = true;
@@ -612,8 +620,7 @@
 			function(scope) {
 				if (scope.numRunIdleEvents < scope.maxIdleEvents) {
 					let randomChance = Math.floor(Math.random() * 101);
-					let rightNow = new Date().getTime();
-					if (scope.userIsIdle && randomChance < scope.idleChatRandomChance && (rightNow - scope.lastIdleChatSent) / 1000 > scope.idleChatCooldownSeconds) {
+					if (scope.userIsIdle && randomChance < scope.idleChatRandomChance && (Date.now() - scope.lastIdleChatSent) / 1000 > scope.idleChatCooldownSeconds) {
 						scope.numRunIdleEvents++;
 						scope.setMood("happy");
 						scope.sayRandom("idle_chat");
@@ -1599,7 +1606,14 @@
 		if (vehicleName) {
 			vehicleCfg = this.elements.vehicles.find((obj) => obj.name === vehicleName);
 		} else {
-			vehicleCfg = opts.vehicle || this.elements.vehicles[Math.floor(Math.random() * this.elements.vehicles.length)];
+			const summonableVehicles = this.elements.vehicles.filter((v) => v.summonable !== false);
+
+			if (summonableVehicles.length === 0) {
+				console.warn("[summonVehicle] No summonable vehicles available!");
+				return;
+			}
+
+			vehicleCfg = opts.vehicle || summonableVehicles[Math.floor(Math.random() * summonableVehicles.length)];
 		}
 
 		if (!vehicleCfg) {
@@ -1619,7 +1633,7 @@
 		const mcy = mrect.top + mrect.height / 2;
 		console.log("[summonVehicle] Mascot center:", { mcx, mcy });
 
-		// Load the image to determine proportions
+		// Load image for proportions
 		const img = new Image();
 		img.src = imgUrl;
 
@@ -1629,7 +1643,7 @@
 			const naturalW = img.naturalWidth || 100;
 			const naturalH = img.naturalHeight || 100;
 
-			// Clamp to maximum height 400px, preserving aspect ratio
+			// Clamp to max height of 400px while preserving ratio
 			const maxH = 400;
 			let scale = naturalH > maxH ? maxH / naturalH : 1;
 			const vW = naturalW * scale;
@@ -1651,7 +1665,7 @@
 			});
 			document.body.appendChild(vehicle);
 
-			// Align along the bottom edge of the screen
+			// Align vehicle bottom edge with viewport
 			const viewportH = window.innerHeight;
 			const bottomMargin = 10;
 			let y = viewportH - vH - bottomMargin;
@@ -1660,12 +1674,7 @@
 			const dir = side === "left" ? +1 : -1;
 			let last = this._now();
 
-			// 🕑 Collision cooldown
-			const hitCooldownMs = 1000;
-			let lastHitTime = 0;
-
 			const setPos = () => {
-				// Clamp y to ensure vehicle bottom never goes below the viewport
 				const clampedY = Math.min(y, window.innerHeight - vH - bottomMargin);
 				vehicle.style.left = `${x}px`;
 				vehicle.style.top = `${clampedY}px`;
@@ -1678,7 +1687,7 @@
 				return !(b.right < m.left || b.left > m.right || b.bottom < m.top || b.top > m.bottom);
 			};
 
-			// 🔊 Play horn if available
+			// 🔊 Horn
 			if (vehicleCfg.horn?.length) {
 				console.log("[summonVehicle] Playing horn:", vehicleCfg.horn);
 				this.playRandomSound?.(vehicleCfg.horn);
@@ -1686,6 +1695,16 @@
 
 			// Optional panic line
 			setTimeout(() => this.sayRandom?.("scared"), 150);
+
+			// 🧠 Per-vehicle state to track single impact
+			const vehicleState = {
+				effects: { ...(vehicleCfg.effects || {}) },
+				impactTriggered: false,
+			};
+
+			// 🕑 Collision cooldown
+			const hitCooldownMs = 1000;
+			let lastHitTime = 0;
 
 			const tick = () => {
 				if (!document.body.contains(vehicle)) {
@@ -1701,7 +1720,7 @@
 				x += dir * vehicleCfg.speed * dt * this._vehicleSpeedMultiplier;
 				setPos();
 
-				// Collision check with cooldown
+				// 🚗 Collision check (only one impact per vehicle)
 				if (intersectsMascot() && now - lastHitTime > hitCooldownMs) {
 					lastHitTime = now;
 					console.log("[summonVehicle] Mascot hit by vehicle:", vehicleCfg.name);
@@ -1719,9 +1738,12 @@
 					setTimeout(() => this.mascotDiv.classList.remove("hitshake"), 140);
 
 					console.log("[summonVehicle] calling physics with effects");
-					console.log(vehicle.effects);
+					console.log(vehicleState.effects);
+
 					this._lastPhysicsT = this._now();
-					if (!this._throwRAF) this._throwRAF = requestAnimationFrame((t) => this._physicsStep(t, vehicleCfg.effects));
+
+					// ✅ always pass the per-vehicle state, let physics decide when to trigger
+					if (!this._throwRAF) this._throwRAF = requestAnimationFrame((t) => this._physicsStep(t, vehicleState));
 				}
 
 				// Despawn when off-screen
@@ -1737,13 +1759,14 @@
 			console.log("[summonVehicle] Starting tick loop.");
 			requestAnimationFrame(tick);
 
-			// Keep the car glued to the bottom when resizing the window
+			// Keep vehicle glued to bottom edge on resize
 			window.addEventListener("resize", () => {
 				const newY = window.innerHeight - vH - bottomMargin;
 				vehicle.style.top = `${newY}px`;
 			});
 		};
 	}
+
 	// 🔮 Generic effect dispatcher
 	_callEffects(effects, trigger) {
 		console.groupCollapsed(`[effects] 🔔 Trigger received: '${trigger}'`);
@@ -1803,7 +1826,7 @@
 	}
 
 	raveEffect(durationMs = 10000) {
-		const start = performance.now();
+		const start = Date.now();
 
 		// Create a full-screen overlay for flashing colors
 		const overlay = document.createElement("div");
@@ -1824,7 +1847,7 @@
 		const originalTransform = document.body.style.transform;
 
 		const shake = () => {
-			const elapsed = performance.now() - start;
+			const elapsed = Date.now() - start;
 			if (elapsed > durationMs) {
 				// Cleanup
 				document.body.style.transform = originalTransform;
@@ -2075,7 +2098,7 @@
 		// 💥 Screen shake
 		this.shakeScreen?.();
 
-		// 💡 Whiteout flash
+		// 💡 White flash
 		const whiteout = document.createElement("div");
 		Object.assign(whiteout.style, {
 			position: "fixed",
@@ -2093,12 +2116,35 @@
 		setTimeout(() => (whiteout.style.opacity = 0), 150);
 		setTimeout(() => whiteout.remove(), 600);
 
-		// Remove explosion sprite after gif loop (~1s)
-		setTimeout(() => explosion.remove(), opts.removeDelay ?? 1000);
+		// 🧹 Remove explosion sprite after 1 second (or custom delay)
+		const removeDelay = opts.removeDelay ?? 1000;
+		setTimeout(() => {
+			if (document.body.contains(explosion)) {
+				explosion.remove();
+				console.log("[explodeEffect] Explosion cleaned up.");
+			}
+		}, removeDelay);
 	}
 
 	shakeScreen(duration = 500) {
+		const whiteout = document.createElement("div");
+		Object.assign(whiteout.style, {
+			position: "fixed",
+			top: "0",
+			left: "0",
+			width: "100vw",
+			height: "100vh",
+			backgroundColor: "white",
+			zIndex: "2147483649",
+			opacity: "1",
+			transition: "opacity 0.5s ease-out",
+			pointerEvents: "none",
+		});
+		document.body.appendChild(whiteout);
+
 		document.body.classList.add("screen-shake");
+
+		setTimeout(() => (whiteout.style.opacity = 0), 150);
 		setTimeout(() => {
 			document.body.classList.remove("screen-shake");
 			whiteout.remove();
@@ -2374,23 +2420,21 @@
 		this._vel.x *= this._air;
 		this._vel.y = this._vel.y * this._air + this._acc.y * dt;
 
-		// 🔒 Clamp velocities to prevent insane speeds
+		// Clamp velocities
 		this._vel.x = Math.max(-this._maxVel, Math.min(this._maxVel, this._vel.x));
 		this._vel.y = Math.max(-this._maxVel, Math.min(this._maxVel, this._vel.y));
 
 		this._pos.x += this._vel.x * dt;
 		this._pos.y += this._vel.y * dt;
 
-		// Integrate angular (tumble)
+		// Integrate angular
 		this._angVel *= this._angAir;
-
-		// 🔒 Clamp angular velocity too
 		this._angVel = Math.max(-this._maxAngVel, Math.min(this._maxAngVel, this._angVel));
-
 		this._angle += this._angVel * dt;
 
 		const W = window.innerWidth;
 		const H = window.innerHeight;
+
 		let impacted = false;
 		let impactSpeed = 0;
 
@@ -2400,11 +2444,11 @@
 			this._pos.y = H - this._size.h;
 			this._vel.y *= -this._restitution;
 			this._vel.x *= this._groundFriction;
-			// angular bounce (flip some spin on floor contact)
 			this._angVel *= -this._angRestitution;
 			impacted = true;
 			impactSpeed = Math.max(impactSpeed, vBefore);
 		}
+
 		// Ceiling
 		if (this._pos.y < 0) {
 			const vBefore = Math.abs(this._vel.y);
@@ -2414,6 +2458,7 @@
 			impacted = true;
 			impactSpeed = Math.max(impactSpeed, vBefore);
 		}
+
 		// Right wall
 		if (this._pos.x + this._size.w > W) {
 			const vBefore = Math.abs(this._vel.x);
@@ -2423,6 +2468,7 @@
 			impacted = true;
 			impactSpeed = Math.max(impactSpeed, vBefore);
 		}
+
 		// Left wall
 		if (this._pos.x < 0) {
 			const vBefore = Math.abs(this._vel.x);
@@ -2433,15 +2479,16 @@
 			impactSpeed = Math.max(impactSpeed, vBefore);
 		}
 
-		// Apply position & rotation
 		this._applyPos();
 
-		// 💥 Trigger impact reactions if collision happened
 		if (impacted) {
-			this.emitPain(impactSpeed);
-			this._playImpactHit(impactSpeed, effects); // <-- only addition
-			this.mascotDiv.classList.add("hitshake");
-			setTimeout(() => this.mascotDiv.classList.remove("hitshake"), 120);
+			if (effects && !effects.impactTriggered) {
+				effects.impactTriggered = true; // ✅ mark as fired only now
+				this.emitPain(impactSpeed);
+				this._playImpactHit(impactSpeed, effects.effects || effects);
+				this.mascotDiv.classList.add("hitshake");
+				setTimeout(() => this.mascotDiv.classList.remove("hitshake"), 120);
+			}
 		}
 
 		// 💤 Sleep if settled on floor
@@ -2454,13 +2501,11 @@
 			return;
 		}
 
-		// Continue animation loop
 		this._throwRAF = requestAnimationFrame((tt) => this._physicsStep(tt, effects));
 	}
+
 	_playImpactHit(impactSpeed = 0, effects = null) {
 		console.groupCollapsed(`[impact] 💥 _playImpactHit called`);
-		console.log(`[impact] impactSpeed: ${impactSpeed}`);
-		console.log(`[impact] effects:`, effects);
 
 		if (!this.isActive || this.mute) {
 			console.warn("[impact] Skipped — inactive or muted.");
@@ -2476,24 +2521,13 @@
 		}
 		this._lastImpactSfx = now;
 
-		console.log("[impact] 🔊 Playing default impact sound: 'hit'");
 		this.playRandomSound("hit");
 
-		// 💣 Guard: only trigger once per effects object
 		if (!effects) {
 			console.warn("[impact] No effects object, skipping callEffects.");
 			console.groupEnd();
 			return;
 		}
-
-		if (effects._impactPlayed) {
-			console.log("[impact] Skipped — impact effects already played for this object.");
-			console.groupEnd();
-			return;
-		}
-
-		effects._impactPlayed = true;
-		console.log("[impact] ✅ Marked effects._impactPlayed = true");
 
 		try {
 			console.log("[impact] ⚡ Triggering _callEffects('impact')...");
@@ -2599,6 +2633,7 @@
 			r.onerror = () => reject(r.error);
 		});
 	}
+	/*
 	rightNow() {
 		// Uses high-resolution timer if available; falls back to Date.now()
 		if (typeof performance !== "undefined" && typeof performance.now === "function") {
@@ -2609,6 +2644,7 @@
 		if (!now._offset) now._offset = Date.now();
 		return Date.now() - now._offset;
 	}
+		*/
 
 	startOffscreenWatcher() {
 		if (this._offscreenInterval) return;
@@ -2619,7 +2655,7 @@
 		// Handle window resizes (can push off-screen)
 		this._onResizeClamp = () => {
 			if (this._isOffscreen()) {
-				if (!offscreenSince) offscreenSince = rightNow();
+				if (!offscreenSince) offscreenSince = _now();
 			} else {
 				offscreenSince = null;
 			}
