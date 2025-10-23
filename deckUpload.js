@@ -84,6 +84,7 @@ async function uploadDeckFromInputs({
 	
 	if (!category) throw new Error("Please choose a category.");
 
+	let deckName = parsed.config.name;
 	// Sanitize deck name: strip extension, collapse spaces, allow [A-Za-z0-9_-]
 	if (!deckName) {
 		throw new Error("Deck name is invalid after sanitization.");
