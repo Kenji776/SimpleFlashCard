@@ -135,14 +135,20 @@
     border: 1px solid #1f2937;
     box-shadow: 0 6px 16px rgba(15,23,42,.8);
   }
-  button:hover {
+  button:hover:not(:disabled) {
     filter: brightness(1.04);
     transform: translateY(-1px);
     box-shadow: 0 14px 32px rgba(15,23,42,.9);
   }
-  button:active {
+  button:active:not(:disabled) {
     transform: translateY(0);
     box-shadow: 0 8px 20px rgba(15,23,42,.8);
+  }
+  button:disabled {
+    opacity: 0.4;
+    cursor: default;
+    box-shadow: none;
+    transform: none;
   }
   .result {
     border-left: 4px solid var(--primary);
@@ -184,6 +190,18 @@
     color: var(--primary);
   }
   .small { font-size: 12px; color: #cbd5e1; }
+
+  /* copy button container */
+  .copy-actions {
+    display:flex;
+    justify-content:flex-end;
+    margin-bottom:6px;
+  }
+  .small-btn {
+    padding: 6px 12px;
+    font-size: 12px;
+    box-shadow: 0 6px 16px rgba(15,23,42,.8);
+  }
 
   /* Info button */
   .info-btn {
@@ -301,7 +319,7 @@
           </div>
         </div>
 
-        <div class="section-label">Weight choice & rounding</div>
+        <div class="section-label">Weight choice &amp; rounding</div>
         <div class="row">
           <div class="field">
             <label>&nbsp;</label>
@@ -334,6 +352,9 @@
 
       <div class="card">
         <h2>Output</h2>
+        <div class="copy-actions">
+          <button id="copyEqBtn" class="secondary small-btn" disabled title="Copy the full substituted equation">Copy equation</button>
+        </div>
         <div id="output" class="result">
           <p class="small">Fill inputs and click <strong>Calculate &amp; Explain</strong>.</p>
         </div>
@@ -550,6 +571,9 @@ function getCanonicalHeightWeight(){
   }
 }
 
+// stores the last fully substituted equation as plain text for copying
+let lastEquationPlain = '';
+
 /* ---------- Teaching Output (full explanation) ---------- */
 function explainAndRender(){
   const age = parseFloat(document.getElementById('age').value);
@@ -560,6 +584,14 @@ function explainAndRender(){
   const forceIbw = document.getElementById('forceIbw').checked;
 
   const out = document.getElementById('output');
+  const copyBtn = document.getElementById('copyEqBtn');
+
+  // reset copy state
+  lastEquationPlain = '';
+  if (copyBtn) {
+    copyBtn.disabled = true;
+    copyBtn.textContent = 'Copy equation';
+  }
 
   // Basic validation
   if (![age, height_cm, weight_kg, scr].every(Number.isFinite) || age<=0 || height_cm<=0 || weight_kg<=0 || scr<=0){
@@ -672,6 +704,66 @@ function explainAndRender(){
       </details>
     </div>
   `;
+
+  // Build plain-text version of the full substituted equation for copying
+  const baseEq = `Creatinine Clearance (Cockcroft–Gault)
+
+CrCl = ((140 − Age) × Weight_used × SexFactor) ÷ (72 × SerumCr)
+
+Substitution:
+CrCl = ((140 − ${age}) × ${roundSmart(pick.weight)} × ${sexFactor}) ÷ (72 × ${scr})
+    = (${roundSmart(140-age)} × ${roundSmart(pick.weight)} × ${sexFactor}) ÷ ${roundSmart(72*scr,3)}
+    = ${roundSmart(crcl)} mL/min`;
+
+  const normPart = doNorm
+    ? `
+
+BSA (Mosteller) = ${roundSmart(bsa)} m²
+CrCl_normalized = ${roundSmart(crcl)} × (1.73 / ${roundSmart(bsa)}) = ${roundSmart(crclNorm)} mL/min/1.73 m²`
+    : '';
+
+  lastEquationPlain = baseEq + normPart;
+
+  if (copyBtn && lastEquationPlain) {
+    copyBtn.disabled = false;
+  }
+}
+
+/* Copy equation handler */
+function copyEquationToClipboard(){
+  if (!lastEquationPlain) return;
+  const btn = document.getElementById('copyEqBtn');
+  const originalText = btn ? btn.textContent : '';
+
+  function showCopied(){
+    if (!btn) return;
+    btn.textContent = 'Copied!';
+    setTimeout(() => {
+      btn.textContent = originalText || 'Copy equation';
+    }, 1200);
+  }
+
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(lastEquationPlain).then(showCopied).catch(() => {
+      // fallback on error
+      const ta = document.createElement('textarea');
+      ta.value = lastEquationPlain;
+      document.body.appendChild(ta);
+      ta.select();
+      try { document.execCommand('copy'); } catch(e) {}
+      document.body.removeChild(ta);
+      showCopied();
+    });
+  } else {
+    // legacy fallback
+    const ta = document.createElement('textarea');
+    ta.value = lastEquationPlain;
+    document.body.appendChild(ta);
+    ta.select();
+    try { document.execCommand('copy'); } catch(e) {}
+    document.body.removeChild(ta);
+    showCopied();
+  }
 }
 
 /* Unit system toggle */
@@ -709,6 +801,11 @@ document.getElementById('demoBtn').addEventListener('click', () => {
 
 document.getElementById('unitSystem').addEventListener('change', updateUnitVisibility);
 updateUnitVisibility();
+
+const copyBtn = document.getElementById('copyEqBtn');
+if (copyBtn) {
+  copyBtn.addEventListener('click', copyEquationToClipboard);
+}
 
 /* ----- Modal logic (accessible) ----- */
 function openModal(id){
