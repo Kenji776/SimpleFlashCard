@@ -6,39 +6,183 @@
 <title>Creatinine Clearance — Teaching Calculator (Cockcroft–Gault)</title>
 <style>
   :root{
-    --bg:#0f172a; --card:#1e293b; --border:#334155; --ink:#e2e8f0;
-    --primary:#06b6d4; --accent:#0ea5e9; --muted:#0b1220;
+    --bg:#0f172a; --card:#020617; --border:#1f2937; --ink:#e2e8f0;
+    --primary:#06b6d4; --accent:#0ea5e9; --muted:#020617;
     --ok:#22c55e; --warn:#fbbf24; --bad:#ef4444;
   }
   /* Layout & typography */
-  body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; margin: 0; color: var(--ink); background: var(--bg); }
-  .wrap { max-width: 980px; margin: 32px auto; padding: 0 16px; }
-  header { text-align: center; margin-bottom: 18px; }
+  body {
+    font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+    margin: 0;
+    color: var(--ink);
+    background: radial-gradient(circle at top, #1e293b 0, #020617 42%, #020617 100%);
+  }
+  .wrap {
+    max-width: 1280px;
+    margin: 32px auto 40px;
+    padding: 0 24px;
+  }
+  header { text-align: center; margin-bottom: 24px; }
   h1 { margin: 0 0 8px; color: var(--primary); }
   h2, h3 { color: var(--accent); }
-  .grid { display: grid; gap: 14px; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }
-  .card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 16px; box-shadow: 0 2px 12px rgba(0,0,0,.35); }
-  label { font-weight: 600; display: block; margin-bottom: 6px; }
-  input, select {
-    width: 150px; padding: 10px 12px; border: 1px solid var(--border); border-radius: 8px; font-size: 14px;
-    background: #0b1220; color: var(--ink);
+  .grid {
+    display: grid;
+    gap: 18px;
   }
-  input:focus, select:focus { outline: 2px solid var(--accent); }
-  .row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-  .actions { display: flex; gap: 10px; flex-wrap: wrap; }
-  button { padding: 10px 14px; border: 0; border-radius: 10px; background: var(--primary); color: #001219; font-weight: 700; cursor: pointer; }
-  button.secondary { background: var(--accent); color: #001219; }
-  button:hover { filter: brightness(1.1); }
-  .result { border-left: 4px solid var(--primary); padding-left: 12px; }
-  .muted { background: rgba(255,255,255,0.04); border-radius: 10px; padding: 10px; }
-  code { background: #0b1220; border: 1px solid var(--border); padding: 2px 6px; border-radius: 6px; color: #bae6fd; }
+  .grid-main {
+    align-items: stretch;
+  }
+  @media (min-width: 960px) {
+    .grid-main {
+      grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+    }
+  }
+  @media (max-width: 959.98px) {
+    .grid-main {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+  .card {
+    background: radial-gradient(circle at top left, #0f172a 0, #020617 55%, #020617 100%);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 18px 20px 18px;
+    box-shadow: 0 14px 40px rgba(0,0,0,.65);
+  }
+  label {
+    font-weight: 600;
+    display: block;
+    margin-bottom: 4px;
+    font-size: 13px;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    color: #9ca3af;
+  }
+  input, select {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 10px 12px;
+    border: 1px solid #273549;
+    border-radius: 10px;
+    font-size: 14px;
+    background: rgba(15,23,42,0.9);
+    color: var(--ink);
+    transition: border-color .12s ease, box-shadow .12s ease, background-color .12s ease;
+  }
+  input::placeholder {
+    color: #64748b;
+  }
+  input:focus, select:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 1px rgba(56,189,248,0.5);
+    background: #020617;
+  }
+  select {
+    cursor: pointer;
+  }
+  .row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 12px 16px;
+    margin-top: 8px;
+  }
+  .field {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .field-inline {
+    display:flex;
+    gap:6px;
+    align-items:center;
+  }
+  .section-label {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color:#9ca3af;
+    margin: 10px 0 4px;
+  }
+  .section-label:first-of-type {
+    margin-top: 0;
+  }
+  .actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-top: 14px;
+  }
+  button {
+    padding: 10px 16px;
+    border: 0;
+    border-radius: 999px;
+    background: linear-gradient(135deg, var(--primary), var(--accent));
+    color: #001219;
+    font-weight: 700;
+    cursor: pointer;
+    font-size: 14px;
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    gap:6px;
+    box-shadow: 0 10px 25px rgba(8,47,73,.7);
+    transition: transform .08s ease, box-shadow .08s ease, filter .12s ease;
+  }
+  button.secondary {
+    background: #0f172a;
+    color: #e5e7eb;
+    border: 1px solid #1f2937;
+    box-shadow: 0 6px 16px rgba(15,23,42,.8);
+  }
+  button:hover {
+    filter: brightness(1.04);
+    transform: translateY(-1px);
+    box-shadow: 0 14px 32px rgba(15,23,42,.9);
+  }
+  button:active {
+    transform: translateY(0);
+    box-shadow: 0 8px 20px rgba(15,23,42,.8);
+  }
+  .result {
+    border-left: 4px solid var(--primary);
+    padding-left: 12px;
+  }
+  .muted {
+    background: rgba(15,23,42,0.82);
+    border-radius: 12px;
+    padding: 10px;
+    border: 1px solid #1f2937;
+  }
+  code {
+    background: #020617;
+    border: 1px solid var(--border);
+    padding: 2px 6px;
+    border-radius: 6px;
+    color: #bae6fd;
+  }
   .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
-  .tag { display: inline-block; padding: 2px 8px; border-radius: 999px; font-size: 12px; font-weight: 700; }
+  .tag {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 700;
+  }
   .ok { background: #14532d; color: var(--ok); }
   .warn { background: #78350f; color: var(--warn); }
   .bad { background: #7f1d1d; color: var(--bad); }
-  details { background: rgba(255,255,255,0.04); border: 1px solid var(--border); border-radius: 10px; padding: 10px 12px; }
-  details > summary { cursor: pointer; font-weight: 700; color: var(--primary); }
+  details {
+    background: rgba(15,23,42,0.82);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 10px 12px;
+  }
+  details > summary {
+    cursor: pointer;
+    font-weight: 700;
+    color: var(--primary);
+  }
   .small { font-size: 12px; color: #cbd5e1; }
 
   /* Info button */
@@ -83,18 +227,20 @@
   <div class="wrap">
     <header>
       <h1>Creatinine Clearance (Cockcroft–Gault) — Teaching Calculator</h1>
-      <p class="small">Shows each value, where it lands in the equation, and why it’s used. Includes IBW/AdjBW logic and optional BSA normalization.</p>
+      <p class="small">Shows each value, where it lands in the equation, and why it’s used. Includes IBW/AdjBW logic, optional IBW override, and BSA normalization.</p>
     </header>
 
-    <div class="grid">
+    <div class="grid grid-main">
       <div class="card">
         <h2>Inputs</h2>
+
+        <div class="section-label">Demographics</div>
         <div class="row">
-          <div>
+          <div class="field">
             <label for="age">Age (years)</label>
             <input id="age" type="number" min="1" max="120" placeholder="e.g., 55">
           </div>
-          <div>
+          <div class="field">
             <label for="sex">Sex</label>
             <select id="sex">
               <option value="male">Male</option>
@@ -103,8 +249,9 @@
           </div>
         </div>
 
-        <div class="row" style="margin-top:8px;">
-          <div>
+        <div class="section-label">Anthropometrics</div>
+        <div class="row" style="margin-top:4px;">
+          <div class="field">
             <label for="unitSystem">Units</label>
             <select id="unitSystem">
               <option value="metric">cm / kg</option>
@@ -114,67 +261,73 @@
         </div>
 
         <div class="row" id="metricInputs">
-          <div>
+          <div class="field">
             <label for="height">Height (cm)</label>
             <input id="height" type="number" min="100" max="250" placeholder="e.g., 175">
           </div>
-          <div>
+          <div class="field">
             <label for="weight">Actual Body Weight (kg)</label>
             <input id="weight" type="number" min="1" step="0.1" placeholder="e.g., 78.5">
           </div>
         </div>
 
         <div class="row" id="usInputs" style="display:none;">
-          <div>
+          <div class="field">
             <label>Height (ft / in)</label>
-            <div style="display:flex; gap:6px; align-items:center;">
-              <input id="height_ft" type="number" min="3" max="8" placeholder="e.g., 5" style="width:70px;">
-              <input id="height_in" type="number" min="0" max="11" placeholder="e.g., 10" style="width:70px;">
+            <div class="field-inline">
+              <input id="height_ft" type="number" min="3" max="8" placeholder="e.g., 5" style="max-width:90px;">
+              <input id="height_in" type="number" min="0" max="11" placeholder="e.g., 10" style="max-width:90px;">
             </div>
           </div>
-          <div>
+          <div class="field">
             <label for="weight_lb">Actual Body Weight (lb)</label>
             <input id="weight_lb" type="number" min="1" step="0.1" placeholder="e.g., 180">
           </div>
         </div>
 
+        <div class="section-label">Renal lab</div>
         <div class="row">
-          <div>
+          <div class="field">
             <label for="scr">Serum Creatinine (mg/dL)</label>
             <input id="scr" type="number" min="0.1" step="0.01" placeholder="e.g., 1.1">
           </div>
-          <div style="display:flex;align-items:end;gap:8px;">
-            <div>
-              <label>&nbsp;</label>
-              <input id="normalize" type="checkbox"> <span>Normalize to 1.73 m² (BSA)</span>
+          <div class="field" style="justify-content:flex-end;">
+            <label>&nbsp;</label>
+            <div class="field-inline" style="align-items:center;">
+              <input id="normalize" type="checkbox" style="width:auto;">
+              <span class="small">Normalize to 1.73 m² (BSA)</span>
               <button class="info-btn" aria-label="What is BSA normalization?" onclick="openModal('bsaModal')">i</button>
             </div>
           </div>
         </div>
 
-        <div class="row" style="margin-top:6px;">
-          <div>
+        <div class="section-label">Weight choice & rounding</div>
+        <div class="row">
+          <div class="field">
             <label>&nbsp;</label>
-            <input id="forceIbw" type="checkbox"> <span>Force use of IBW in equation</span>
+            <div class="field-inline" style="align-items:center;">
+              <input id="forceIbw" type="checkbox" style="width:auto;">
+              <span class="small">Force use of IBW in equation</span>
+            </div>
           </div>
         </div>
 
-        <div class="row" style="margin-top:10px;">
-          <div>
+        <div class="row" style="margin-top:6px;">
+          <div class="field">
             <label for="roundMode">Rounding mode</label>
             <select id="roundMode">
               <option value="end">Round only at final step</option>
               <option value="each">Round at each step</option>
             </select>
           </div>
-          <div>
+          <div class="field">
             <label for="roundPrecision">Precision (decimals)</label>
             <input id="roundPrecision" type="number" min="0" max="6" value="2">
           </div>
         </div>
 
-        <div class="actions" style="margin-top:12px;">
-          <button id="calcBtn">Calculate & Explain</button>
+        <div class="actions">
+          <button id="calcBtn">Calculate &amp; Explain</button>
           <button class="secondary" id="demoBtn" title="Load a realistic example">Load Example</button>
         </div>
       </div>
@@ -182,7 +335,7 @@
       <div class="card">
         <h2>Output</h2>
         <div id="output" class="result">
-          <p class="small">Fill inputs and click <strong>Calculate & Explain</strong>.</p>
+          <p class="small">Fill inputs and click <strong>Calculate &amp; Explain</strong>.</p>
         </div>
       </div>
     </div>
@@ -193,26 +346,26 @@
         <button class="info-btn" aria-label="Explain weight logic" onclick="openModal('weightModal')">i</button>
       </h2>
       <ol>
-        <li><strong>Compute IBW</strong> (needs height & sex):
+        <li><strong>Compute IBW</strong> (needs height &amp; sex):
           <div class="muted small">
             <div><strong>Male:</strong> <code>IBW = 50 + 2.3 × (height_in − 60)</code></div>
             <div><strong>Female:</strong> <code>IBW = 45.5 + 2.3 × (height_in − 60)</code></div>
-            <div>(height_in = height in inches = cm ÷ 2.54)</div>
+            <div>(height_in = height in inches = cm ÷ 2.54, or from direct ft/in entry)</div>
           </div>
         </li>
         <li><strong>Compare actual weight to IBW</strong>:
           <ul class="small">
-            <li>If <code>Actual &lt; IBW</code> → use <strong>Actual</strong> (underweight).</li>
-            <li>If <code>Actual</code> is within <strong>100–120% of IBW</strong> → use <strong>IBW</strong>.</li>
-            <li>If <code>Actual &gt; 120% of IBW</code> → compute and use <strong>Adjusted Body Weight</strong>: <code>AdjBW = IBW + 0.4 × (Actual − IBW)</code>.</li>
+            <li>If <code>Actual &lt; IBW</code> → use <strong>Actual</strong> (underweight, avoids underestimating muscle mass).</li>
+            <li>If <code>Actual</code> is within <strong>100–120% of IBW</strong> → use <strong>IBW</strong> (typical build).</li>
+            <li>If <code>Actual &gt; 120% of IBW</code> → compute and use <strong>Adjusted Body Weight</strong>: <code>AdjBW = IBW + 0.4 × (Actual − IBW)</code> (obesity, avoids overestimating).</li>
           </ul>
         </li>
-        <li><strong>That chosen weight</strong> is the one that drops into the Cockcroft–Gault numerator.</li>
+        <li><strong>That chosen weight</strong> is the one that drops into the Cockcroft–Gault numerator — unless you explicitly tick “Force use of IBW,” which overrides the automatic choice.</li>
       </ol>
       <details>
         <summary>Why these choices?</summary>
         <div class="small">
-          Creatinine comes from muscle. Using <em>actual</em> weight in obesity can overstate muscle mass and overestimate kidney function; using <em>IBW</em> in underweight persons can understate it. The IBW/AdjBW rules are a pragmatic way to keep the estimate realistic across body types.
+          Creatinine comes from muscle. Using <em>actual</em> weight in obesity can overstate muscle mass and overestimate kidney function; using <em>IBW</em> in underweight persons can understate it. The IBW/AdjBW rules are a pragmatic way to keep the estimate realistic across body types, with an optional manual override to IBW when teaching or following a protocol that mandates IBW.
         </div>
       </details>
     </div>
@@ -227,7 +380,7 @@
       </div>
       <ul class="small">
         <li><strong>Age</strong>: filtration declines with age → subtracting age lowers estimate appropriately.</li>
-        <li><strong>ChosenWeight</strong>: proxy for muscle mass — picked via the IBW/AdjBW rules above.</li>
+        <li><strong>ChosenWeight</strong>: proxy for muscle mass — picked via the IBW/AdjBW rules above, or forced to IBW if you choose.</li>
         <li><strong>SexFactor</strong>: 1.00 (male) or 0.85 (female) — accounts for average differences in muscle-derived creatinine.</li>
         <li><strong>72</strong>: a unit-scaling constant of the original equation so the output is in mL/min.</li>
         <li><strong>Serum creatinine</strong>: higher Scr means kidneys cleared less creatinine → estimate goes down.</li>
@@ -277,13 +430,13 @@
             <li><strong>Adjusted BW</strong> if Actual &gt; 120% of IBW: <code>AdjBW = IBW + 0.4 × (Actual − IBW)</code></li>
             <li><strong>Selection</strong>:
               <ul class="bullets">
-                <li>Actual &lt; IBW → use <em>Actual</em></li>
-                <li>100–120% of IBW → use <em>IBW</em></li>
-                <li>&gt;120% of IBW → use <em>Adjusted</em></li>
+                <li>Actual &lt; IBW → use <em>Actual</em> (underweight).</li>
+                <li>100–120% of IBW → use <em>IBW</em> (typical build).</li>
+                <li>&gt;120% of IBW → use <em>Adjusted</em> (obesity).</li>
               </ul>
             </li>
           </ul>
-          <p>This keeps CrCl realistic for underweight and overweight individuals.</p>
+          <p>You can optionally override these rules and force IBW directly into the numerator (e.g., for teaching scenarios or when following a protocol that mandates IBW).</p>
         </div>
       </div>
     </div>
@@ -297,7 +450,7 @@
           <p><code>CrCl = ((140 − Age) × Weight_used × SexFactor) / (72 × SerumCr)</code></p>
           <ul class="bullets">
             <li><strong>(140 − Age)</strong>: kidney function decreases with age → lowers estimate.</li>
-            <li><strong>Weight_used</strong>: proxy for muscle mass (selected via IBW/AdjBW rules).</li>
+            <li><strong>Weight_used</strong>: proxy for muscle mass (selected via IBW/AdjBW rules, or IBW if forced).</li>
             <li><strong>SexFactor</strong>: 1.00 (male) / 0.85 (female) for average differences in creatinine production.</li>
             <li><strong>72</strong>: unit-scaling constant in the original derivation (mL/min output).</li>
             <li><strong>SerumCr</strong>: higher value → lower clearance (more creatinine left in blood).</li>
@@ -353,7 +506,7 @@ function chooseWeight(actual, ibw){
   if (!Number.isFinite(actual) || !Number.isFinite(ibw)) return {weight: NaN, type: 'unknown', ratio: NaN};
   const ratio = actual / ibw;
   if (actual < ibw) return { weight: actual, type: 'Actual (under IBW)', ratio };
-  if (ratio < 1.2)  return { weight: ibw, type: 'IBW (within 100–120% of IBW)', ratio };
+  if (ratio <= 1.2)  return { weight: ibw, type: 'IBW (within 100–120% of IBW)', ratio };
   return { weight: adjBw(ibw, actual), type: 'Adjusted (Actual > 120% of IBW)', ratio };
 }
 
@@ -432,13 +585,17 @@ function explainAndRender(){
                  : (bandCls==='warn') ? '≈ mildly reduced (teaching band)'
                  : '≈ reduced (teaching band)';
 
+  const overrideNote = (forceIbw && autoPick.type !== pick.type)
+    ? ` Automatically, the IBW/AdjBW rules would have selected <strong>${autoPick.type}</strong> (${roundSmart(autoPick.weight)} kg) for the numerator, but you chose to override this and force IBW into the equation (often done for teaching or to follow a protocol that mandates IBW).`
+    : '';
+
   // Build explicit “what goes where and why” panel
   const lines = [
     `<div class="muted"><strong>Equation:</strong> <span class="mono">CrCl = ((140 − Age) × Weight_used × SexFactor) ÷ (72 × SerumCr)</span></div>`,
     `<div style="margin-top:10px;"><strong>We plug in:</strong></div>`,
     `<ul class="small">`+
       `<li><strong>(140 − Age)</strong> → (140 − <strong>${age}</strong>) = <strong>${140 - age}</strong> — Age reduces the estimate because filtration typically declines with age.</li>`+
-      `<li><strong>Weight_used</strong> → <strong>${roundSmart(pick.weight)} kg</strong> (${pick.type}). We choose this because Actual/IBW = <strong>${roundSmart(pick.ratio, 3)}</strong>. Using the selection rules avoids over/under-estimating muscle mass.</li>`+
+      `<li><strong>Weight_used</strong> → <strong>${roundSmart(pick.weight)} kg</strong> (${pick.type}). We choose this because Actual/IBW = <strong>${roundSmart(pick.ratio, 3)}</strong>. Using the selection rules avoids over/under-estimating muscle mass.${overrideNote}</li>`+
       `<li><strong>SexFactor</strong> → <strong>${sexFactor}</strong> (${sex==='female' ? 'females produce less creatinine on average' : 'baseline for males'}).</li>`+
       `<li><strong>72</strong> in the denominator is a unit-scaling constant of the original Cockcroft–Gault derivation so the result is in mL/min.</li>`+
       `<li><strong>SerumCr</strong> → <strong>${scr}</strong> mg/dL. Higher Scr means more creatinine remains in blood → lower clearance.</li>`+
@@ -446,6 +603,23 @@ function explainAndRender(){
     `<div class="muted small"><strong>Numerator</strong> = <code>(140 − ${age}) × ${roundSmart(pick.weight)} × ${sexFactor}</code> = <code>${roundSmart(140-age)} × ${roundSmart(pick.weight)} × ${sexFactor}</code> = <strong>${roundSmart((140-age)*pick.weight*sexFactor, 3)}</strong></div>`,
     `<div class="muted small"><strong>Denominator</strong> = <code>72 × ${scr}</code> = <strong>${roundSmart(72*scr, 3)}</strong></div>`
   ].join('');
+
+  const autoReason = (() => {
+    if (weight_kg < _ibw) {
+      return 'because the actual weight is below IBW (underweight pattern), the automatic rule would normally use actual body weight to avoid underestimating muscle mass and clearance.';
+    }
+    if (weight_kg / _ibw <= 1.2) {
+      return 'because the actual weight is within about 100–120% of IBW (a “typical build”), the automatic rule would normally use IBW as a reasonable proxy for muscle mass.';
+    }
+    return 'because the actual weight is more than 120% of IBW (obesity range), the automatic rule would normally use an adjusted body weight to avoid overestimating clearance.';
+  })();
+
+  const autoSelectionSentence =
+    (weight_kg < _ibw
+      ? 'Actual &lt; IBW → would use <strong>Actual</strong> (underweight: using IBW here might underestimate true clearance).'
+      : (weight_kg/_ibw <= 1.2
+          ? 'Actual within 100–120% of IBW → would use <strong>IBW</strong> (typical build: IBW approximates muscle mass).'
+          : 'Actual &gt; 120% of IBW → would use <strong>Adjusted</strong> (obesity: adjusted weight tempers the influence of fat mass).'));
 
   const weightExplain = [
     `<div class="muted small"><strong>Height</strong>: ${roundSmart(height_cm)} cm = ${roundSmart(height_in,1)} in</div>`,
@@ -455,17 +629,11 @@ function explainAndRender(){
         : `<code>50 + 2.3 × (${roundSmart(height_in,1)} − 60)</code>`) +
       ` = <strong>${roundSmart(_ibw)}</strong> kg</div>`,
     (autoPick.type.startsWith('Adjusted')
-      ? `<div class="muted small"><strong>AdjBW</strong> = <code>${roundSmart(_ibw)} + 0.4 × (${roundSmart(weight_kg)} − ${roundSmart(_ibw)})</code> = <strong>${roundSmart(autoPick.weight)}</strong> kg</div>`
+      ? `<div class="muted small"><strong>AdjBW</strong> (automatic logic) = <code>${roundSmart(_ibw)} + 0.4 × (${roundSmart(weight_kg)} − ${roundSmart(_ibw)})</code> = <strong>${roundSmart(autoPick.weight)}</strong> kg</div>`
       : ``),
-    `<div class="small">Selection rule used automatically: `+
-      (weight_kg < _ibw
-        ? `Actual &lt; IBW → would use <strong>Actual</strong>.`
-        : (weight_kg/_ibw < 1.2
-            ? `Actual within 100–120% of IBW → would use <strong>IBW</strong>.`
-            : `Actual &gt; 120% of IBW → would use <strong>Adjusted</strong>.`)) +
-      `</div>`,
+    `<div class="small">Automatic selection rule (if you had not forced IBW): ${autoSelectionSentence}</div>`,
     (forceIbw && Number.isFinite(_ibw)
-      ? `<div class="small">You checked <strong>Force use of IBW</strong>, so the equation uses IBW (<strong>${roundSmart(_ibw)} kg</strong>) even if the automatic rules would choose ${autoPick.type.toLowerCase()}.</div>`
+      ? `<div class="small">You checked <strong>Force use of IBW</strong>, so the Cockcroft–Gault numerator uses IBW (<strong>${roundSmart(_ibw)} kg</strong>) instead of the automatically chosen weight path (<strong>${autoPick.type}</strong>). This matters here ${autoReason}</div>`
       : ``)
   ].join('');
 
@@ -475,7 +643,7 @@ function explainAndRender(){
     <div>
       <p><strong>Creatinine Clearance (CrCl):</strong> <span class="mono" style="font-size:1.25rem;">${roundSmart(crcl)} mL/min</span> ${interpTag}</p>
       ${doNorm ? `<p><strong>CrCl normalized to 1.73 m²:</strong> <span class="mono">${roundSmart(crclNorm)} mL/min/1.73m²</span></p>` : ``}
-      <p class="small">BSA (Mosteller, uses actual height & weight): <span class="mono">${roundSmart(bsa)} m²</span></p>
+      <p class="small">BSA (Mosteller, uses actual height &amp; weight): <span class="mono">${roundSmart(bsa)} m²</span></p>
 
       <h3>Exactly what goes where — and why</h3>
       ${lines}
@@ -494,7 +662,7 @@ function explainAndRender(){
       </details>
 
       <details style="margin-top:8px;">
-        <summary>Notes & teaching caveats</summary>
+        <summary>Notes &amp; teaching caveats</summary>
         <ul class="small">
           <li>Cockcroft–Gault estimates <em>creatinine clearance</em> (mL/min). Many guidelines dose by CG CrCl, while kidney disease staging typically uses <em>eGFR</em> (CKD-EPI) normalized to 1.73 m².</li>
           <li>Scr is affected by muscle mass, diet, and lab method; equations are approximations.</li>
@@ -618,7 +786,7 @@ function runUnitTests(){
   if (roundModeEl) roundModeEl.value = prevMode;
 
   const resEl = document.getElementById('testResults');
-  const summary = `<p><strong>Summary:</strong> ${passed} passed, ${failed} failed (tolerance ±${tol} mL/min).</p>`;
+  const summary = `<p class="small"><strong>Summary:</strong> ${passed} passed, ${failed} failed (tolerance ±${tol} mL/min).</p>`;
   const table = `
     <div class="muted" style="overflow:auto;">
       <table>
