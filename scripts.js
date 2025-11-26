@@ -639,9 +639,14 @@ function setVariantDeckOptions(){
     }
     setSelectOptions('load-variant-select', optionsArray, null, false, true);
 
-    if(optionsArray.length == 0 ) {
-        doLog('No variants found?');
-        selectedVariantDeck = optionsArray[0].value;
+    if (optionsArray.length === 0) {
+        doLog("No variants found.");
+        selectedVariantDeck = "";
+    } else {
+        const hasExistingSelection = optionsArray.some((option) => option.value === selectedVariantDeck);
+        if (!hasExistingSelection) {
+            selectedVariantDeck = optionsArray[0].value;
+        }
     }
     
 }
@@ -704,7 +709,29 @@ async function handleUploadFile(){
 function loadVariantDeck(){
     doLog('Loading custom variant deck: ' + selectedVariantDeck);
 
-    let variantConfig = config.variants[selectedVariantDeck];
+    if(!config || !config.variants){
+        handleError(new Error('No variant configurations are available for this deck.'));
+        return;
+    }
+
+    let variantConfig = null;
+    if(Array.isArray(config.variants)){
+        variantConfig = config.variants.find((variant) => {
+            return variant?.name === selectedVariantDeck || variant?.id === selectedVariantDeck || variant?.key === selectedVariantDeck;
+        });
+    }else if(typeof config.variants === 'object'){
+        variantConfig = config.variants[selectedVariantDeck];
+        if(!variantConfig){
+            variantConfig = Object.values(config.variants).find((variant) => {
+                return variant?.name === selectedVariantDeck || variant?.id === selectedVariantDeck || variant?.key === selectedVariantDeck;
+            });
+        }
+    }
+
+    if(!variantConfig){
+        handleError(new Error(`Unable to find variant config for "${selectedVariantDeck}".`));
+        return;
+    }
 
     doLog(variantConfig);
 
@@ -774,6 +801,9 @@ async function loadDeck(deckData){
         
         setPromptKey(config.defaultPrompt);
         
+        console.log('Prompt keys are');
+        console.log(config.promptKeys);
+
         setSelectOptions('prompt-key', config.promptKeys, promptKey, true, true);
         //setSelectOptions('answerKey', config.answerKeys, answerKey, true);
         //loadCard(0);
@@ -806,164 +836,260 @@ function handleShowHighScores(){
     highScoresModal.showModal();
 }
 
-function generateDeckFromData(shuffleConfig=new ShuffleDeckConfig()){
-    doLog('Generating Custom Deck From Config');
-    doLog(shuffleConfig);
+function generateDeckFromData(shuffleConfig = new ShuffleDeckConfig()) {
+	doLog("Generating Custom Deck From Config");
+	doLog(shuffleConfig);
 
-    try{
+	try {
+		let newCards = [];
+		let newConfig = config;
 
-        let newCards = [];
-        let newConfig = config;
+		// Helper: build a random multiple-choice question for a single card
+		function buildRandomChoiceFromCard(coreCard, sourceCards, opts, deckCfg) {
+			const labelProp = opts.answerLabelProperty;
+			const valueProp = opts.answerValueProperty;
+			const maxAns = Number.isFinite(opts.maxAnswerOptions) && opts.maxAnswerOptions > 1 ? opts.maxAnswerOptions : 4;
 
-        //if we are building a custom deck by grouping cards by a property and generating multiple choice questions then start here
-        if(shuffleConfig.options.shuffleType == 'group-by'){
+			const label = coreCard[labelProp];
+			const value = coreCard[valueProp];
 
-            let answerLabelProperty = shuffleConfig.options.answerLabelProperty;
-            let answerValueProperty = shuffleConfig.options.answerValueProperty;
-            doLog('Shuffling Deck. Grouping by: ' + shuffleConfig.options.groupBy);
+			// If we can't get a usable label/value, skip this card
+			if (label == null || value == null) return null;
 
-            let groups = {};
-            //group our cards by the desired key
-            for(let thisCard of shuffleConfig.sourceDeckConfig.cards){
-                let thisGroupCards = groups.hasOwnProperty(thisCard[shuffleConfig.options.groupBy]) ? groups[thisCard[shuffleConfig.options.groupBy]] : [];
-                
-                if(thisCard[shuffleConfig.options.groupBy] === undefined){
-                    if(mascot) mascot.say('There is some bad data in the card set. This drug has an undefined group!','confused');
-                }
+			const allOptions = [];
+			const usedValues = new Set();
 
-                thisGroupCards.push(thisCard);
-                groups[thisCard[shuffleConfig.options.groupBy]] = thisGroupCards;
+			// Correct option first
+			allOptions.push({ label, value });
+			usedValues.add(String(value));
 
-            }
+			// Build pool of possible distractors (all other cards)
+			const pool = sourceCards.filter((c) => c !== coreCard);
 
-            //if building a multiple choice deck...
-            if(shuffleConfig.options.deckType === 'multiple-choice'){
-                                
-                for(let groupName in groups){
-                    let thisGroupCorrectAnswers = [];
-                    //first generate list of correct options
-                    for(let thisAnswer in groups[groupName]){
+			// Shuffle pool (Fisher-Yates)
+			for (let i = pool.length - 1; i > 0; i--) {
+				const j = Math.floor(Math.random() * (i + 1));
+				[pool[i], pool[j]] = [pool[j], pool[i]];
+			}
 
-                        if (thisGroupCorrectAnswers.some(e => e.value === groups[groupName][thisAnswer][answerValueProperty])) continue; //dont include duplicates
-                        let thisOption = {
-                            value: groups[groupName][thisAnswer][answerValueProperty],
-                            label: groups[groupName][thisAnswer][answerLabelProperty]
-                        }
-                        thisGroupCorrectAnswers.push(thisOption);
-                    }
+			// Add wrong answers until we hit maxAns or run out of candidates
+			for (let i = 0; i < pool.length && allOptions.length < maxAns; i++) {
+				const candidate = pool[i];
+				const cVal = candidate[valueProp];
+				const cLabel = candidate[labelProp];
+				if (cVal == null || cLabel == null) continue;
+				if (usedValues.has(String(cVal))) continue;
 
+				allOptions.push({ label: cLabel, value: cVal });
+				usedValues.add(String(cVal));
+			}
 
-                    //construct our answer array
-                    let allOptionsArray = [];
-                    let correctAnswerIndexes = [];
-                    let allValidAnswers = JSON.parse(JSON.stringify(thisGroupCorrectAnswers));
+			// If we don't have at least 2 options, skip (not a useful question)
+			if (allOptions.length < 2) return null;
 
-                    while(true) {
-                        //decide if we get a correct anwer by 'flipping a coin' and by ensuring there is a correct answer left to get from the source array.
-                        let getCorrectAnswer = randomIntFromInterval(0,1) == 1 && thisGroupCorrectAnswers.length > 0 ? true : false;
-                 
-                        if(getCorrectAnswer){
-                            //get the index of a random card in the correct answers stack
-                            let index = randomIntFromInterval(0,thisGroupCorrectAnswers.length-1);
+			// Shuffle final options so correct is not always first
+			for (let i = allOptions.length - 1; i > 0; i--) {
+				const j = Math.floor(Math.random() * (i + 1));
+				[allOptions[i], allOptions[j]] = [allOptions[j], allOptions[i]];
+			}
 
-                            //read that option from the source array and put it into our selectable options array
-                            let randomCorrectAnswer = thisGroupCorrectAnswers[index];
+			// Find index of the correct answer after shuffle
+			const correctIndex = allOptions.findIndex((o) => String(o.value) === String(value));
+			if (correctIndex === -1) return null;
 
-                            allOptionsArray.push(randomCorrectAnswer);
+			const correctAnswerValues = [correctIndex];
 
-                            if(randomCorrectAnswer.label == undefined || randomCorrectAnswer.value == undefined) debugger;
+			const originalCfg = deckCfg || {};
+			const origPromptKey = originalCfg.defaultPrompt || opts.answerLabelProperty;
+			const promptVal = coreCard[origPromptKey] || coreCard[labelProp] || "this item";
 
-                            //record the index position of this correct answer
-                            correctAnswerIndexes.push(allOptionsArray.length-1);
+			const questionText = `Which of the following is ${promptVal}?`;
 
-                            //remove this element from the source array so it cannot be added again.
-                            thisGroupCorrectAnswers.splice(index,1)
-                        }else{
-                            //get a random different answer from a different group. Use random selection in while loop to prevent selecting this group
-                            let wrongAnswerGroup = '';
-                            while(true){
-                                let keys = Object.keys(groups);
-                                let wrongAnswerGroupName = keys[ keys.length * Math.random() << 0];
+			return new Card({
+				type: "choice",
+				questionText,
+				points: 1,
+				hint: "Select the single best answer.",
+				options: allOptions,
+				correctAnswerValues,
+				allValidAnswers: [{ label, value }],
+			});
+		}
 
-                                wrongAnswerGroup = groups[wrongAnswerGroupName];
-                                if(wrongAnswerGroupName != groupName) break;
-                            }
-    
-                            //get the index of a random card in the correct answers stack
-                            let index = randomIntFromInterval(0,wrongAnswerGroup.length-1);
+		// Only currently implemented path: group-by + multiple-choice
+		if (shuffleConfig.options.shuffleType === "group-by") {
+			const answerLabelProperty = shuffleConfig.options.answerLabelProperty;
+			const answerValueProperty = shuffleConfig.options.answerValueProperty;
 
-                            //read that option from the source array and put it into our selectable options array
-                            let randomWrongAnswer = wrongAnswerGroup[index];
+			doLog("Shuffling Deck. Grouping by: " + shuffleConfig.options.groupBy);
 
-                            //allOptionsArray.push(randomWrongAnswer);
+			const groups = {};
+			const ungroupedCards = [];
 
-                            allOptionsArray.push({
-                                label: randomWrongAnswer[answerLabelProperty],
-                                value: randomWrongAnswer[answerValueProperty]
-                            });
-                            
-                        }
+			// Group cards by the desired key, or mark them as ungrouped
+			for (let thisCard of shuffleConfig.sourceDeckConfig.cards) {
+				const groupKey = thisCard[shuffleConfig.options.groupBy];
 
+				if (groupKey === undefined || groupKey === null || groupKey === "") {
+					// NEW: no groupBy property on this card → handle later via random MCQ
+					ungroupedCards.push(thisCard);
+					continue;
+				}
 
-                        //check all conditions to see if we should stop adding answers
-                        if( allOptionsArray.length >= shuffleConfig.options.maxAnswerOptions){
-                            break;
-                        }
-                    }
+				if (!groups[groupKey]) groups[groupKey] = [];
+				groups[groupKey].push(thisCard);
+			}
 
-                    let newCard = new Card({
-                        type: 'choice',
-                        questionText: `Which of the following are ${groupName}`, //(${correctAnswerIndexes.join(',')})`,
-                        points: 1,
-                        hint: 'There are ' + correctAnswerIndexes.length + ' correct answers',
-                        options: allOptionsArray,
-                        correctAnswerValues: correctAnswerIndexes,
-                        allValidAnswers: allValidAnswers
-                    });
+			const groupKeys = Object.keys(groups);
 
-                    newCards.push(newCard);
-                }
+			// ----- MULTIPLE CHOICE DECK (group-based) -----
+			if (shuffleConfig.options.deckType === "multiple-choice" && groupKeys.length > 0) {
+				for (let groupName of groupKeys) {
+					const groupCards = groups[groupName];
+					let thisGroupCorrectAnswers = [];
 
-            }
+					// first generate list of correct options
+					for (let i = 0; i < groupCards.length; i++) {
+						const card = groupCards[i];
+						const value = card[answerValueProperty];
+						const label = card[answerLabelProperty];
 
-            doLog('Grouped cards is now');
-            doLog(groups);
+						if (value == null || label == null) continue;
 
-            doLog('Generated New Card Deck');
-            doLog(newCards);
+						if (thisGroupCorrectAnswers.some((e) => e.value === value)) continue;
 
-            newConfig = {  
-                    "promptKeys": [
-                    {
-                        "value": "questionText",
-                        "label": "Question"
-                    }],
-                    "answerKeys": [
-                    {
-                        "value": "questionText",
-                        "label": "Question"
-                    }],
-                    "defaultPrompt": "questionText",
-                    "clueTextKey": "hint",
-                    "labels": {
-                        "questionText": "Answer me this!",
-                        "clueButtonName": "Seriously. A hint?"
-                    }
-            };
+						thisGroupCorrectAnswers.push({ value, label });
+					}
 
-            newConfig.name = 'Custom Deck Build';
-            newConfig.isVariant = true;
-        
-            let cards = assignCardIds(newCards.cards);
-            doLog(JSON.stringify(cards));
-            loadDeck({
-                config: newConfig,
-                cards: newCards
-            });
-        }
-    }catch(ex){
-        handleError(ex);
-    }
+					// If somehow no valid correct answers, skip this group
+					if (thisGroupCorrectAnswers.length === 0) continue;
+
+					let allOptionsArray = [];
+					let correctAnswerIndexes = [];
+					const allValidAnswers = JSON.parse(JSON.stringify(thisGroupCorrectAnswers));
+
+					let maxAns = shuffleConfig.options.maxAnswerOptions;
+					if (!Number.isFinite(maxAns) || maxAns <= 0) {
+						maxAns = Math.min(4, allValidAnswers.length);
+					}
+
+					// Pre-build a list of other groups for wrong answers
+					const otherGroupNames = groupKeys.filter((k) => k !== groupName);
+
+					// Build the answer list without infinite loops
+					while (allOptionsArray.length < maxAns) {
+						// Decide if we pull from correct answers
+						let getCorrectAnswer = randomIntFromInterval(0, 1) === 1 && thisGroupCorrectAnswers.length > 0;
+
+						// If there's only one group, we can't pull from other groups
+						if (otherGroupNames.length === 0) {
+							getCorrectAnswer = true;
+						}
+
+						if (getCorrectAnswer) {
+							const index = randomIntFromInterval(0, thisGroupCorrectAnswers.length - 1);
+							const randomCorrectAnswer = thisGroupCorrectAnswers[index];
+
+							allOptionsArray.push(randomCorrectAnswer);
+							correctAnswerIndexes.push(allOptionsArray.length - 1);
+
+							// Remove so we don’t duplicate
+							thisGroupCorrectAnswers.splice(index, 1);
+						} else {
+							// Pick a wrong answer from ANY other group, without endless looping
+							const wrongGroupName = otherGroupNames[randomIntFromInterval(0, otherGroupNames.length - 1)];
+							const wrongGroup = groups[wrongGroupName];
+
+							if (!Array.isArray(wrongGroup) || wrongGroup.length === 0) {
+								// No usable wrong group → fallback
+								continue;
+							}
+
+							const index = randomIntFromInterval(0, wrongGroup.length - 1);
+							const randomWrongAnswer = wrongGroup[index];
+
+							const wLabel = randomWrongAnswer[answerLabelProperty];
+							const wValue = randomWrongAnswer[answerValueProperty];
+
+							if (wLabel == null || wValue == null) continue;
+
+							allOptionsArray.push({
+								label: wLabel,
+								value: wValue,
+							});
+						}
+
+						if (allOptionsArray.length >= maxAns || (thisGroupCorrectAnswers.length === 0 && otherGroupNames.length === 0)) {
+							break;
+						}
+					}
+
+					const newCard = new Card({
+						type: "choice",
+						questionText: `Which of the following are ${groupName}`,
+						points: 1,
+						hint: "There are " + correctAnswerIndexes.length + " correct answers",
+						options: allOptionsArray,
+						correctAnswerValues: correctAnswerIndexes,
+						allValidAnswers: allValidAnswers,
+					});
+
+					newCards.push(newCard);
+				}
+			}
+
+			// ----- FALLBACK: ungrouped cards → random MCQ per card -----
+			if (ungroupedCards.length > 0) {
+				doLog(`Building random multiple-choice questions for ${ungroupedCards.length} ungrouped cards`);
+				const srcCards = shuffleConfig.sourceDeckConfig.cards;
+				const deckCfg = shuffleConfig.sourceDeckConfig.config || {};
+
+				for (const coreCard of ungroupedCards) {
+					const mcCard = buildRandomChoiceFromCard(coreCard, srcCards, shuffleConfig.options, deckCfg);
+					if (mcCard) newCards.push(mcCard);
+				}
+			}
+
+			doLog("Generated New Card Deck");
+			doLog(newCards);
+
+			// Build new config for the generated deck
+			newConfig = {
+				promptKeys: [
+					{
+						value: "questionText",
+						label: "Question",
+					},
+				],
+				answerKeys: [
+					{
+						value: "questionText",
+						label: "Question",
+					},
+				],
+				defaultPrompt: "questionText",
+				clueTextKey: "hint",
+				labels: {
+					questionText: "Answer me this!",
+					clueButtonName: "Seriously. A hint?",
+				},
+			};
+
+			newConfig.name = "Custom Deck Build";
+			newConfig.isVariant = true;
+
+			// ✅ FIX: assign ids to the newCards ARRAY, not newCards.cards
+			const cardsWithIds = assignCardIds(newCards);
+			doLog(JSON.stringify(cardsWithIds));
+
+			loadDeck({
+				config: newConfig,
+				cards: cardsWithIds,
+			});
+		}
+	} catch (ex) {
+		handleError(ex);
+	}
 }
 
 /**
@@ -1181,33 +1307,43 @@ function generateAnswerText(card){
     return answerString;
 }
 
-function recordQuestionResponse(card,givenAnswers,correctAnswers,awardedPoints){
-    if(!isArray(givenAnswers)) givenAnswers = [givenAnswers];
-    if(!isArray(correctAnswers)) correctAnswers = [correctAnswers];
+function recordQuestionResponse(card, givenAnswers, correctAnswers, awardedPoints) {
+	if (!isArray(givenAnswers)) givenAnswers = [givenAnswers];
+	if (!isArray(correctAnswers)) correctAnswers = [correctAnswers];
 
-    const thisAnswer = new Answer({
-        "card": card,
-        "givenAnswers": givenAnswers,
-        "correctAnswers": correctAnswers,
-        "awardedPoints": awardedPoints,
-        "possiblePoints" : card.points ? card.points : 1,
-        "correct": JSON.stringify(givenAnswers.sort()) === JSON.stringify(correctAnswers.sort()) ? true : false,
-        "question": card
-    });
+	const thisAnswer = new Answer({
+		card: card,
+		givenAnswers: givenAnswers,
+		correctAnswers: correctAnswers,
+		awardedPoints: awardedPoints,
+		possiblePoints: card.points ? card.points : 1,
+		correct: JSON.stringify(givenAnswers.sort()) === JSON.stringify(correctAnswers.sort()) ? true : false,
+		question: card,
+	});
 
-    performance.recordAnswer(thisAnswer);
+	performance.recordAnswer(thisAnswer);
 
-    if(thisAnswer.correct) {
-        correctAnswerAlert()
-    }
-    else {
-        incorrectAnswerAlert();
+	if (thisAnswer.correct) {
+		// ✅ Correct
+		correctAnswerAlert();
 
-        if(performance.missStreak >= mascotLeaveLimit){
-            if (mascot) mascot.rageQuit("sad_leave");
-        }
-    }
-    if(autoLoadNextCardOnAnswer) loadNext();
+		// ✅ Auto-progress only on correct answers
+		const shouldAutoProgress = autoLoadNextCardOnAnswer || (options && options.deckControls && options.deckControls.autoProgress);
+
+		if (shouldAutoProgress) {
+			loadNext();
+		}
+	} else {
+		// ❌ Incorrect
+		incorrectAnswerAlert();
+
+		if (performance.missStreak >= mascotLeaveLimit) {
+			if (mascot) mascot.rageQuit("sad_leave");
+		}
+	}
+
+	updateUIWithPerformanceData(performance);
+	setHistoryItemStyles();
 }
 
 function updateUIWithPerformanceData(performanceData){
@@ -1841,72 +1977,98 @@ function showPerformanceData(){
     console.log('Existing Performance Info');
 
 }
-function generateSelectListFromOptions(optionsArray,correctValues){
+function generateSelectListFromOptions(optionsArray, correctValues) {
+	if (!isArray(correctValues)) correctValues = [correctValues];
 
-    if(!isArray(correctValues)) correctValues = [correctValues];
+	const container = document.createElement("div");
+	container.className = "question-container";
 
-    const container = document.createElement('div');
-    container.className = 'question-container';
+	const form = document.createElement("form");
+	form.setAttribute("data-correct-value", correctValues);
+	for (let option of optionsArray) {
+		form.appendChild(createAnswerOptionInput(option, correctValues, true));
+	}
 
-    const form = document.createElement('form');
-    form.setAttribute('data-correct-value',correctValues);
-    for(let option of optionsArray){
-        form.appendChild(createAnswerOptionInput(option,correctValues,true));
-    }
-    
-    const answerBtn = document.createElement('input');
-    answerBtn.type = 'button';
-    answerBtn.className = 'answer-button';
-    answerBtn.value = `Submit Answer ${currentCard.points ? currentCard.points : 1} ${currentCard.points && currentCard.points > 1 ? 'Points' : 'Point'}`;
-    answerBtn.id = `answer-btn`;
-    answerBtn.name = `answer-btn`;
-    answerBtn.className = 'button';
-    //answerBtn.setAttribute('data-correct-value',correctValues);
-    answerBtn.onclick = function(event){
-    
-        console.log('Correct values are');
-        console.log(correctValues);
+	const answerBtn = document.createElement("input");
+	answerBtn.type = "button";
+	answerBtn.className = "answer-button";
+	answerBtn.value = `Submit Answer ${currentCard.points ? currentCard.points : 1} ${currentCard.points && currentCard.points > 1 ? "Points" : "Point"}`;
+	answerBtn.id = `answer-btn`;
+	answerBtn.name = `answer-btn`;
+	answerBtn.className = "button";
+	//answerBtn.setAttribute('data-correct-value',correctValues);
+    answerBtn.onclick = function(event) {
+		console.log("Correct values are");
+		console.log(correctValues);
 
-        let options = ui.getElements('.question-option');
-        let selectedOptionIndexes = [];
-        let selectedOptionValues = [];
+		let options = ui.getElements(".question-option");
+		let selectedOptionIndexes = [];
+		let selectedOptionValues = [];
 
+		for (let i = 0; i < options.length; i++) {
+			if (options[i].checked) {
+				selectedOptionIndexes.push(i);
+				selectedOptionValues.push(options[i].value);
+			}
+		}
 
-        for(let i = 0; i < options.length; i++){
-            if(options[i].checked){
-                selectedOptionIndexes.push(i); //the values in the array this will compare to are strings, so convert this to a string as well
-                selectedOptionValues.push(options[i].value);
-            }
-        }
+		// Normalize arrays for comparison
+		correctValues = correctValues.slice().sort(); // don't mutate original if you care
+		const sortedSelected = selectedOptionIndexes.slice().sort();
 
-        correctValues = correctValues.sort();
-        console.log(JSON.stringify(selectedOptionIndexes.sort()) + ' VS ' + JSON.stringify(correctValues));
-        const isCorrect = JSON.stringify(selectedOptionIndexes.sort()) == JSON.stringify(correctValues) ? true : false;
+		console.log(JSON.stringify(sortedSelected) + " VS " + JSON.stringify(correctValues));
+		const isCorrect = JSON.stringify(sortedSelected) === JSON.stringify(correctValues);
 
-        console.log('Is correct?: ' + isCorrect)
+		console.log("Is correct?: " + isCorrect);
 
-        let pointsMod = currentCard.points ? currentCard.points : 1;
+		let pointsMod = currentCard.points ? currentCard.points : 1;
+		if (!isCorrect) {
+			doLog("User got question wrong!");
+			pointsMod = 0;
+		} else {
+			doLog("User got question correct!");
+		}
 
-        if(isCorrect){
-            doLog('User got question correct!');
-        }else{
-            doLog('User got question wrong!');
-            pointsMod = 0;
-        }
+		// Record result (this will trigger auto-progress if correct & autoProgress is on)
+		recordQuestionResponse(currentCard, selectedOptionIndexes, correctValues, pointsMod);
 
-        recordQuestionResponse(currentCard,selectedOptionIndexes,correctValues,pointsMod);
+		// 🔄 Refresh score UI / history markers (safe to keep)
+		updateUIWithPerformanceData(performance);
+		setHistoryItemStyles();
 
-        updateUIWithPerformanceData(performance);
+		// 🧹 Reset any old highlight classes on labels
+		for (let i = 0; i < options.length; i++) {
+			const labelEl = options[i].nextSibling;
+			if (!labelEl) continue;
+			ui.removeClass([labelEl], "incorrect-answer");
+			ui.removeClass([labelEl], "correct-answer");
+		}
 
-        setHistoryItemStyles();
-    }
+		// 🎨 Highlight results
+		for (let i = 0; i < options.length; i++) {
+			const labelEl = options[i].nextSibling;
+			if (!labelEl) continue;
 
-    form.appendChild(answerBtn);
-    container.appendChild(form);
+			const isIndexCorrect = correctValues.indexOf(i) > -1 || correctValues.indexOf(String(i)) > -1;
 
-    doLog('Returning Container');
-    doLog(container);
-    return container;
+			// Mark all correct answers in green (or whatever your .correct-answer style is)
+			if (isIndexCorrect) {
+				ui.addClass([labelEl], "correct-answer");
+			}
+
+			// If user got it wrong, highlight their wrong picks in red
+			if (!isCorrect && options[i].checked && !isIndexCorrect) {
+				ui.addClass([labelEl], "incorrect-answer");
+			}
+		}
+	};
+
+	form.appendChild(answerBtn);
+	container.appendChild(form);
+
+	doLog("Returning Container");
+	doLog(container);
+	return container;
 }
 
 function createAnswerOptionInput(optionData,correctValues,forceCheckboxList){
@@ -2084,30 +2246,6 @@ function setPreventDupes(){
 }
 
 
-function setUi(enableUi){
-
-
-    doLog('toggling ui');
-    if(enableUi){
-        doLog('enabling UI');
-        //document.getElementById('deck-controls').style.visibility='visible';
-        //document.getElementById('controls').style.visibility='visible';
-        ui.showElements(['deck-controls','controls','deck-variants'])
-        ui.getElements("prompt-key")[0].removeAttribute("disabled");
-        ui.getElements("load-variant-select")[0].removeAttribute("disabled");
-        ui.getElements("load-variable-deck-button")[0].removeAttribute("disabled");
-
-    }else{
-        doLog('Hiding ui')
-        //document.getElementById('deck-controls').style.visibility='hidden';
-        //document.getElementById('controls').style.visibility='hidden';
-        ui.hideElements(['deck-controls','controls','deck-variants'])
-        ui.getElements("prompt-key")[0].setAttribute("disabled", true);
-		ui.getElements("load-variant-select")[0].setAttribute("disabled", true);
-		ui.getElements("load-variable-deck-button")[0].setAttribute("disabled", true);
-    }   
-}
-
 function randomIntFromInterval(min, max) { // min and max included 
     return Math.floor(Math.random() * (max - min + 1) + min)
 }
@@ -2142,7 +2280,7 @@ function launchTypingGame() {
  * Ensures consistent enable/disable of buttons based on where we are in the deck.
  */
 function updateUiForState(state) {
-	const coreControls = ["prev-button", "next-button", "flip-button", "clue-button", "next-letter-button", "next-answer-button", "mnemonic-button", "type-attack-button"];
+	const coreControls = ["prev-button", "next-button", "flip-button", "clue-button", "next-letter-button", "next-answer-button", "mnemonic-button", "type-attack-button", "prompt-key", "load-variant-select", "load-variable-deck-button"];
 	const scoreControls = ["high-scores-button"];
 
 	const enable = (ids) => ui.enable(ids);

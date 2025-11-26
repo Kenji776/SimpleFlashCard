@@ -390,8 +390,14 @@ input[type=button]:disabled,button[disabled],button:disabled{
      background-color: #04AA6D!important;
      color: #ffffff!important;
 }
-.history-item.correct-answer{
-     color:#04AA6D;
+.correct-answer {
+    color: #0a0;
+    font-weight: bold;
+}
+
+.incorrect-answer {
+    color: #c00;
+    font-weight: bold;
 }
 .history-item.incorrect-answer{
      color:red;
@@ -945,6 +951,9 @@ input[type="checkbox"]:checked::before {
 .tg-hidden { filter: blur(6px); }
 .disabled { opacity: 0.6; pointer-events: none; }
 
+button{
+     cursor: hand;
+}
 /* --- New Game Button --- */
 #new-game-button {
     font-family: 'Rocher', sans-serif;

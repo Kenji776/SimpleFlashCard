@@ -1,25 +1,54 @@
 class ShuffleDeckConfig {
-    constructor(sourceDeckConfig, options={}) {
+    constructor(sourceDeckConfig = { config: {}, cards: [] }, options = {}) {
         this.sourceDeckConfig = sourceDeckConfig;
-        this.shuffleType;
-        this.groupBy;
 
-        //default options
-        //TODO: Set better defaults
-        this.options = {
-            shuffleType: 'group-by',
-            groupBy: 'drugClassName',
-            deckType: 'multiple-choice',
+        // default options for building a variant deck
+        const defaultOptions = {
+            shuffleType: "group-by",
+            groupBy: "drugClassName",
+            deckType: "multiple-choice",
             minRightAnswers: 1,
             minWrongAnswers: 1,
             maxAnswerOptions: 5,
-            answerLabelProperty: 'genericName',
-            answerValueProperty: 'genericName'
-        }
+            answerLabelProperty: "genericName",
+            answerValueProperty: "genericName",
+        };
 
-        for(let propName in options){
-            if(options[propName] && options[propName] != undefined ) this[propName] = options[propName];
-        }
+        // allow users to set metadata (like name/id) directly on this config
+        const metaOnlyOptions = { ...options };
+        delete metaOnlyOptions.options;
+        Object.entries(metaOnlyOptions).forEach(([propName, value]) => {
+            if (value === undefined || value === null) return;
+            this[propName] = value;
+        });
+
+        const nestedOptions =
+            options && typeof options.options === "object" ? options.options : {};
+
+        // merge defaults with a combination of nested options and any direct overrides
+        const directOverrides = {};
+        Object.keys(defaultOptions).forEach((key) => {
+            if (
+                Object.prototype.hasOwnProperty.call(options, key) &&
+                options[key] !== undefined &&
+                options[key] !== null
+            ) {
+                directOverrides[key] = options[key];
+            }
+        });
+
+        this.options = {
+            ...defaultOptions,
+            ...nestedOptions,
+            ...directOverrides,
+        };
+
+        // ensure we never end up with an undefined/invalid maxAnswerOptions
+        const normalizedMaxAnswers = parseInt(this.options.maxAnswerOptions, 10);
+        this.options.maxAnswerOptions =
+            Number.isFinite(normalizedMaxAnswers) && normalizedMaxAnswers > 0
+                ? normalizedMaxAnswers
+                : defaultOptions.maxAnswerOptions;
     }
 }
 
